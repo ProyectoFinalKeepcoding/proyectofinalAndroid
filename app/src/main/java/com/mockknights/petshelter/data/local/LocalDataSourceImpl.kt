@@ -1,4 +1,4 @@
 package com.mockknights.petshelter.data.local
 
-class LocalDataSourceImpl {
+class LocalDataSourceImpl: LocalDataSource {
 }

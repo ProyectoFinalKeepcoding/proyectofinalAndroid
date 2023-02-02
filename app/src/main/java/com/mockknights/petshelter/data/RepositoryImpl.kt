@@ -1,4 +1,6 @@
 package com.mockknights.petshelter.data
 
-class RepositoryImpl {
+import com.mockknights.petshelter.domain.Repository
+
+class RepositoryImpl: Repository {
 }
