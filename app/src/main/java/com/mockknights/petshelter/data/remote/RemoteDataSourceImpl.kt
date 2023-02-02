@@ -1,4 +1,14 @@
 package com.mockknights.petshelter.data.remote
 
-class RemoteDataSourceImpl: RemoteDataSource {
+import com.mockknights.petshelter.data.remote.response.PetShelterRemote
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
+
+class RemoteDataSourceImpl @Inject constructor(private val api: PetShelterAPI): RemoteDataSource {
+
+    override suspend fun getAllPetShelter(): Flow<List<PetShelterRemote>> {
+        val result = api.getAllPetShelter()
+        return flow { emit(result) }
+    }
 }
