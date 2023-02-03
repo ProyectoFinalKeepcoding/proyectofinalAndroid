@@ -1,10 +1,8 @@
 package com.mockknights.petshelter.ui.login
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,10 +14,14 @@ import com.mockknights.petshelter.ui.components.createButton
 
 @Preview(showSystemUi = true)
 @Composable
-fun LoginScreen (viewModel: LoginViewModel = hiltViewModel()) {
+fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),navigateToPetShelter: () -> (Unit) = {}) {
 
-    val success = viewModel.stateLogin
+    val success = viewModel.stateLogin.observeAsState()
     LaunchedEffect(key1 = success.value) {
+        //TODO: Tema de LIVE DATA CON FLOW
+        if(false) {
+            navigateToPetShelter()
+        }
     }
     
     Column(
@@ -36,12 +38,8 @@ fun LoginScreen (viewModel: LoginViewModel = hiltViewModel()) {
 fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel) {
     Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 
-        var password = ""
-        var user = ""
-
-        //        var password by remember {
-        //            mutableStateOf("")
-        //        }
+        var user by remember { mutableStateOf("") }
+        var password by remember { mutableStateOf("") }
 
         FormField(
             value = user,
@@ -56,7 +54,9 @@ fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel) {
         }
         createButton(name = "LOGIN", color = Color.Black) {
             viewModel.getToken(user, password)
-            //viewModel.login(email, password)
         }
     }
 }
+
+
+

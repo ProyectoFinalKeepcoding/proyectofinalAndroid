@@ -11,10 +11,15 @@ import com.mockknights.petshelter.ui.welcome.WelcomeScreen
 @Composable
 fun AppNavigation () {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Screens.Map.route) {
+    NavHost(navController = navController, startDestination = Screens.Welcome.route) {
 
         composable(Screens.Welcome.route) {
-            WelcomeScreen()
+            WelcomeScreen( navigateToLogin = {
+                navController.navigate(Screens.Login.route)
+            }, navigateToMap = {
+                navController.navigate((Screens.Map.route))
+            })
+
         }
 
         composable(Screens.Login.route) {
