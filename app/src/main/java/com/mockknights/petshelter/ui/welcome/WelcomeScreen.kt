@@ -5,4 +5,6 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Preview(showSystemUi = true)
 @Composable
-fun WelcomeScreen () { }
+fun WelcomeScreen () {
+
+}

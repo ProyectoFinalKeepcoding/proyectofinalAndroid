@@ -1,21 +1,18 @@
 package com.mockknights.petshelter.ui.login
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mockknights.petshelter.ui.components.FormField
+import com.mockknights.petshelter.ui.components.createButton
 
 @Preview(showSystemUi = true)
 @Composable
@@ -25,35 +22,41 @@ fun LoginScreen (viewModel: LoginViewModel = hiltViewModel()) {
     LaunchedEffect(key1 = success.value) {
     }
     
-    Row(
+    Column(
         modifier = Modifier.fillMaxSize(), 
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically) {
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
 
-            createButton(name = "USER", color = Color.Green){
-
-            }
-            createButton(name = "PET SHELTER", color = Color.Red) {
-
-            }
-
-        }
+            LoginForm(viewModel = viewModel)
     }
-
+}
 
 @Composable
-fun createButton(name: String, color: Color, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(backgroundColor = color)
-    ) {
-        Text(
-            text = name,
-            textAlign = TextAlign.Center,
-            textDecoration = TextDecoration.None,
-            color = Color.White,
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold
-        )
+fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel) {
+    Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+
+        var password = ""
+        var user = ""
+
+        //        var password by remember {
+        //            mutableStateOf("")
+        //        }
+
+        FormField(
+            value = user,
+            onValueChange = { user = it },
+            placeholder = "Email")
+
+        if (extended) {
+            FormField(
+                value = password,
+                onValueChange = { password = it },
+                placeholder = "Password")
+        }
+        createButton(name = "LOGIN", color = Color.Black) {
+            viewModel.getToken(user, password)
+            //viewModel.login(email, password)
+        }
     }
 }
