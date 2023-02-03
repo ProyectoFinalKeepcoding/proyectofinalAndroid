@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.mockknights.petshelter.navigation.AppNavigation
-import com.mockknights.petshelter.ui.login.LoginScreen
 import com.mockknights.petshelter.ui.theme.PetShelterTheme
 import dagger.hilt.android.AndroidEntryPoint
 

@@ -15,6 +15,11 @@
         android:theme="@style/Theme.PetShelter"
         android:name=".App"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAYk7lMFAb_tZjVD1zcDlipBE-LyA4PqSI" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
