@@ -73,7 +73,7 @@ fun MyGoogleMaps() {
     val properties by remember {
         mutableStateOf(MapProperties(
             mapType = MapType.NORMAL,
-            isMyLocationEnabled = true,
+            //isMyLocationEnabled = true,
             //latLngBoundsForCameraTarget = LatLngBounds(marker2, marker3)
         )) }
 
