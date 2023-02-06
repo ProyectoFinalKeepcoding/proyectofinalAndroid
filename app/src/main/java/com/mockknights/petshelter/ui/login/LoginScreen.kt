@@ -16,8 +16,8 @@ import com.mockknights.petshelter.ui.components.createButton
 @Composable
 fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),navigateToPetShelter: () -> (Unit) = {}) {
 
-    val success = viewModel.stateLogin.observeAsState()
-    LaunchedEffect(key1 = success.value) {
+    val success by viewModel.stateLogin.collectAsState()
+    LaunchedEffect(key1 = success) {
         //TODO: Tema de LIVE DATA CON FLOW
         if(false) {
             navigateToPetShelter()
