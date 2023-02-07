@@ -1,6 +1,5 @@
 package com.mockknights.petshelter.ui.map
 
-import android.location.Location
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,23 +7,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.google.android.gms.maps.GoogleMapOptions
-import com.google.android.gms.maps.LocationSource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.PatternItem
 import com.google.maps.android.compose.*
 import com.mockknights.petshelter.ui.components.createButton
+import com.mockknights.petshelter.ui.login.LoginViewModel
 
 @Preview(showSystemUi = true)
 @Composable
-fun MapScreen() {
+fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     MyGoogleMaps()
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Bottom) {
@@ -67,7 +63,7 @@ fun MyGoogleMaps() {
     }
     //2- POSICION DE LA CAMARA
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(igualada, 10f)
+        position = CameraPosition.fromLatLngZoom(igualada, 1f)
     }
    //3- PROPIEDADES DEL MAPA
     val properties by remember {

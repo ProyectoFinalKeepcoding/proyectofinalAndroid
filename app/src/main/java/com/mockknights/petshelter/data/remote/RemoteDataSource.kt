@@ -6,3 +6,4 @@ import kotlinx.coroutines.flow.Flow
 interface RemoteDataSource {
     suspend fun getAllPetShelter(): Flow<List<PetShelterRemote>>
 }
+

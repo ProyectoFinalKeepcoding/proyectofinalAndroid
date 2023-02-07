@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(private val repository: Repository): ViewModel() {
 
-    private val _stateLogin = MutableStateFlow(LoginState())
+    private val _stateLogin = MutableStateFlow<LoginState>(LoginState.loading)
     val stateLogin: StateFlow<LoginState> get() = _stateLogin
 
     private fun setValueOnMainThread(value: LoginState) {
@@ -29,7 +29,7 @@ class LoginViewModel @Inject constructor(private val repository: Repository): Vi
             val token = withContext(Dispatchers.IO) {
                 //TODO: LLAMADA AL TOKEN
                 //repository.getToken()
-                LoginState()
+                LoginState.Succes("")
             }
             setValueOnMainThread(token)
         }

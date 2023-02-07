@@ -1,5 +1,12 @@
 package com.mockknights.petshelter.ui.login
 
-data class LoginState (
-    val token: String = ""
-    )
+import com.mockknights.petshelter.navigation.Screens
+
+sealed class LoginState {
+    data class Succes(val token: String): LoginState()
+    data class Failure (val error: String?): LoginState()
+    data class NetworkError (val code: Int): LoginState()
+    object loading: LoginState()
+
+
+}
