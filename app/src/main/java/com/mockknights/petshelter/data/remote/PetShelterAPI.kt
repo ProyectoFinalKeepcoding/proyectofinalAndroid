@@ -5,6 +5,8 @@ import retrofit2.http.GET
 
 interface PetShelterAPI {
 
-    @GET("")
+    @GET("shelters")
     suspend fun getAllPetShelter(): List<PetShelterRemote>
+
+
 }

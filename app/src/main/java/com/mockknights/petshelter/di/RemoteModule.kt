@@ -51,10 +51,11 @@ object RemoteModule {
             .addInterceptor { chain ->
                 val originalRequest = chain.request()
                 val newUrl = originalRequest.url.newBuilder()
-                    .build() //TODO: Añadir query o parametros
+                    .build()
 
                 val newRequest = originalRequest.newBuilder()
                     .url(newUrl)
+                    .addHeader("ApiKey", "mWIwALVZo3a0evMfbUgkl/gLvRis1/w99To0AamBN+0=")
                     .build()
                 chain.proceed(newRequest)
             }
@@ -71,7 +72,7 @@ object RemoteModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         var retrofit = Retrofit.Builder()
-            .baseUrl("http://keepcoding.education")
+            .baseUrl("http://127.0.0.1:8080/api/")
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
             .build()

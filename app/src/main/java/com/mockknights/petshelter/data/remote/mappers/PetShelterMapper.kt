@@ -16,7 +16,10 @@ class PetShelterMapper @Inject constructor() {
             petShelterRemote.name,
             petShelterRemote.password,
             petShelterRemote.phoneNumber,
-            petShelterRemote.photoURL
+            //petShelterRemote.address,
+            //petShelterRemote.shelterType,
+            petShelterRemote.photoURL ?: ""
+
         )
     }
 }

@@ -1,0 +1,99 @@
+[  {    "id": "10000000-0000-0000-0000-000000000001",
+  "name": "Shelter Point 1",
+  "phoneNumber": "555-555-0001",
+  "address": {
+    "latitude": 40.4168,
+    "longitude": -3.7038    },
+  "shelterType": "shelterPoint"  },
+
+  {    "id": "10000000-0000-0000-0000-000000000002",
+    "name": "Shelter Point 2",    "phoneNumber": "555-555-0002",
+    "address": {
+      "latitude": 41.3851,
+      "longitude": 2.1734    },
+    "shelterType": "veterinary"  },
+
+  {    "id": "10000000-0000-0000-0000-000000000003",
+    "name": "Shelter Point 3",
+    "phoneNumber": "555-555-0003",
+    "address": {
+      "latitude": 43.2609,
+      "longitude": -2.9403    },
+    "shelterType": "particular"  },
+
+  {
+    "id": "10000000-0000-0000-0000-000000000021",
+    "name": "Shelter Point 21",
+    "phoneNumber": "555-555-0021",
+    "address": {
+      "latitude": 39.4667,
+      "longitude": -0.3763
+    },
+    "shelterType": "veterinary"
+  },
+
+  {
+    "id": "10000000-0000-0000-0000-000000000022",
+    "name": "Shelter Point 22",
+    "phoneNumber": "555-555-0022",
+    "address": {
+      "latitude": 38.3875,
+      "longitude": -0.5246
+    },
+    "shelterType": "particular"
+  },
+
+  {
+    "id": "10000000-0000-0000-0000-000000000023",
+    "name": "Shelter Point 23",
+    "phoneNumber": "555-555-0023",
+    "address": {
+      "latitude": 42.8781,
+      "longitude": -8.5448
+    },
+    "shelterType": "shelterPoint"
+  },
+
+  {
+    "id": "10000000-0000-0000-0000-000000000024",
+    "name": "Shelter Point 24",
+    "phoneNumber": "555-555-0024",
+    "address": {
+      "latitude": 41.3889,
+      "longitude": 2.1594
+    },
+    "shelterType": "veterinary"
+  },
+
+  {
+    "id": "10000000-0000-0000-0000-000000000025",
+    "name": "Shelter Point 25",
+    "phoneNumber": "555-555-0025",
+    "address": {
+      "latitude": 40.9167,
+      "longitude": -3.7167
+    },
+    "shelterType": "particular"
+  },
+
+  {
+    "id": "10000000-0000-0000-0000-000000000026",
+    "name": "Shelter Point 26",
+    "phoneNumber": "555-555-0026",
+    "address": {
+      "latitude": 43.5133,
+      "longitude": -5.6750
+    },
+    "shelterType": "shelterPoint"
+  },
+
+  {
+    "id": "10000000-0000-0000-0000-000000000027",
+    "name": "Shelter Point 27",
+    "phoneNumber": "555-555-0027",
+    "address": {
+      "latitude": 37.9833,
+      "longitude": -1.1167
+    },
+    "shelterType": "veterinary"
+  }]
