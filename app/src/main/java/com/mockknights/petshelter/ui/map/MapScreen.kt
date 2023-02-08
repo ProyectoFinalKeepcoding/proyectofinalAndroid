@@ -23,24 +23,30 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     //ActivityCompat.checkSelfPermission(requireContext(), )
 
     val petShelter = viewModel.petShelter.collectAsState()
+    LaunchedEffect(key1 = petShelter.value) {
 
-    MyGoogleMaps(petShelter.value)
-    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Bottom) {
-        createButton(name = "ME", color = Color.Red) {
-            //TODO: Llamar a mi Localizacion
+    }
+
+    if(!petShelter.value.isEmpty()) {
+        MyGoogleMaps(petShelter.value)
+        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom) {
+            createButton(name = "ME", color = Color.Red) {
+                //TODO: Llamar a mi Localizacion
+            }
         }
     }
+
 }
 
 
 @Composable
-fun MyGoogleMaps(petShelter: List<PetShelter> = emptyList()) {
-    val marker = LatLng(41.5678, -16.8)
-    //val teide = LatLng(petShelter[0].address.latitude, petShelter[0].address.longitude)
-    //val madrid = LatLng(petShelter[1].address.latitude, petShelter[1].address.longitude)
-    //val igualada = LatLng(petShelter[2].address.latitude, petShelter[2].address.longitude)
-    //val otra = LatLng(petShelter[3].address.latitude, petShelter[3].address.longitude)
+fun MyGoogleMaps(petShelter: List<PetShelter>) {
+
+    val teide = LatLng(petShelter[0].address.latitude, petShelter[0].address.longitude)
+    val madrid = LatLng(petShelter[1].address.latitude, petShelter[1].address.longitude)
+    val igualada = LatLng(petShelter[2].address.latitude, petShelter[2].address.longitude)
+    val otra = LatLng(petShelter[3].address.latitude, petShelter[3].address.longitude)
 
     //PORPIEDAS DE LOS MAPAS
     //1- MODIFICADOR
@@ -49,7 +55,7 @@ fun MyGoogleMaps(petShelter: List<PetShelter> = emptyList()) {
     }
     //2- POSICION DE LA CAMARA
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(marker, 1f)
+        position = CameraPosition.fromLatLngZoom(madrid, 10f)
     }
    //3- PROPIEDADES DEL MAPA
     val properties by remember {
@@ -74,28 +80,28 @@ fun MyGoogleMaps(petShelter: List<PetShelter> = emptyList()) {
     ) {
 
         Marker(
-            MarkerState(marker),
+            MarkerState(teide),
             title = petShelter[0].name,
-            snippet = "Iep que pasa contigo?",
+            snippet = petShelter[0].phoneNumber,
             rotation = Float.MAX_VALUE
 
         )
         Marker(
-            MarkerState(marker),
-            title = "MARKER2",
-            snippet = "Me lo estas preguntando a mi hermano?",
+            MarkerState(igualada),
+            title = petShelter[1].name,
+            snippet = petShelter[1].phoneNumber,
             rotation = Float.MIN_VALUE
         )
         Marker(
-            MarkerState(marker),
-            title = "MARKER3",
-            snippet = "Que coño dices tu ahora?",
+            MarkerState(madrid),
+            title = petShelter[3].name,
+            snippet = petShelter[3].phoneNumber,
             flat = true
         )
         Marker(
-            MarkerState(marker),
-            title = "MARKER4",
-            snippet = "No se, tu sabras",
+            MarkerState(otra),
+            title = petShelter[4].name,
+            snippet = petShelter[4].phoneNumber,
         )
     }
 }

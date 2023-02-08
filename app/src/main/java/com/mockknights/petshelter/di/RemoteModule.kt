@@ -68,11 +68,12 @@ object RemoteModule {
         return okHttpClient
     }
 
+
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         var retrofit = Retrofit.Builder()
-            .baseUrl("http://127.0.0.1:8080/api/")
+            .baseUrl("http://10.0.2.2:8080/api/")
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
             .build()

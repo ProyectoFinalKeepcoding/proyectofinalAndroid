@@ -6,17 +6,12 @@ import java.util.UUID
 data class PetShelterRemote (
     @Json(name = "id") val id: String,
     @Json(name = "name") val name: String,
-    @Json(name = "password") val password: String,
+    @Json(name = "password") val password: String?,
     @Json(name = "phoneNumber") val phoneNumber: String,
-    //@Json(name = "address") val address: Address,
-    //@Json(name = "shelterType") val shelterType: ShelterType,
+    @Json(name = "address") val address: Address,
+    @Json(name = "shelterType") val shelterType: String,
     @Json(name = "photoURL") val photoURL: String?
     )
-
-
-enum class ShelterType {
-    VETERINARY, PARTICULAR, SHELTER_POINT
-}
 
 
 data class Address (
