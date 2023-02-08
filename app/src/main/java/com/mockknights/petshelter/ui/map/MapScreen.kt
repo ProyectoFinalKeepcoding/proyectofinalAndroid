@@ -43,10 +43,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 @Composable
 fun MyGoogleMaps(petShelter: List<PetShelter>) {
 
-    val teide = LatLng(petShelter[0].address.latitude, petShelter[0].address.longitude)
     val madrid = LatLng(petShelter[1].address.latitude, petShelter[1].address.longitude)
-    val igualada = LatLng(petShelter[2].address.latitude, petShelter[2].address.longitude)
-    val otra = LatLng(petShelter[3].address.latitude, petShelter[3].address.longitude)
 
     //PORPIEDAS DE LOS MAPAS
     //1- MODIFICADOR
@@ -55,7 +52,7 @@ fun MyGoogleMaps(petShelter: List<PetShelter>) {
     }
     //2- POSICION DE LA CAMARA
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(madrid, 10f)
+        position = CameraPosition.fromLatLngZoom(madrid, 5f)
     }
    //3- PROPIEDADES DEL MAPA
     val properties by remember {
@@ -79,30 +76,13 @@ fun MyGoogleMaps(petShelter: List<PetShelter>) {
         onPOIClick = { }
     ) {
 
-        Marker(
-            MarkerState(teide),
-            title = petShelter[0].name,
-            snippet = petShelter[0].phoneNumber,
-            rotation = Float.MAX_VALUE
-
-        )
-        Marker(
-            MarkerState(igualada),
-            title = petShelter[1].name,
-            snippet = petShelter[1].phoneNumber,
-            rotation = Float.MIN_VALUE
-        )
-        Marker(
-            MarkerState(madrid),
-            title = petShelter[3].name,
-            snippet = petShelter[3].phoneNumber,
-            flat = true
-        )
-        Marker(
-            MarkerState(otra),
-            title = petShelter[4].name,
-            snippet = petShelter[4].phoneNumber,
-        )
+        for (i in petShelter) {
+            Marker(
+                MarkerState(LatLng(i.address.latitude, i.address.longitude)),
+                title = i.name,
+                snippet = i.phoneNumber
+            )
+        }
     }
 }
 
