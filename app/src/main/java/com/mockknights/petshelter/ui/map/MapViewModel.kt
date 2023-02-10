@@ -19,6 +19,12 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
     private val _petShelter = MutableStateFlow(emptyList<PetShelter>())
     val petShelter: MutableStateFlow<List<PetShelter>> get() = _petShelter
 
+    private val _modalShelterList = MutableStateFlow(emptyList<PetShelter>())
+    val modalShelterList: MutableStateFlow<List<PetShelter>> get() = _modalShelterList
+
+    private val _sheetState = MutableStateFlow(BottomSheetState.COLLAPSED)
+    val sheetstate: MutableStateFlow<BottomSheetState> get() = _sheetState
+
     private fun setValueOnMainThreadShelter(value: List<PetShelter>) {
         viewModelScope.launch(Dispatchers.Main) {
             _petShelter.value = value
@@ -35,11 +41,33 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
                 setValueOnMainThreadShelter(it)
             }
         }
-
     }
 
+    fun setModalShelter(shelterName: String) {
+        val modalPetShelter = petShelter.value.filter { it.name == shelterName }
+        viewModelScope.launch(Dispatchers.Main) {
+            _modalShelterList.value = modalPetShelter
+        }
+    }
 
+    fun toggleModal() {
+        when(_sheetState.value) {
+            BottomSheetState.COLLAPSED -> expand()
+            BottomSheetState.EXPANDED -> collapse()
+        }
+    }
 
+    private fun expand(){
+        viewModelScope.launch(Dispatchers.Main) {
+            _sheetState.value = BottomSheetState.EXPANDED
+        }
+    }
+
+    fun collapse(){
+        viewModelScope.launch(Dispatchers.Main) {
+            _sheetState.value = BottomSheetState.COLLAPSED
+        }
+    }
 
 
     @SuppressLint("MissingPermission") //Por si hay problemas con los permisos
