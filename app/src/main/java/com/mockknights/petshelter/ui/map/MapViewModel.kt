@@ -48,7 +48,15 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
         val locationManager: LocationManager
 
         //VER SI TIENE LOS PERMISOS ACEPTADOS y SINO PEDIRLOS
-        //ActivityCompat.getPermissionCompatDelegate()
+        //if(ActivityCompat.getPermissionCompatDelegate(requireContext(), ACCESS_FINE_LOCATION)
+        // == PackageManager.PERMISSION_GRANTED
+        // && ActivityCompat.getPermissionCompatDelegate(requireContext(), ACCESS_COARSE_LOCATION)
+        // == PackageManager.PERMISSION_GRANTED) {
+        // LLAMAR A LA FUNCION GETMYLOCATION para obtener mi Localizacion
+        //} else {
+        //val permissionLauncher = ActivityResultLauncher
+        //}
+
 
 
         //LOCATION HECHO EN CLASE

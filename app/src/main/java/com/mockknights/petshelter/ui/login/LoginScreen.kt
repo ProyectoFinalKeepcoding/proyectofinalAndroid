@@ -1,6 +1,12 @@
 package com.mockknights.petshelter.ui.login
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -14,7 +20,7 @@ import com.mockknights.petshelter.ui.components.createButton
 
 @Preview(showSystemUi = true)
 @Composable
-fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),navigateToPetShelter: () -> (Unit) = {}) {
+fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(), navigateToPetShelter: () -> (Unit) = {}, navigateToWelcome: () -> (Unit)= {}) {
 
     val success by viewModel.stateLogin.collectAsState()
     LaunchedEffect(key1 = success) {
@@ -29,8 +35,14 @@ fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),navigateToPetShelte
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        TopAppBar() {
+            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Volver atras",
+                modifier = Modifier.clickable { navigateToWelcome() })
+            Text(text = "PANTALLA DE HEROES")
+        }
+        Spacer(modifier = Modifier.fillMaxWidth().height(200.dp))
 
-            LoginForm(viewModel = viewModel)
+        LoginForm(viewModel = viewModel)
     }
 }
 

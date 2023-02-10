@@ -1,9 +1,16 @@
 package com.mockknights.petshelter.ui.welcome
 
+import android.widget.Toolbar
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +23,7 @@ import com.mockknights.petshelter.ui.components.createButton
 @Preview(showSystemUi = true)
 @Composable
 fun WelcomeScreen (viewModel: WelcomeViewModel = hiltViewModel(), navigateToMap: () -> (Unit) = {} , navigateToLogin: () -> (Unit) = {}) {
+
 
     Column(
         modifier = Modifier.fillMaxSize(),

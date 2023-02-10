@@ -1,5 +1,9 @@
 package com.mockknights.petshelter.ui.map
 
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -15,17 +21,12 @@ import com.google.maps.android.compose.*
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.ui.components.createButton
 
+@SuppressLint("RestrictedApi")
 @Preview(showSystemUi = true)
 @Composable
 fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
-    //PEDIR PERMISOS
-    //ActivityCompat.checkSelfPermission(requireContext(), )
-
     val petShelter = viewModel.petShelter.collectAsState()
-    LaunchedEffect(key1 = petShelter.value) {
-
-    }
 
     if(!petShelter.value.isEmpty()) {
         MyGoogleMaps(petShelter.value)
@@ -80,7 +81,7 @@ fun MyGoogleMaps(petShelter: List<PetShelter>) {
             Marker(
                 MarkerState(LatLng(i.address.latitude, i.address.longitude)),
                 title = i.name,
-                snippet = i.phoneNumber
+                snippet = i.shelterType
             )
         }
     }

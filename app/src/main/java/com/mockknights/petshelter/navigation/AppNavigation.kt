@@ -23,7 +23,9 @@ fun AppNavigation () {
         }
 
         composable(Screens.Login.route) {
-            LoginScreen()
+            LoginScreen(navigateToWelcome = {
+                navController.navigate(Screens.Welcome.route)
+            })
         }
 
         composable(Screens.Map.route) {
