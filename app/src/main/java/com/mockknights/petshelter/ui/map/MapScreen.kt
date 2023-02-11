@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.PetShelter
+import com.mockknights.petshelter.ui.components.KiwokoIconButton
 import com.mockknights.petshelter.ui.components.createButton
 import com.mockknights.petshelter.ui.theme.moderatMediumTitle
 
@@ -69,7 +70,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            if(!petShelter.value.isEmpty()) {
+            if(petShelter.value.isNotEmpty()) {
                 MyGoogleMaps(petShelter.value,
                     onPointClicked = {clickedShelterName ->
                         viewModel.toggleModal()
@@ -138,9 +139,11 @@ fun MyGoogleMaps(petShelter: List<PetShelter>, onPointClicked: (String) -> Boole
     }
 }
 
+// ModalScreen shown on the map. It has 3 thirds of the vertical height. Image scales to allow at
+// least 8 dp of padding.
 @Preview
 @Composable
-fun ModalBox(title: String = "Title", phoneNumber: String = "NUMBER", photoUrl: String = "") {
+fun ModalBox(title: String = "Title", phoneNumber: String = "918158899", photoUrl: String = "") {
     val configuration = LocalConfiguration.current
     val modalHeight = configuration.screenHeightDp.dp / 3
     Box(
@@ -162,10 +165,10 @@ fun ModalBox(title: String = "Title", phoneNumber: String = "NUMBER", photoUrl: 
             // Row with the remaining elements
             ImageAndButtonsRow(
                 photoUrl = photoUrl,
-                phoneNumber = phoneNumber,
                 modifier = Modifier
                     .fillMaxSize()
-                    .weight(7.4f))
+                    .weight(7.4f)
+            )
         }
     }
 }
@@ -196,7 +199,7 @@ fun TitleBox(title: String, modifier: Modifier) {
 }
 
 @Composable
-fun ImageAndButtonsRow(photoUrl: String, phoneNumber: String, modifier: Modifier) {
+fun ImageAndButtonsRow(photoUrl: String, modifier: Modifier) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.Start,
@@ -206,14 +209,14 @@ fun ImageAndButtonsRow(photoUrl: String, phoneNumber: String, modifier: Modifier
             modifier = Modifier
                 .fillMaxSize()
                 .weight(5.3f)
-                .padding(10.dp)
+                .padding(horizontal = 8.dp, vertical = 8.dp) // Depending on the device, the image will adjust to 8dp
         )
         ButtonsColumn(
-            phoneNumber = phoneNumber,
             modifier = Modifier
                 .fillMaxSize()
                 .weight(4.7f)
-                .padding(10.dp))
+                .padding(horizontal = 8.dp, vertical = 8.dp)
+        )
     }
 }
 
@@ -231,20 +234,36 @@ fun ImageColumn(photoUrl: String, modifier: Modifier) {
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .aspectRatio(1f)
-                .clip(RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(25.dp))
         )
     }
 }
 
 @Composable
-fun ButtonsColumn(phoneNumber: String, modifier: Modifier) {
+fun ButtonsColumn(modifier: Modifier) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        createButton(name = phoneNumber, color = Color.Red, onClick = { /*TODO*/ })
-        createButton(name = "GO", color = Color.Red, onClick = { /*TODO*/ })
+        KiwokoIconButton(
+            name = "Llamar",
+            icon = R.drawable.phone,
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+        ) {
+            // TODO: Call!!
+        }
+        KiwokoIconButton(
+            name = "Ir",
+            icon = R.drawable.directions,
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+        ) {
+            // TODO: Go!!
+        }
     }
 }
 
@@ -267,4 +286,3 @@ fun drawBottomLine(drawScope: DrawScope, width: Float) {
         width
     )
 }
-

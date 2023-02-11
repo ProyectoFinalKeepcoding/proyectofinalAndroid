@@ -36,7 +36,18 @@ val Typography.moderatMediumTitle: TextStyle
             fontFamily = ModeratFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 24.sp,
-            letterSpacing = 15.sp
+            letterSpacing = 9.sp
+        )
+    }
+
+// Create extension styles that can be used as Material styles
+val Typography.moderatButtonBold: TextStyle
+    @Composable
+    get() {
+        return  TextStyle(
+            fontFamily = ModeratFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = 22.sp,
         )
     }
 
