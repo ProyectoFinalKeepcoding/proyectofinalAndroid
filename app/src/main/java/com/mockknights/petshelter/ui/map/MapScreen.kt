@@ -1,6 +1,8 @@
 package com.mockknights.petshelter.ui.map
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,18 +17,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.PetShelter
+import com.mockknights.petshelter.domain.ShelterType
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
 import com.mockknights.petshelter.ui.components.createButton
 import com.mockknights.petshelter.ui.theme.moderatMediumTitle
@@ -72,6 +79,9 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         ) {
             if(petShelter.value.isNotEmpty()) {
                 MyGoogleMaps(petShelter.value,
+                    onPlacingPoint = {
+                        viewModel.getShelterIconByShelterType(it) // Defines the icon depending on shelterType
+                    },
                     onPointClicked = {clickedShelterName ->
                         viewModel.toggleModal()
                         viewModel.setModalShelter(clickedShelterName)
@@ -92,7 +102,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
 
 @Composable
-fun MyGoogleMaps(petShelter: List<PetShelter>, onPointClicked: (String) -> Boolean, onMapClicked: () -> Unit) {
+fun MyGoogleMaps(petShelter: List<PetShelter>, onPlacingPoint: (String) -> Int, onPointClicked: (String) -> Boolean, onMapClicked: () -> Unit) {
 
     val madrid = LatLng(petShelter[1].address.latitude, petShelter[1].address.longitude)
 
@@ -130,6 +140,7 @@ fun MyGoogleMaps(petShelter: List<PetShelter>, onPointClicked: (String) -> Boole
         for (i in petShelter) {
             Marker(
                 MarkerState(LatLng(i.address.latitude, i.address.longitude)),
+                icon = bitmapDescriptorFromVector(LocalContext.current, onPlacingPoint(i.shelterType)),
                 title = i.name,
                 snippet = i.shelterType,
                 onClick = { onPointClicked(i.name) }
@@ -285,4 +296,25 @@ fun drawBottomLine(drawScope: DrawScope, width: Float) {
         Offset(drawScope.size.width, y),
         width
     )
+}
+
+// Get bitmapDescriptor from svg icon
+fun bitmapDescriptorFromVector(
+    context: Context,
+    vectorResId: Int
+): BitmapDescriptor? {
+
+    // retrieve the actual drawable
+    val drawable = ContextCompat.getDrawable(context, vectorResId) ?: return null
+    drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+    val bm = Bitmap.createBitmap(
+        drawable.intrinsicWidth,
+        drawable.intrinsicHeight,
+        Bitmap.Config.ARGB_8888
+    )
+
+    // draw it onto the bitmap
+    val canvas = android.graphics.Canvas(bm)
+    drawable.draw(canvas)
+    return BitmapDescriptorFactory.fromBitmap(bm)
 }

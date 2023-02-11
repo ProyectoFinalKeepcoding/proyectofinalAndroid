@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.location.LocationManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.domain.Repository
+import com.mockknights.petshelter.domain.ShelterType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,6 +68,16 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
     fun collapse(){
         viewModelScope.launch(Dispatchers.Main) {
             _sheetState.value = BottomSheetState.COLLAPSED
+        }
+    }
+
+    fun getShelterIconByShelterType(shelterType: String): Int {
+        return when(shelterType){
+            ShelterType.PARTICULAR.stringValue -> R.drawable.particular
+            ShelterType.LOCAL_GOVERNMENT.stringValue -> R.drawable.towncouncil
+            ShelterType.VETERINARY.stringValue -> R.drawable.veterinary
+            ShelterType.SHELTER_POINT.stringValue -> R.drawable.animalshelter
+            else -> R.drawable.questionmark
         }
     }
 
