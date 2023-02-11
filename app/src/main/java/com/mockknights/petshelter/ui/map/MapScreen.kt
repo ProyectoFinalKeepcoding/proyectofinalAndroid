@@ -3,18 +3,21 @@ package com.mockknights.petshelter.ui.map
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -33,9 +36,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.PetShelter
-import com.mockknights.petshelter.domain.ShelterType
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
-import com.mockknights.petshelter.ui.components.createButton
 import com.mockknights.petshelter.ui.theme.moderatMediumTitle
 
 
@@ -77,39 +78,51 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            if(petShelter.value.isNotEmpty()) {
-                MyGoogleMaps(petShelter.value,
-                    onPlacingPoint = {
-                        viewModel.getShelterIconByShelterType(it) // Defines the icon depending on shelterType
-                    },
-                    onPointClicked = {clickedShelterName ->
-                        viewModel.toggleModal()
-                        viewModel.setModalShelter(clickedShelterName)
-                        true // This way, the default behaviour of google maps is disabled (shows info window with title and snippet)
-                    }, onMapClicked = {
-                        viewModel.collapse()
-                    })
-                Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Bottom) {
-                    createButton(name = "ME", color = Color.Red) {
-                        //TODO: Llamar a mi Localizacion
-                    }
+            Column() {
+                LogoBox(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1.3f))
+                if(petShelter.value.isNotEmpty()) {
+                    MyGoogleMaps(petShelter.value,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(7.7f),
+                        onPlacingPoint = {
+                            viewModel.getShelterIconByShelterType(it) // Defines the icon depending on shelterType
+                        },
+                        onPointClicked = {clickedShelterName ->
+                            viewModel.toggleModal()
+                            viewModel.setModalShelter(clickedShelterName)
+                            true // This way, the default behaviour of google maps is disabled (shows info window with title and snippet)
+                        }, onMapClicked = {
+                            viewModel.collapse()
+                        })
                 }
             }
         }
     }
 }
-
+@Composable
+fun LogoBox(modifier: Modifier) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Center
+    ) {
+        val image: Painter = painterResource(id = R.drawable.logo)
+        Image(painter = image, contentDescription = "Logo")
+    }
+}
 
 @Composable
-fun MyGoogleMaps(petShelter: List<PetShelter>, onPlacingPoint: (String) -> Int, onPointClicked: (String) -> Boolean, onMapClicked: () -> Unit) {
+fun MyGoogleMaps(petShelter: List<PetShelter>, modifier: Modifier, onPlacingPoint: (String) -> Int, onPointClicked: (String) -> Boolean, onMapClicked: () -> Unit) {
 
     val madrid = LatLng(petShelter[1].address.latitude, petShelter[1].address.longitude)
 
     //PORPIEDAS DE LOS MAPAS
     //1- MODIFICADOR
     val modifier by remember {
-        mutableStateOf(Modifier.fillMaxSize())
+        mutableStateOf(modifier)
     }
     //2- POSICION DE LA CAMARA
     val cameraPositionState = rememberCameraPositionState {
