@@ -21,4 +21,8 @@ class RepositoryImpl @Inject constructor(
         val result = remoteResult.map { petShelterList -> mapper.mapPetShelterRemoteToPresentation(petShelterList) }
         return result
     }
+
+    override suspend fun getToken(): Flow<String> {
+        return remoteDataSource.getToken()
+    }
 }

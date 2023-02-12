@@ -1,14 +1,12 @@
 package com.mockknights.petshelter.ui.login
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,34 +14,44 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mockknights.petshelter.ui.components.FormField
-import com.mockknights.petshelter.ui.components.createButton
+import com.mockknights.petshelter.ui.components.CreateWelcomeButton
+import com.mockknights.petshelter.ui.theme.RedKiwoko
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Preview(showSystemUi = true)
 @Composable
-fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(), navigateToPetShelter: () -> (Unit) = {}, navigateToWelcome: () -> (Unit)= {}) {
+fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),
+    navigateToPetShelter: () -> (Unit) = {},
+    navigateToWelcome: () -> (Unit)= {},
+    navigateToRegister: () -> (Unit) = {}) {
 
     val success by viewModel.stateLogin.collectAsState()
     LaunchedEffect(key1 = success) {
-        //TODO: Tema de LIVE DATA CON FLOW
-        if(false) {
+        if (success.equals(LoginState.Succes(""))) {
             navigateToPetShelter()
         }
     }
-    
-    Column(
-        modifier = Modifier.fillMaxSize(), 
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
+
+
+    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar() {
             Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Volver atras",
                 modifier = Modifier.clickable { navigateToWelcome() })
-            Text(text = "PANTALLA DE HEROES")
+            Text(text = "BACK")
         }
-        Spacer(modifier = Modifier.fillMaxWidth().height(200.dp))
-
-        LoginForm(viewModel = viewModel)
+    }) {
+        Column(modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center)
+        {
+            LoginForm(viewModel = viewModel)
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp))
+            Register(navigateToRegister)
+        }
     }
+
 }
 
 @Composable
@@ -64,10 +72,15 @@ fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel) {
                 onValueChange = { password = it },
                 placeholder = "Password")
         }
-        createButton(name = "LOGIN", color = Color.Black) {
+        CreateWelcomeButton(name = "LOGIN", modifier = Modifier.fillMaxWidth(),colorButton = RedKiwoko, colorText = Color.White) {
             viewModel.getToken(user, password)
         }
     }
+}
+
+@Composable
+fun Register(navigateToRegister: () -> (Unit) = {}) {
+    Text(text = "¿AUN NO ESTAS REGISTRADO? Registrate", Modifier.clickable{ navigateToRegister() })
 }
 
 

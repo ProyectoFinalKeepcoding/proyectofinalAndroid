@@ -1,41 +1,77 @@
 package com.mockknights.petshelter.ui.welcome
 
-import android.widget.Toolbar
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.mockknights.petshelter.ui.components.createButton
+import com.mockknights.petshelter.ui.components.CreateWelcomeButton
+import com.mockknights.petshelter.ui.theme.RedKiwoko
 
 @Preview(showSystemUi = true)
 @Composable
-fun WelcomeScreen (viewModel: WelcomeViewModel = hiltViewModel(), navigateToMap: () -> (Unit) = {} , navigateToLogin: () -> (Unit) = {}) {
+fun WelcomeScreen(/*viewModel: WelcomeViewModel = hiltViewModel(),*/ navigateToMap: () -> (Unit) = {},
+                                                                     navigateToLogin: () -> (Unit) = {}
+) {
 
+    val buttonModifier by remember {
+        mutableStateOf(
+            Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .padding(16.dp)
+        )
+    }
+    val spacerModifier by remember { mutableStateOf(
+        Modifier
+            .fillMaxWidth()
+            .height(100.dp)) }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            createButton(name = "USER", color = Color.Black) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1F)
+                .background(RedKiwoko), Alignment.Center
+        )
+
+        {
+            CreateWelcomeButton(
+                name = "Puedo acoger a una mascota",
+                modifier = buttonModifier,
+                colorButton = Color.White,
+                colorText = RedKiwoko
+            )
+            {
                 navigateToMap()
             }
+        }
+        Spacer(modifier = spacerModifier.background(RedKiwoko))
+        Spacer(modifier = spacerModifier.background(Color.White))
 
-            createButton(name = "PETSHELTER", color = Color.Green ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1F)
+                .background(Color.White), Alignment.Center
+        ) {
+            CreateWelcomeButton(
+                name = "He encontrado una mascota",
+                modifier = buttonModifier,
+                colorButton = RedKiwoko,
+                colorText = Color.White
+            ) {
                 navigateToLogin()
             }
         }

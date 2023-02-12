@@ -1,8 +1,6 @@
 package com.mockknights.petshelter.ui.components
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -21,16 +19,17 @@ import com.mockknights.petshelter.ui.theme.RedKiwoko
 import com.mockknights.petshelter.ui.theme.moderatButtonBold
 
 @Composable
-fun createButton(name: String, color: Color, onClick: () -> Unit) {
+fun CreateWelcomeButton(name: String, modifier: Modifier, colorButton: Color, colorText: Color, onClick: () -> Unit) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(backgroundColor = color)
+        modifier = modifier,
+        colors = ButtonDefaults.buttonColors(backgroundColor = colorButton)
     ) {
         Text(
             text = name,
             textAlign = TextAlign.Center,
             textDecoration = TextDecoration.None,
-            color = Color.White,
+            color = colorText,
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold
         )

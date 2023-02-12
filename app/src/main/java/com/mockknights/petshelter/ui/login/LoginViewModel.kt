@@ -5,8 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.mockknights.petshelter.domain.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -26,12 +25,10 @@ class LoginViewModel @Inject constructor(private val repository: Repository): Vi
     fun getToken(user: String, password: String) {
 
         viewModelScope.launch {
-            val token = withContext(Dispatchers.IO) {
-                //TODO: LLAMADA AL TOKEN
-                //repository.getToken()
-                LoginState.Succes("")
-            }
-            setValueOnMainThread(token)
+            repository.getToken().flowOn(Dispatchers.IO).collect() {
+                setValueOnMainThread(LoginState.Succes(it))
+                }
         }
     }
+
 }

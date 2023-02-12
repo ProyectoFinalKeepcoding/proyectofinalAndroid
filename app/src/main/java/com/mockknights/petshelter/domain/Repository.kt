@@ -4,4 +4,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface Repository {
     suspend fun getAllPetShelter(): Flow<List<PetShelter>>
+    suspend fun getToken(): Flow<String>
 }
