@@ -109,8 +109,20 @@ fun LogoBox(modifier: Modifier) {
         modifier = modifier,
         contentAlignment = Center
     ) {
-        val image: Painter = painterResource(id = R.drawable.logo)
-        Image(painter = image, contentDescription = "Logo")
+        val logoMarker: Painter = painterResource(id = R.drawable.logomarker)
+        val logoTypescript: Painter = painterResource(id = R.drawable.logo)
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Image(painter = logoMarker, contentDescription = "Logo marker")
+            Spacer(modifier = Modifier.size(1.dp))
+            Image(painter = logoTypescript, contentDescription = "Logo typescript")
+        }
+
     }
 }
 

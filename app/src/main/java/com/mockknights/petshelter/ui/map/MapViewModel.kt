@@ -77,6 +77,7 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
             ShelterType.LOCAL_GOVERNMENT.stringValue -> R.drawable.towncouncil
             ShelterType.VETERINARY.stringValue -> R.drawable.veterinary
             ShelterType.SHELTER_POINT.stringValue -> R.drawable.animalshelter
+            ShelterType.KIWOKO_STORE.stringValue -> R.drawable.kiwoko
             else -> R.drawable.questionmark
         }
     }
