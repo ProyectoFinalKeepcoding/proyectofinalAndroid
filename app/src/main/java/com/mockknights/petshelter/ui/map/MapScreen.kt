@@ -1,8 +1,11 @@
 package com.mockknights.petshelter.ui.map
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -21,6 +24,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,7 +32,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
+import com.google.accompanist.permissions.*
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -40,7 +47,7 @@ import com.mockknights.petshelter.ui.components.KiwokoIconButton
 import com.mockknights.petshelter.ui.theme.moderatMediumTitle
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
 @SuppressLint("RestrictedApi")
 //@Preview(showSystemUi = true)
 @Composable
@@ -49,7 +56,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val petShelter = viewModel.petShelter.collectAsState()
 
     val sheetState =
-        if (viewModel.sheetstate.collectAsState().value == BottomSheetState.COLLAPSED) BottomSheetState(initialValue = BottomSheetValue.Collapsed)
+        if (viewModel.sheetState.collectAsState().value == BottomSheetState.COLLAPSED) BottomSheetState(initialValue = BottomSheetValue.Collapsed)
         else BottomSheetState(initialValue = BottomSheetValue.Expanded)
 
     val bottomSheetScaffoldState = BottomSheetScaffoldState(
@@ -57,6 +64,22 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         drawerState = DrawerState(DrawerValue.Closed),
         snackbarHostState = SnackbarHostState()
     )
+    // Permission for user locations
+    // Before composing the view, request check and request location permissions
+    val permissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
+
+    // Before composing the view, request check and request location permissions
+    val lifecycleOwner = LocalLifecycleOwner.current // Compose views don't have onStart, onCreate... but a LifecycleOwner
+    DisposableEffect(key1 = lifecycleOwner, effect = {
+        val eventObserver = LifecycleEventObserver { _, event ->
+            // When starting to compose the view, ask for location permission if not allowed
+            if(event == Lifecycle.Event.ON_START) permissionState.launchPermissionRequest()
+        }
+        // Add the event observer to check the location permission on starting the composition
+        lifecycleOwner.lifecycle.addObserver(eventObserver)
+        // When leaving the map screen, remove the observer
+        onDispose { lifecycleOwner.lifecycle.removeObserver(eventObserver) }
+    })
 
     BottomSheetScaffold(
         scaffoldState = bottomSheetScaffoldState,
@@ -83,8 +106,10 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     modifier = Modifier
                         .fillMaxSize()
                         .weight(1.3f))
-                if(petShelter.value.isNotEmpty()) {
+                if(petShelter.value.isNotEmpty() && permissionState.status.isGranted) {
+                    // If the permission is granted, show the location
                     MyGoogleMaps(petShelter.value,
+                        locationGranted = true,
                         modifier = Modifier
                             .fillMaxSize()
                             .weight(7.7f),
@@ -98,6 +123,30 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                         }, onMapClicked = {
                             viewModel.collapse()
                         })
+                } else if (petShelter.value.isNotEmpty()) {
+                    // This is the case when the permission is not granted: the user can't see his location
+                    MyGoogleMaps(petShelter.value,
+                        locationGranted = false,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(7.7f),
+                        onPlacingPoint = {
+                            viewModel.getShelterIconByShelterType(it) // Defines the icon depending on shelterType
+                        },
+                        onPointClicked = {clickedShelterName ->
+                            viewModel.toggleModal()
+                            viewModel.setModalShelter(clickedShelterName)
+                            true // This way, the default behaviour of google maps is disabled (shows info window with title and snippet)
+                        }, onMapClicked = {
+                            viewModel.collapse()
+                        })
+
+                    Button(onClick = {
+                        permissionState.launchPermissionRequest()
+                    }) {
+                        if(!permissionState.status.shouldShowRationale) Text(text = "To use this allow permission in settings")
+                        else Text(text = "Refugio más cercano")
+                    }
                 }
             }
         }
@@ -127,7 +176,7 @@ fun LogoBox(modifier: Modifier) {
 }
 
 @Composable
-fun MyGoogleMaps(petShelter: List<PetShelter>, modifier: Modifier, onPlacingPoint: (String) -> Int, onPointClicked: (String) -> Boolean, onMapClicked: () -> Unit) {
+fun MyGoogleMaps(petShelter: List<PetShelter>, locationGranted: Boolean, modifier: Modifier, onPlacingPoint: (String) -> Int, onPointClicked: (String) -> Boolean, onMapClicked: () -> Unit) {
 
     val madrid = LatLng(petShelter[1].address.latitude, petShelter[1].address.longitude)
 
@@ -144,7 +193,7 @@ fun MyGoogleMaps(petShelter: List<PetShelter>, modifier: Modifier, onPlacingPoin
     val properties by remember {
         mutableStateOf(MapProperties(
             mapType = MapType.NORMAL,
-            //isMyLocationEnabled = true,
+            isMyLocationEnabled = locationGranted,
             //latLngBoundsForCameraTarget = LatLngBounds(marker2, marker3)
         )) }
 
@@ -343,3 +392,5 @@ fun bitmapDescriptorFromVector(
     drawable.draw(canvas)
     return BitmapDescriptorFactory.fromBitmap(bm)
 }
+
+

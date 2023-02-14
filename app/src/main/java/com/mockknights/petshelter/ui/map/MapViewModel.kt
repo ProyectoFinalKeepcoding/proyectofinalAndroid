@@ -1,7 +1,5 @@
 package com.mockknights.petshelter.ui.map
 
-import android.annotation.SuppressLint
-import android.location.LocationManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mockknights.petshelter.R
@@ -16,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MapViewModel @Inject constructor(private val repository: Repository): ViewModel(){
+class MapViewModel @Inject constructor(private val repository: Repository): ViewModel() {
 
     private val _petShelter = MutableStateFlow(emptyList<PetShelter>())
     val petShelter: MutableStateFlow<List<PetShelter>> get() = _petShelter
@@ -25,7 +23,10 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
     val modalShelterList: MutableStateFlow<List<PetShelter>> get() = _modalShelterList
 
     private val _sheetState = MutableStateFlow(BottomSheetState.COLLAPSED)
-    val sheetstate: MutableStateFlow<BottomSheetState> get() = _sheetState
+    val sheetState: MutableStateFlow<BottomSheetState> get() = _sheetState
+
+    private val _permissionState = MutableStateFlow(false)
+    val permissionState: MutableStateFlow<Boolean> get() = _permissionState
 
     private fun setValueOnMainThreadShelter(value: List<PetShelter>) {
         viewModelScope.launch(Dispatchers.Main) {
@@ -53,26 +54,26 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
     }
 
     fun toggleModal() {
-        when(_sheetState.value) {
+        when (_sheetState.value) {
             BottomSheetState.COLLAPSED -> expand()
             BottomSheetState.EXPANDED -> collapse()
         }
     }
 
-    private fun expand(){
+    private fun expand() {
         viewModelScope.launch(Dispatchers.Main) {
             _sheetState.value = BottomSheetState.EXPANDED
         }
     }
 
-    fun collapse(){
+    fun collapse() {
         viewModelScope.launch(Dispatchers.Main) {
             _sheetState.value = BottomSheetState.COLLAPSED
         }
     }
 
     fun getShelterIconByShelterType(shelterType: String): Int {
-        return when(shelterType){
+        return when (shelterType) {
             ShelterType.PARTICULAR.stringValue -> R.drawable.particular
             ShelterType.LOCAL_GOVERNMENT.stringValue -> R.drawable.towncouncil
             ShelterType.VETERINARY.stringValue -> R.drawable.veterinary
@@ -82,34 +83,10 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
         }
     }
 
-
-    @SuppressLint("MissingPermission") //Por si hay problemas con los permisos
-    fun getMyLocation() {
-
-        val locationManager: LocationManager
-
-        //VER SI TIENE LOS PERMISOS ACEPTADOS y SINO PEDIRLOS
-        //if(ActivityCompat.getPermissionCompatDelegate(requireContext(), ACCESS_FINE_LOCATION)
-        // == PackageManager.PERMISSION_GRANTED
-        // && ActivityCompat.getPermissionCompatDelegate(requireContext(), ACCESS_COARSE_LOCATION)
-        // == PackageManager.PERMISSION_GRANTED) {
-        // LLAMAR A LA FUNCION GETMYLOCATION para obtener mi Localizacion
-        //} else {
-        //val permissionLauncher = ActivityResultLauncher
-        //}
-
-
-
-        //LOCATION HECHO EN CLASE
-        //val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient (requireContext())
-        //fusedLocationProviderClient.lastLocation.addOnSuccessListener {
-        //Log.d("Success", "${it.latitude} ${it.longitude}")
-        //val myLocation = LatLng(it.latitude, it.longitude)
-        //}.addOnCanceledListener {
-        //Log.d("Canceled", "Cancelado")
-        //}.addOnFailureListener {
-        //Log.d("Fallo", "Ha fallado")
-        //}
-
+    fun setPermissionState(value: Boolean) {
+        viewModelScope.launch(Dispatchers.Main) {
+            _permissionState.value = value
+            println(permissionState.value)
+        }
     }
 }
