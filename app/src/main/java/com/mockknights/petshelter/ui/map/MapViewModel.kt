@@ -25,9 +25,6 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
     private val _sheetState = MutableStateFlow(BottomSheetState.COLLAPSED)
     val sheetState: MutableStateFlow<BottomSheetState> get() = _sheetState
 
-    private val _permissionState = MutableStateFlow(false)
-    val permissionState: MutableStateFlow<Boolean> get() = _permissionState
-
     private fun setValueOnMainThreadShelter(value: List<PetShelter>) {
         viewModelScope.launch(Dispatchers.Main) {
             _petShelter.value = value
@@ -80,13 +77,6 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
             ShelterType.SHELTER_POINT.stringValue -> R.drawable.animalshelter
             ShelterType.KIWOKO_STORE.stringValue -> R.drawable.kiwoko
             else -> R.drawable.questionmark
-        }
-    }
-
-    fun setPermissionState(value: Boolean) {
-        viewModelScope.launch(Dispatchers.Main) {
-            _permissionState.value = value
-            println(permissionState.value)
         }
     }
 }

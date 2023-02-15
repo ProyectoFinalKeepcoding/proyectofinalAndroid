@@ -64,10 +64,8 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         drawerState = DrawerState(DrawerValue.Closed),
         snackbarHostState = SnackbarHostState()
     )
-    // Permission for user locations
-    // Before composing the view, request check and request location permissions
-    val permissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
 
+    val permissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
     // Before composing the view, request check and request location permissions
     val lifecycleOwner = LocalLifecycleOwner.current // Compose views don't have onStart, onCreate... but a LifecycleOwner
     DisposableEffect(key1 = lifecycleOwner, effect = {
@@ -106,27 +104,11 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     modifier = Modifier
                         .fillMaxSize()
                         .weight(1.3f))
-                if(petShelter.value.isNotEmpty() && permissionState.status.isGranted) {
-                    // If the permission is granted, show the location
+
+                if (petShelter.value.isNotEmpty()) {
+
                     MyGoogleMaps(petShelter.value,
-                        locationGranted = true,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .weight(7.7f),
-                        onPlacingPoint = {
-                            viewModel.getShelterIconByShelterType(it) // Defines the icon depending on shelterType
-                        },
-                        onPointClicked = {clickedShelterName ->
-                            viewModel.toggleModal()
-                            viewModel.setModalShelter(clickedShelterName)
-                            true // This way, the default behaviour of google maps is disabled (shows info window with title and snippet)
-                        }, onMapClicked = {
-                            viewModel.collapse()
-                        })
-                } else if (petShelter.value.isNotEmpty()) {
-                    // This is the case when the permission is not granted: the user can't see his location
-                    MyGoogleMaps(petShelter.value,
-                        locationGranted = false,
+                        locationGranted = permissionState.status.isGranted,
                         modifier = Modifier
                             .fillMaxSize()
                             .weight(7.7f),
@@ -144,8 +126,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     Button(onClick = {
                         permissionState.launchPermissionRequest()
                     }) {
-                        if(!permissionState.status.shouldShowRationale) Text(text = "To use this allow permission in settings")
-                        else Text(text = "Refugio más cercano")
+                        Text(text = "Refugio más cercano")
                     }
                 }
             }
@@ -190,12 +171,11 @@ fun MyGoogleMaps(petShelter: List<PetShelter>, locationGranted: Boolean, modifie
         position = CameraPosition.fromLatLngZoom(madrid, 5f)
     }
     //3- PROPIEDADES DEL MAPA
-    val properties by remember {
-        mutableStateOf(MapProperties(
-            mapType = MapType.NORMAL,
-            isMyLocationEnabled = locationGranted,
-            //latLngBoundsForCameraTarget = LatLngBounds(marker2, marker3)
-        )) }
+    val properties = MapProperties( // Important: not remembered, as it has to be recomposed entirely for purposes of repainting user location
+        mapType = MapType.NORMAL,
+        isMyLocationEnabled = locationGranted,
+        //latLngBoundsForCameraTarget = LatLngBounds(marker2, marker3)
+    )
 
     //4- UI SETTINGS
     val uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = true, tiltGesturesEnabled = true))}
