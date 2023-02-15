@@ -4,8 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -49,7 +47,7 @@ import com.mockknights.petshelter.ui.theme.moderatMediumTitle
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
 @SuppressLint("RestrictedApi")
-//@Preview(showSystemUi = true)
+@Preview(showSystemUi = true)
 @Composable
 fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
@@ -67,32 +65,20 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
     val permissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
     // Before composing the view, request check and request location permissions
-    val lifecycleOwner = LocalLifecycleOwner.current // Compose views don't have onStart, onCreate... but a LifecycleOwner
-    DisposableEffect(key1 = lifecycleOwner, effect = {
-        val eventObserver = LifecycleEventObserver { _, event ->
-            // When starting to compose the view, ask for location permission if not allowed
-            if(event == Lifecycle.Event.ON_START) permissionState.launchPermissionRequest()
-        }
-        // Add the event observer to check the location permission on starting the composition
-        lifecycleOwner.lifecycle.addObserver(eventObserver)
-        // When leaving the map screen, remove the observer
-        onDispose { lifecycleOwner.lifecycle.removeObserver(eventObserver) }
-    })
+    OnMapLaunched { permissionState.launchPermissionRequest() }
 
     BottomSheetScaffold(
         scaffoldState = bottomSheetScaffoldState,
         sheetPeekHeight = 0.dp,
         sheetContent = {
             val modalShelterList = viewModel.modalShelterList.collectAsState().value
-            var modalShelterName = ""
-            var modalShelterNumber = ""
-            var modalShelterPhotoUrl = ""
             if(modalShelterList.isNotEmpty()) {
-                modalShelterName = modalShelterList[0].name
-                modalShelterNumber = modalShelterList[0].phoneNumber
-                modalShelterPhotoUrl = modalShelterList[0].photoURL
+                ModalBox(modalShelterList[0].name,
+                    modalShelterList[0].phoneNumber,
+                    modalShelterList[0].photoURL)
+            } else {
+                ModalBox(null, null, null)
             }
-            ModalBox(modalShelterName, modalShelterNumber, modalShelterPhotoUrl)
         }
     ) {
         Box(modifier = Modifier
@@ -208,7 +194,7 @@ fun MyGoogleMaps(petShelter: List<PetShelter>, locationGranted: Boolean, modifie
 // least 8 dp of padding.
 @Preview
 @Composable
-fun ModalBox(title: String = "Title", phoneNumber: String = "918158899", photoUrl: String = "") {
+fun ModalBox(title: String? = "Title", phoneNumber: String? = "918158899", photoUrl: String? = "") {
     val configuration = LocalConfiguration.current
     val modalHeight = configuration.screenHeightDp.dp / 3
     Box(
@@ -223,13 +209,13 @@ fun ModalBox(title: String = "Title", phoneNumber: String = "918158899", photoUr
         ) {
             // Title box: modifier passed as parameter to use columnScope
             TitleBox(
-                title = title,
+                title = title ?: "",
                 modifier = Modifier
                     .fillMaxSize()
                     .weight(2.6f))
             // Row with the remaining elements
             ImageAndButtonsRow(
-                photoUrl = photoUrl,
+                photoUrl = photoUrl ?:"",
                 modifier = Modifier
                     .fillMaxSize()
                     .weight(7.4f)
@@ -373,4 +359,18 @@ fun bitmapDescriptorFromVector(
     return BitmapDescriptorFactory.fromBitmap(bm)
 }
 
-
+@Composable
+fun OnMapLaunched(execute: () -> Unit) {
+    // Before composing the view, request check and request location permissions
+    val lifecycleOwner = LocalLifecycleOwner.current // Compose views don't have onStart, onCreate... but a LifecycleOwner
+    DisposableEffect(key1 = lifecycleOwner, effect = {
+        val eventObserver = LifecycleEventObserver { _, event ->
+            // When starting to compose the view, ask for location permission if not allowed
+            if(event == Lifecycle.Event.ON_START) execute()
+        }
+        // Add the event observer to check the location permission on starting the composition
+        lifecycleOwner.lifecycle.addObserver(eventObserver)
+        // When leaving the map screen, remove the observer
+        onDispose { lifecycleOwner.lifecycle.removeObserver(eventObserver) }
+    })
+}
