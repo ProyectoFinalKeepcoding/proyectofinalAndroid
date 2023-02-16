@@ -33,7 +33,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -52,9 +51,7 @@ import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
 import com.mockknights.petshelter.ui.theme.moderatMediumTitle
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
@@ -63,17 +60,8 @@ import kotlinx.coroutines.withContext
 @Composable
 fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
+    val coroutineScope = rememberCoroutineScope()
     val petShelter = viewModel.petShelter.collectAsState()
-
-    val sheetState =
-        if (viewModel.sheetState.collectAsState().value == BottomSheetState.COLLAPSED) BottomSheetState(initialValue = BottomSheetValue.Collapsed)
-        else BottomSheetState(initialValue = BottomSheetValue.Expanded)
-
-    val bottomSheetScaffoldState = BottomSheetScaffoldState(
-        bottomSheetState = sheetState,
-        drawerState = DrawerState(DrawerValue.Closed),
-        snackbarHostState = SnackbarHostState()
-    )
 
     // Get user current location
     val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(LocalContext.current)
@@ -99,7 +87,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
 
     BottomSheetScaffold(
-        scaffoldState = bottomSheetScaffoldState,
+        scaffoldState = viewModel.bottomSheetScaffoldState,
         sheetPeekHeight = 0.dp,
         sheetContent = {
             val modalShelterList = viewModel.modalShelterList.collectAsState().value
@@ -134,11 +122,11 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                             viewModel.getShelterIconByShelterType(it) // Defines the icon depending on shelterType
                         },
                         onPointClicked = {clickedShelterName ->
-                            viewModel.toggleModal()
+                            viewModel.toggleModal(coroutineScope)
                             viewModel.setModalShelter(clickedShelterName)
                             true // This way, the default behaviour of google maps is disabled (shows info window with title and snippet)
                         }, onMapClicked = {
-                            viewModel.collapse()
+                            viewModel.collapseModal(coroutineScope)
                         }, onShelterButtonClicked = { cameraPositionState ->
                             CoroutineScope(Dispatchers.Main).launch {
                                 withContext(Dispatchers.Main) {
