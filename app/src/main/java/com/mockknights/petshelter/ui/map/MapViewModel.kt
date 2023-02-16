@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
@@ -21,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -40,11 +42,11 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
         snackbarHostState = SnackbarHostState()
     )
 
-    private val _locationPermissionState = mutableStateOf(false)
-    val locationPermissionState: MutableState<Boolean> get() = _locationPermissionState
+    private val _locationPermissionGranted = mutableStateOf(false)
+    val locationPermissionGranted: MutableState<Boolean> get() = _locationPermissionGranted
 
     private val _currentUserLocation = mutableStateOf(LatLng(40.4167047, -3.7035825)) // Madrid by default
-    val currentUserLocation: MutableState<LatLng> get() = _currentUserLocation
+    private val currentUserLocation: MutableState<LatLng> get() = _currentUserLocation
 
     private val _cameraPositionState = mutableStateOf(CameraPositionState(CameraPosition.fromLatLngZoom(currentUserLocation.value, 6f)))
     val cameraPositionState: MutableState<CameraPositionState> get() = _cameraPositionState
@@ -103,20 +105,15 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
 
     fun onPermissionRequestCompleted(isGranted: Boolean, context: Context) {
         // Change the status of the permission
-        _locationPermissionState.value = isGranted
+        _locationPermissionGranted.value = isGranted
         // If the permission is granted, get the user location
-        if (isGranted) {
-            setCurrentUserLocation(context)
-            moveCameraToUserLocation()
-        } else {
-            moveCameraToDefaultLocation()
-        }
+        if (isGranted) { setCurrentUserLocation(context) }
     }
 
     @SuppressLint("MissingPermission") // Permission is checked with locationPermissionState
     private fun setCurrentUserLocation(context: Context) {
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
-        if (locationPermissionState.value) {
+        if (locationPermissionGranted.value) {
             fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
                 location?.let {nullCheckedLocation ->
                     _currentUserLocation.value = LatLng(nullCheckedLocation.latitude, nullCheckedLocation.longitude)
@@ -125,12 +122,10 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
         }
     }
 
-    fun moveCameraToUserLocation() {
-        _cameraPositionState.value.position = CameraPosition.fromLatLngZoom(currentUserLocation.value, 9f)
+    fun moveCameraToUserLocation(coroutineScope: CoroutineScope) {
+        val update = CameraUpdateFactory.newCameraPosition(CameraPosition(currentUserLocation.value, 9f, 0f, 0f))
+        coroutineScope.launch {
+            _cameraPositionState.value.animate(update)
+        }
     }
-
-    fun moveCameraToDefaultLocation() {
-        _cameraPositionState.value.position = CameraPosition.fromLatLngZoom(LatLng(40.4167047, -3.7035825), 6f)
-    }
-
 }

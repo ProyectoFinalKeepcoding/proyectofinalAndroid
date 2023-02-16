@@ -102,7 +102,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 if (petShelters.isNotEmpty()) {
 
                     MyGoogleMaps(petShelters,
-                        locationGranted = viewModel.locationPermissionState.value,
+                        locationGranted = viewModel.locationPermissionGranted.value,
                         cameraPositionState = cameraPositionState.value,
                         modifier = Modifier
                             .fillMaxSize()
@@ -116,10 +116,12 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                             true // This way, the default behaviour of google maps is disabled (shows info window with title and snippet)
                         }, onMapClicked = {
                             viewModel.collapseModal(coroutineScope)
+                        }, onMapLoaded = {
+                            if(viewModel.locationPermissionGranted.value) viewModel.moveCameraToUserLocation(coroutineScope)
                         })
 
                     Button(onClick = {
-                        viewModel.moveCameraToUserLocation()
+                        viewModel.moveCameraToUserLocation(coroutineScope)
                     }) {
                         Text(text = "Move camera to user location")
                     }
@@ -158,7 +160,8 @@ fun MyGoogleMaps(petShelter: List<PetShelter>,
                  modifier: Modifier,
                  onPlacingPoint: (String) -> Int,
                  onPointClicked: (String) -> Boolean,
-                 onMapClicked: () -> Unit) {
+                 onMapClicked: () -> Unit,
+                 onMapLoaded: () -> Unit) {
 
     // Map properties
     val properties = MapProperties( // Important: not remembered, as it has to be recomposed entirely for purposes of repainting user location
@@ -175,7 +178,7 @@ fun MyGoogleMaps(petShelter: List<PetShelter>,
         properties = properties,
         uiSettings = uiSettings,
         onMapClick = { onMapClicked() },
-        onMapLoaded = { },
+        onMapLoaded = { onMapLoaded() },
         onMyLocationButtonClick = { true },
         onMyLocationClick = { },
         onPOIClick = {  }
