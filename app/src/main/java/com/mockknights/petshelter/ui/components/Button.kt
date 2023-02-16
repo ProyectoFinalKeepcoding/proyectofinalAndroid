@@ -42,7 +42,7 @@ fun KiwokoIconButton(name: String, icon: Int, modifier: Modifier, onClick: () ->
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(backgroundColor = RedKiwoko),
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(4))
     ) {
         Row(

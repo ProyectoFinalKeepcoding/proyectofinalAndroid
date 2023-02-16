@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.widget.Space
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -90,7 +91,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     ) {
         Box(modifier = Modifier
             .fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.BottomCenter
         ) {
             Column() {
                 // The logo box is always shown, whether or not the list of shelters is empty
@@ -120,13 +121,20 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                             if(viewModel.locationPermissionGranted.value) viewModel.moveCameraToUserLocation(coroutineScope)
                         })
 
-                    Button(onClick = {
-                        viewModel.moveCameraToUserLocation(coroutineScope)
-                    }) {
-                        Text(text = "Move camera to user location")
-                    }
+
                 }
             }
+            KiwokoIconButton(
+                name = "Me!",
+                icon = R.drawable.logomarker,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .width(LocalConfiguration.current.screenWidthDp.dp / 2)
+                    .padding(16.dp),
+                onClick = {
+                    if(viewModel.locationPermissionGranted.value) viewModel.moveCameraToUserLocation(coroutineScope)
+                }
+            )
         }
     }
 }
@@ -298,8 +306,8 @@ fun ImageColumn(photoUrl: String, modifier: Modifier) {
 @Composable
 fun ButtonsColumn(modifier: Modifier) {
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.SpaceEvenly,
+        modifier = modifier.padding(vertical = 16.dp),
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         KiwokoIconButton(
@@ -311,6 +319,10 @@ fun ButtonsColumn(modifier: Modifier) {
         ) {
             // TODO: Call!!
         }
+        Spacer(modifier = Modifier.
+            fillMaxSize()
+            .weight(0.5f))
+
         KiwokoIconButton(
             name = "Ir",
             icon = R.drawable.directions,
