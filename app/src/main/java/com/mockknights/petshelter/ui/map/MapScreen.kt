@@ -4,9 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
-import android.location.Location
-import android.location.LocationRequest
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -39,12 +36,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
 import com.google.accompanist.permissions.*
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdate
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.mockknights.petshelter.R
@@ -60,41 +53,36 @@ import kotlinx.coroutines.*
 @Composable
 fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
+    // Coroutine scope to launch coroutines from composable functions
     val coroutineScope = rememberCoroutineScope()
-    val petShelter = viewModel.petShelter.collectAsState()
-
-    // Get user current location
-    val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(LocalContext.current)
-    val currentUserLocation = remember { mutableStateOf(LatLng(40.4167047, -3.7035825)) } // Madrid by default
-
+    // Local context to get resources
+    val mapScreenContext = LocalContext.current
+    // PetShelter list
+    val petShelters = viewModel.petShelter.collectAsState().value
     // Get camera position
-    val cameraPositionState = rememberCameraPositionState { CameraPosition.fromLatLngZoom(currentUserLocation.value, 6f) }
-
-    val permissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION) { granted ->
-        if (granted) {
-            fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
-                if (location != null) {
-                    currentUserLocation.value = LatLng(location.latitude, location.longitude)
-                    cameraPositionState.position = CameraPosition.fromLatLngZoom(currentUserLocation.value, 9f)
-                }
-            }
-        } else {
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(currentUserLocation.value, 6f)
-        }
+    val cameraPositionState = remember { viewModel.cameraPositionState }
+    // This launcher is used to request permissions
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        viewModel.onPermissionRequestCompleted(isGranted, mapScreenContext)
     }
-    // Before composing the view, request check and request location permissions
-    OnMapLaunched { permissionState.launchPermissionRequest() }
-
-
+    // Before composing the view, check and request (or not) location permissions
+    OnMapLaunched { launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
+    // This composable contains the map and manages the modal of selected shelter
     BottomSheetScaffold(
         scaffoldState = viewModel.bottomSheetScaffoldState,
         sheetPeekHeight = 0.dp,
         sheetContent = {
             val modalShelterList = viewModel.modalShelterList.collectAsState().value
+            // When clicking on a shelter, the viewModel gets the shelter and sets it in the modalShelterList
+            // This modal shelter is then shown in the modal
             if(modalShelterList.isNotEmpty()) {
-                ModalBox(modalShelterList[0].name,
-                    modalShelterList[0].phoneNumber,
-                    modalShelterList[0].photoURL)
+                val shelter = modalShelterList[0]
+                ModalBox(
+                    title = shelter.name,
+                    phoneNumber = shelter.phoneNumber,
+                    photoUrl = shelter.photoURL)
             } else {
                 ModalBox(null, null, null)
             }
@@ -105,16 +93,17 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             contentAlignment = Alignment.Center
         ) {
             Column() {
+                // The logo box is always shown, whether or not the list of shelters is empty
                 LogoBox(
                     modifier = Modifier
                         .fillMaxSize()
                         .weight(1.3f))
 
-                if (petShelter.value.isNotEmpty()) {
+                if (petShelters.isNotEmpty()) {
 
-                    MyGoogleMaps(petShelter.value,
-                        locationGranted = permissionState.status.isGranted,
-                        cameraPositionState = cameraPositionState,
+                    MyGoogleMaps(petShelters,
+                        locationGranted = viewModel.locationPermissionState.value,
+                        cameraPositionState = cameraPositionState.value,
                         modifier = Modifier
                             .fillMaxSize()
                             .weight(7.7f),
@@ -127,14 +116,13 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                             true // This way, the default behaviour of google maps is disabled (shows info window with title and snippet)
                         }, onMapClicked = {
                             viewModel.collapseModal(coroutineScope)
-                        }, onShelterButtonClicked = { cameraPositionState ->
-                            CoroutineScope(Dispatchers.Main).launch {
-                                withContext(Dispatchers.Main) {
-                                    permissionState.launchPermissionRequest()
-                                }
-                                if(permissionState.status.isGranted) { cameraPositionState.position = CameraPosition.fromLatLngZoom(currentUserLocation.value, 9f) }
-                            }
                         })
+
+                    Button(onClick = {
+                        viewModel.moveCameraToUserLocation()
+                    }) {
+                        Text(text = "Move camera to user location")
+                    }
                 }
             }
         }
@@ -170,8 +158,7 @@ fun MyGoogleMaps(petShelter: List<PetShelter>,
                  modifier: Modifier,
                  onPlacingPoint: (String) -> Int,
                  onPointClicked: (String) -> Boolean,
-                 onMapClicked: () -> Unit,
-                 onShelterButtonClicked: (CameraPositionState) -> Unit) {
+                 onMapClicked: () -> Unit) {
 
     // Map properties
     val properties = MapProperties( // Important: not remembered, as it has to be recomposed entirely for purposes of repainting user location
@@ -202,12 +189,6 @@ fun MyGoogleMaps(petShelter: List<PetShelter>,
                 onClick = { onPointClicked(i.name) }
             )
         }
-    }
-
-    Button(onClick = {
-        onShelterButtonClicked(cameraPositionState)
-    }) {
-        Text(text = "Refugio más cercano")
     }
 }
 

@@ -1,9 +1,16 @@
 package com.mockknights.petshelter.ui.map
 
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.material.*
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
 import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.domain.Repository
@@ -14,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -33,6 +39,15 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
         drawerState = DrawerState(DrawerValue.Closed),
         snackbarHostState = SnackbarHostState()
     )
+
+    private val _locationPermissionState = mutableStateOf(false)
+    val locationPermissionState: MutableState<Boolean> get() = _locationPermissionState
+
+    private val _currentUserLocation = mutableStateOf(LatLng(40.4167047, -3.7035825)) // Madrid by default
+    val currentUserLocation: MutableState<LatLng> get() = _currentUserLocation
+
+    private val _cameraPositionState = mutableStateOf(CameraPositionState(CameraPosition.fromLatLngZoom(currentUserLocation.value, 6f)))
+    val cameraPositionState: MutableState<CameraPositionState> get() = _cameraPositionState
 
     private fun setValueOnMainThreadShelter(value: List<PetShelter>) {
         viewModelScope.launch(Dispatchers.Main) {
@@ -85,4 +100,37 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
             else -> R.drawable.questionmark
         }
     }
+
+    fun onPermissionRequestCompleted(isGranted: Boolean, context: Context) {
+        // Change the status of the permission
+        _locationPermissionState.value = isGranted
+        // If the permission is granted, get the user location
+        if (isGranted) {
+            setCurrentUserLocation(context)
+            moveCameraToUserLocation()
+        } else {
+            moveCameraToDefaultLocation()
+        }
+    }
+
+    @SuppressLint("MissingPermission") // Permission is checked with locationPermissionState
+    private fun setCurrentUserLocation(context: Context) {
+        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+        if (locationPermissionState.value) {
+            fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
+                location?.let {nullCheckedLocation ->
+                    _currentUserLocation.value = LatLng(nullCheckedLocation.latitude, nullCheckedLocation.longitude)
+                }
+            }
+        }
+    }
+
+    fun moveCameraToUserLocation() {
+        _cameraPositionState.value.position = CameraPosition.fromLatLngZoom(currentUserLocation.value, 9f)
+    }
+
+    fun moveCameraToDefaultLocation() {
+        _cameraPositionState.value.position = CameraPosition.fromLatLngZoom(LatLng(40.4167047, -3.7035825), 6f)
+    }
+
 }
