@@ -5,6 +5,16 @@ import retrofit2.http.GET
 
 interface PetShelterAPI {
 
-    @GET("")
+    @GET("auth/signin")
+    suspend fun getToken(): String
+
+    @GET("auth/signup")
+    suspend fun register()
+
+    @GET("shelters")
     suspend fun getAllPetShelter(): List<PetShelterRemote>
+
+
+
+
 }

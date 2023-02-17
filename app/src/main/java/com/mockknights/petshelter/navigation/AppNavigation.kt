@@ -6,6 +6,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mockknights.petshelter.ui.login.LoginScreen
 import com.mockknights.petshelter.ui.map.MapScreen
+import com.mockknights.petshelter.ui.petshelter.PetShelterScreen
+import com.mockknights.petshelter.ui.register.RegisterScreen
 import com.mockknights.petshelter.ui.welcome.WelcomeScreen
 
 @Composable
@@ -23,11 +25,25 @@ fun AppNavigation () {
         }
 
         composable(Screens.Login.route) {
-            LoginScreen()
+            LoginScreen(navigateToWelcome = {
+                navController.navigate(Screens.Welcome.route)
+            }, navigateToRegister = {
+                navController.navigate(Screens.Register.route)
+            }, navigateToPetShelter = {
+                navController.navigate(Screens.PetShelter.route)
+            })
+        }
+
+        composable(Screens.PetShelter.route) {
+            PetShelterScreen()
         }
 
         composable(Screens.Map.route) {
             MapScreen()
+        }
+
+        composable(Screens.Register.route) {
+            RegisterScreen()
         }
     }
 
