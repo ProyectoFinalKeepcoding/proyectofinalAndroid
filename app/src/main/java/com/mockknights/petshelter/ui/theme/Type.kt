@@ -62,3 +62,36 @@ val Typography.moderatLightTitle: TextStyle
             letterSpacing = 0.14.em
         )
     }
+
+val Typography.moderatDataFieldLabel: TextStyle
+    @Composable
+    get() {
+        return  TextStyle(
+            fontFamily = ModeratFamily,
+            fontWeight = FontWeight.Light,
+            fontSize = 14.sp,
+            letterSpacing = 0.03.em
+        )
+    }
+
+val Typography.moderatUsername: TextStyle
+    @Composable
+    get() {
+        return  TextStyle(
+            fontFamily = ModeratFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = 22.sp,
+            letterSpacing = 0.03.em
+        )
+    }
+
+val Typography.moderatTextField: TextStyle
+    @Composable
+    get() {
+        return  TextStyle(
+            fontFamily = ModeratFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 18.sp,
+            letterSpacing = 0.03.em
+        )
+    }
