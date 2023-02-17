@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mockknights.petshelter.ui.theme.RedKiwoko
 import com.mockknights.petshelter.ui.theme.moderatButtonBold
+import com.mockknights.petshelter.ui.theme.moderatLightTitle
+import com.mockknights.petshelter.ui.theme.moderatMediumTitle
 
 @Composable
 fun CreateWelcomeButton(name: String, modifier: Modifier, colorButton: Color, colorText: Color, onClick: () -> Unit) {
@@ -30,8 +32,13 @@ fun CreateWelcomeButton(name: String, modifier: Modifier, colorButton: Color, co
             textAlign = TextAlign.Center,
             textDecoration = TextDecoration.None,
             color = colorText,
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.moderatMediumTitle,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Medium,
+            lineHeight = 38.sp,
+            modifier = Modifier
+                .wrapContentHeight()
+                .padding(vertical = 14.dp)
         )
     }
 }

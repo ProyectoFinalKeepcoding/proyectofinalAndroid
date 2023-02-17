@@ -1,12 +1,10 @@
 package com.mockknights.petshelter.ui.welcome
 
+import android.content.res.Resources
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,74 +16,80 @@ import com.mockknights.petshelter.ui.components.CreateWelcomeButton
 import com.mockknights.petshelter.ui.theme.RedKiwoko
 import com.mockknights.petshelter.R
 
+
+fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt())
+fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density.toInt())
+
 @Preview(showSystemUi = true)
 @Composable
-fun WelcomeScreen(/*viewModel: WelcomeViewModel = hiltViewModel(),*/ navigateToMap: () -> (Unit) = {},
-                                                                     navigateToLogin: () -> (Unit) = {}
-) {
+fun WelcomeScreen( navigateToMap: () -> (Unit) = {}, navigateToLogin: () -> (Unit) = {}) {
 
-    val buttonModifier by remember {
-        mutableStateOf(
-            Modifier
-                .fillMaxWidth()
-                .height(150.dp)
-                .padding(16.dp)
-        )
-    }
-    val spacerModifier by remember { mutableStateOf(
-        Modifier
-            .fillMaxWidth()
-            .height(100.dp)) }
-    //SetBackground()
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1F)
                 .background(RedKiwoko), Alignment.Center
         ) {
-            CreateWelcomeButton(
-                name = "Puedo acoger a una mascota",
-                modifier = buttonModifier,
-                colorButton = Color.White,
-                colorText = RedKiwoko
+            BackgroundImage()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 25.toDp().dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                navigateToLogin()
-            }
-        }
-        Spacer(modifier = spacerModifier.background(RedKiwoko))
-        Spacer(modifier = spacerModifier.background(Color.White))
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(2.8f),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    CreateWelcomeButton(
+                        name = "Puedo acoger a una mascota",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .padding(horizontal = 16.toDp().dp),
+                        colorButton = Color.White,
+                        colorText = RedKiwoko
+                    ) {
+                        navigateToLogin()
+                    }
+                }
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(3.8f)
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(3.4f)
+                ) {
+                    CreateWelcomeButton(
+                        name = "He encontrado una mascota",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .padding(horizontal = 16.toDp().dp),
+                        colorButton = RedKiwoko,
+                        colorText = Color.White
+                    ) {
+                        navigateToMap()
+                    }
+                }
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1F)
-                .background(Color.White), Alignment.Center
-        ) {
-            CreateWelcomeButton(
-                name = "He encontrado una mascota",
-                modifier = buttonModifier,
-                colorButton = RedKiwoko,
-                colorText = Color.White
-            ) {
-                navigateToMap()
             }
         }
-    }
+
 }
 
 
 @Composable
-fun SetBackground() {
-    val imageModifier = Modifier.fillMaxSize()
+fun BackgroundImage() {
     Image(
         painter = painterResource(id = R.drawable.welcome),
         contentDescription = "Fondo pantalla",
-        contentScale = ContentScale.Crop,
-        modifier = imageModifier)
+        contentScale = ContentScale.FillBounds,
+        modifier = Modifier.fillMaxSize())
 }
