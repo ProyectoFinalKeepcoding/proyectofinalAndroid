@@ -58,8 +58,8 @@ fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),
 fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel) {
     Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 
-        var user by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
+        var user by remember { mutableStateOf("isma") }
+        var password by remember { mutableStateOf("123456") }
 
         FormField(
             value = user,

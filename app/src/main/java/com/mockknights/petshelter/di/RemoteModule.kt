@@ -51,12 +51,9 @@ object RemoteModule {
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val originalRequest = chain.request()
-                val newUrl = originalRequest.url.newBuilder()
-                    .build()
 
                 val newRequest = originalRequest.newBuilder()
-                    .url(newUrl)
-                    .addHeader("ApiKey", "mWIwALVZo3a0evMfbUgkl/gLvRis1/w99To0AamBN+0=")
+                    .header("ApiKey", "mWIwALVZo3a0evMfbUgkl/gLvRis1/w99To0AamBN+0=")
                     .build()
                 chain.proceed(newRequest)
             }
