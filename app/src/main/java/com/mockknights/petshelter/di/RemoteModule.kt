@@ -21,10 +21,10 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RemoteModule {
 
-//    @Provides
-//    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-//        return context.getSharedPreferences("NAME", Context.MODE_PRIVATE)
-//    }
+    @Provides
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences("NAME", Context.MODE_PRIVATE)
+    }
 
     @Provides
     fun provideMoshi(): Moshi {
@@ -45,7 +45,8 @@ object RemoteModule {
 
     @Provides
     fun provideOkHttpClient(
-        httpLoggingInterceptor: HttpLoggingInterceptor
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        sharedPreferences: SharedPreferences
     ): OkHttpClient {
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor { chain ->
@@ -62,7 +63,7 @@ object RemoteModule {
             .authenticator { _, response ->
                 if(response.request.url.encodedPath.contains("auth/signin")) {
                     response.request.newBuilder()
-                        .header("Authorization", "Basic aXNtYToxMjM0NTY=")
+                        .header("Authorization", "Basic ${sharedPreferences.getString("CREDENTIAL", null)}")
                         .build()
                 }
                 else {
