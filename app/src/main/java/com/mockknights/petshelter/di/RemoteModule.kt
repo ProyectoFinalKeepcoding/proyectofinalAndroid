@@ -60,8 +60,15 @@ object RemoteModule {
                 chain.proceed(newRequest)
             }
             .authenticator { _, response ->
-                response.request.newBuilder()
-                    .build()
+                if(response.request.url.encodedPath.contains("auth/signin")) {
+                    response.request.newBuilder()
+                        .header("Authorization", "Basic aXNtYToxMjM0NTY=")
+                        .build()
+                }
+                else {
+                    response.request.newBuilder()
+                        .build()
+                }
             }
             .addInterceptor(httpLoggingInterceptor)
             .build()

@@ -27,7 +27,7 @@ fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),
 
     val success by viewModel.stateLogin.collectAsState()
     LaunchedEffect(key1 = success) {
-        if (success.equals(LoginState.Succes(""))) {
+        if (success.equals(LoginState.Succes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjb20ubW9ja2tuaWdodHMucGV0c2hlbHRlciIsInN1YiI6IkFDNTdBNkMzLUQ2RTYtNEY2OC04RkQzLTU2MEU1MkVGRTc2NiJ9.oKwuGiFAjxnQgJn0Az59jfs3JhJOYwz7IJoIOCKLhLs"))) {
             navigateToPetShelter()
         }
     }
