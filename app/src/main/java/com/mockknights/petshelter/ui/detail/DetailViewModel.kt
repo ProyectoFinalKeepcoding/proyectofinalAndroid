@@ -28,10 +28,33 @@ class DetailViewModel@Inject constructor(private val repository: Repository): Vi
         }
     }
 
-    fun updateShelterType(shelterType: ShelterType) {
+    fun onUpdatedShelterType(shelterType: ShelterType) {
+        updateShelterType(shelterType)
+    }
+    private fun updateShelterType(shelterType: ShelterType) {
         val newDetailState = _detailState.value.copy(shelterType = shelterType.stringValue)
         viewModelScope.launch (Dispatchers.IO) {
             _detailState.value = newDetailState
         }
     }
+
+    fun onUpdatedDataField(text: String, fieldType: DetailFieldType) {
+        updateDataField(text, fieldType)
+    }
+    private fun updateDataField(text: String, fieldType: DetailFieldType) {
+        val newDetailState = getDetailStateByFieldType(text, fieldType)
+        viewModelScope.launch (Dispatchers.IO) {
+            _detailState.value = newDetailState
+        }
+    }
+    private fun getDetailStateByFieldType(text: String, fieldType: DetailFieldType): PetShelter {
+        return when (fieldType) {
+            DetailFieldType.ADDRESS -> _detailState.value // TODO: Implement after managing addresses with google api
+            DetailFieldType.PHONE -> _detailState.value.copy(phoneNumber = text)
+        }
+    }
+}
+
+enum class DetailFieldType {
+    ADDRESS, PHONE
 }

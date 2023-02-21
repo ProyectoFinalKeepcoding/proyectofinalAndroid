@@ -1,18 +1,25 @@
 package com.mockknights.petshelter.ui.detail
 
 import android.content.res.Resources
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,9 +33,11 @@ fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt
 fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density.toInt())
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel()) {
 
+    val keyboardController = LocalSoftwareKeyboardController.current
     val detailState by detailViewModel.detailState.collectAsState()
 
     LaunchedEffect(key1 = id) {
@@ -44,7 +53,12 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
             ){
         Column (
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        keyboardController?.hide()
+                    })
+                },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.toDp().dp)
         ) {
@@ -57,15 +71,21 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                 )
                 UserDataField(
                     fieldLabel = "Dirección",
-                    userData = detailState.address.latitude.toString() + " " + detailState.address.longitude.toString()
+                    userData = detailState.address.latitude.toString() + " " + detailState.address.longitude.toString(),
+                    doneAction = ImeAction.Next,
+                    onUpdateValue = { text -> detailViewModel.onUpdatedDataField(text, DetailFieldType.ADDRESS) }
                 )
                 UserDataField(
                     fieldLabel = "Teléfono",
-                    userData = detailState.phoneNumber
+                    userData = detailState.phoneNumber,
+                    keyboardType = KeyboardType.Phone,
+                    onUpdateValue = { text ->
+                        detailViewModel.onUpdatedDataField(text, DetailFieldType.PHONE)
+                    }
                 )
                 RadioButtonsRow(
                     currentSelection = ShelterType.valueOf(detailState.shelterType.uppercase()),
-                    onItemClick = { shelterType -> detailViewModel.updateShelterType(shelterType) }
+                    onItemClick = { shelterType -> detailViewModel.onUpdatedShelterType(shelterType) }
                 )
                 ButtonRow(
                     onClick = {
@@ -155,12 +175,23 @@ modifier = Modifier
 
 @Preview
 @Composable
-fun UserDataField(fieldLabel: String = "Dirección", userData: String = "Avenida Europa, 2") {
+fun UserDataField(
+    fieldLabel: String = "Dirección",
+    userData: String = "Avenida Europa, 2",
+    keyboardType: KeyboardType = KeyboardType.Text,
+    doneAction: ImeAction = ImeAction.Done,
+    onUpdateValue: (String) -> Unit = { }
+    ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.toDp().dp),
     ) {
         UserDataFieldLabel(fieldLabel)
-        UserDataFieldTextField(userData)
+        UserDataFieldTextField(
+            userData = userData,
+            keyboardType = keyboardType,
+            doneAction = doneAction,
+            onUpdateValue = { onUpdateValue(it)}
+        )
     }
 }
 
@@ -173,11 +204,20 @@ fun UserDataFieldLabel(fieldLabel: String = "Dirección") {
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Preview
 @Composable
-fun UserDataFieldTextField(userAddress: String = "Avenida Europa, 2") {
+fun UserDataFieldTextField(
+    userData: String = "Avenida Europa, 2",
+    keyboardType: KeyboardType = KeyboardType.Text,
+    doneAction: ImeAction = ImeAction.Done,
+    onUpdateValue: (String) -> Unit = { },
+) {
+
+    var text by remember { mutableStateOf(userData) }
+
     OutlinedTextField(
-        value = userAddress,
+        value = text,
         textStyle = MaterialTheme.typography.moderatTextField,
         singleLine = true,
         shape = RoundedCornerShape(4.dp),
@@ -187,7 +227,15 @@ fun UserDataFieldTextField(userAddress: String = "Avenida Europa, 2") {
             focusedBorderColor = GrayKiwoko,
             unfocusedBorderColor = GrayKiwoko,
         ),
-        onValueChange = {} )
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = doneAction,
+            keyboardType = keyboardType
+        ),
+        onValueChange = {
+            text = it
+            onUpdateValue(it)
+        }
+    )
 }
 
 
