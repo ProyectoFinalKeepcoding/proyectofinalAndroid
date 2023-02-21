@@ -58,9 +58,9 @@ object RemoteModule {
                 chain.proceed(newRequest)
             }
             .authenticator { _, response ->
-                if(response.request.url.encodedPath.contains("auth/signin")) {
+                if(response.request.url.encodedPath.contains("api/auth/signin")) {
                     response.request.newBuilder()
-                        .header("Authorization", "Basic ${sharedPreferences.getString("CREDENTIAL", null)}")
+                        .header("Authorization", "${sharedPreferences.getString("CREDENTIAL", null)}")
                         .build()
                 }
                 else {
