@@ -8,6 +8,6 @@ data class PetShelter (
     val password: String,
     val phoneNumber: String,
     val address: Address,
-    val shelterType: String,
+    val shelterType: ShelterType,
     val photoURL: String
         )

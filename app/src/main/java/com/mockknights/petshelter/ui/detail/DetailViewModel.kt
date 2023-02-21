@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel@Inject constructor(private val repository: Repository): ViewModel() {
 
-    private val _detailState = MutableStateFlow(PetShelter("", "", "","", Address(0.0, 0.0), ShelterType.PARTICULAR.stringValue, ""))
+    private val _detailState = MutableStateFlow(PetShelter("", "", "","", Address(0.0, 0.0), ShelterType.PARTICULAR, ""))
     val detailState: MutableStateFlow<PetShelter> get() = _detailState
 
     fun getShelterDetail(id: String) {
@@ -32,7 +32,7 @@ class DetailViewModel@Inject constructor(private val repository: Repository): Vi
         updateShelterType(shelterType)
     }
     private fun updateShelterType(shelterType: ShelterType) {
-        val newDetailState = _detailState.value.copy(shelterType = shelterType.stringValue)
+        val newDetailState = _detailState.value.copy(shelterType = shelterType)
         viewModelScope.launch (Dispatchers.IO) {
             _detailState.value = newDetailState
         }

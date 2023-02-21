@@ -1,11 +1,13 @@
 package com.mockknights.petshelter.domain
 
+import com.squareup.moshi.Json
+
 enum class ShelterType(val stringValue: String) {
-    PARTICULAR("particular"),
-    LOCAL_GOVERNMENT("localGovernment"),
-    VETERINARY("veterinary"),
-    SHELTER_POINT("shelterPoint"),
-    KIWOKO_STORE("kiwokoStore");
+    @Json(name = "particular") PARTICULAR("particular"),
+    @Json(name = "localGovernment") LOCAL_GOVERNMENT("localGovernment"),
+    @Json(name = "veterinary") VETERINARY("veterinary"),
+    @Json(name = "shelterPoint") SHELTER_POINT("shelterPoint"),
+    @Json(name = "kiwokoStore") KIWOKO_STORE("kiwokoStore");
 
     override fun toString(): String {
         return when(this) {

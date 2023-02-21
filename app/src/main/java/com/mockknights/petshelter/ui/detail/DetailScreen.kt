@@ -84,7 +84,7 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                     }
                 )
                 RadioButtonsRow(
-                    currentSelection = ShelterType.valueOf(detailState.shelterType.uppercase()),
+                    currentSelection = detailState.shelterType,
                     onItemClick = { shelterType -> detailViewModel.onUpdatedShelterType(shelterType) }
                 )
                 ButtonRow(
