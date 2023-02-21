@@ -4,9 +4,7 @@ import android.content.res.Resources
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -14,9 +12,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.ShelterType
@@ -26,9 +25,16 @@ import com.mockknights.petshelter.ui.theme.*
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt())
 fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density.toInt())
 
-@Preview
+
 @Composable
-fun DetailScreen() {
+fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel()) {
+
+    val detailState by detailViewModel.detailState.collectAsState()
+
+    LaunchedEffect(key1 = id) {
+        detailViewModel.getShelterDetail(id)
+    }
+
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -42,16 +48,30 @@ fun DetailScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.toDp().dp)
         ) {
-
-            UserNameRow()
-            ImageRow()
-            UserDataField("Dirección", "Avenida Europa 12") // TODO: Change to real data
-            UserDataField("Teléfono", "626892362") // TODO: Change to real data
-            RadioButtonsRow(currentSelection = ShelterType.PARTICULAR) // TODO: Change to real data
-            ButtonRow(
-                onClick = {
-                    // TODO: Viewmodel action
-                })
+            if (detailState.name != "") { // If the data is not loaded yet, don't show anything
+                UserNameRow(
+                    userName = detailState.name
+                )
+                ImageRow(
+                    photoUrl = detailState.photoURL
+                )
+                UserDataField(
+                    fieldLabel = "Dirección",
+                    userData = detailState.address.latitude.toString() + " " + detailState.address.longitude.toString()
+                )
+                UserDataField(
+                    fieldLabel = "Teléfono",
+                    userData = detailState.phoneNumber
+                )
+                RadioButtonsRow(
+                    currentSelection = ShelterType.valueOf(detailState.shelterType.uppercase()),
+                    onItemClick = { shelterType -> detailViewModel.updateShelterType(shelterType) }
+                )
+                ButtonRow(
+                    onClick = {
+                        // TODO: Viewmodel action
+                    })
+            }
         }
     }
 }
@@ -135,12 +155,12 @@ modifier = Modifier
 
 @Preview
 @Composable
-fun UserDataField(fieldLabel: String = "Dirección", userAddress: String = "Avenida Europa, 2") {
+fun UserDataField(fieldLabel: String = "Dirección", userData: String = "Avenida Europa, 2") {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.toDp().dp),
     ) {
         UserDataFieldLabel(fieldLabel)
-        UserDataFieldTextField(userAddress)
+        UserDataFieldTextField(userData)
     }
 }
 
@@ -170,9 +190,9 @@ fun UserDataFieldTextField(userAddress: String = "Avenida Europa, 2") {
         onValueChange = {} )
 }
 
-@Preview
+
 @Composable
-fun RadioButtonsRow(currentSelection: ShelterType = ShelterType.PARTICULAR) {
+fun RadioButtonsRow(currentSelection: ShelterType, onItemClick: (ShelterType) -> Unit = {}) {
 
     val currentlySelectedShelterType = remember { mutableStateOf(currentSelection) }
 
@@ -183,6 +203,7 @@ fun RadioButtonsRow(currentSelection: ShelterType = ShelterType.PARTICULAR) {
         RadioButtonsGroup(
             selected = currentlySelectedShelterType.value,
             onItemClick = { shelterType ->
+                onItemClick(shelterType)
                 currentlySelectedShelterType.value = shelterType
             }
         )
