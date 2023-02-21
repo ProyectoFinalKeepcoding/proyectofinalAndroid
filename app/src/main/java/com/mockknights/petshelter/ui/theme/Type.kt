@@ -74,6 +74,17 @@ val Typography.moderatDataFieldLabel: TextStyle
         )
     }
 
+val Typography.moderatRadioButtonLabel: TextStyle
+    @Composable
+    get() {
+        return  TextStyle(
+            fontFamily = ModeratFamily,
+            fontWeight = FontWeight.Light,
+            fontSize = 12.sp,
+            letterSpacing = 0.03.em
+        )
+    }
+
 val Typography.moderatUsername: TextStyle
     @Composable
     get() {
