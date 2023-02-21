@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mockknights.petshelter.R
+import com.mockknights.petshelter.domain.ShelterType
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
 import com.mockknights.petshelter.ui.theme.*
 
@@ -44,7 +47,7 @@ fun DetailScreen() {
             ImageRow()
             UserDataField("Dirección", "Avenida Europa 12") // TODO: Change to real data
             UserDataField("Teléfono", "626892362") // TODO: Change to real data
-            RadioButtonsRow()
+            RadioButtonsRow(currentSelection = ShelterType.PARTICULAR) // TODO: Change to real data
             ButtonRow(
                 onClick = {
                     // TODO: Viewmodel action
@@ -169,17 +172,25 @@ fun UserDataFieldTextField(userAddress: String = "Avenida Europa, 2") {
 
 @Preview
 @Composable
-fun RadioButtonsRow() {
+fun RadioButtonsRow(currentSelection: ShelterType = ShelterType.PARTICULAR) {
+
+    val currentlySelectedShelterType = remember { mutableStateOf(currentSelection) }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(12.toDp().dp),
     ) {
         UserDataFieldLabel(fieldLabel = "¿Qué soy?")
-        RadioButtonsGroup()
+        RadioButtonsGroup(
+            selected = currentlySelectedShelterType.value,
+            onItemClick = { shelterType ->
+                currentlySelectedShelterType.value = shelterType
+            }
+        )
     }
 }
 
 @Composable
-fun KiwokoRadioButton(selected: Boolean = false, labelText: String = "Particular", modifier: Modifier) {
+fun KiwokoRadioButton(selected: Boolean = false, labelText: String = "Particular", modifier: Modifier, onClick: () -> Unit = {}) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.toDp().dp),
@@ -194,7 +205,7 @@ fun KiwokoRadioButton(selected: Boolean = false, labelText: String = "Particular
                 selectedColor = RedKiwoko,
                 unselectedColor = GrayKiwoko,
             ),
-            onClick = {}
+            onClick = { onClick() }
         )
         Text(
             text = labelText,
@@ -206,7 +217,7 @@ fun KiwokoRadioButton(selected: Boolean = false, labelText: String = "Particular
 
 @Preview
 @Composable
-fun RadioButtonsGroup() {
+fun RadioButtonsGroup(selected: ShelterType = ShelterType.PARTICULAR, onItemClick: (ShelterType) -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -215,23 +226,14 @@ fun RadioButtonsGroup() {
         val modifier = Modifier
             .fillMaxWidth()
             .weight(1f)
-        KiwokoRadioButton(
-            labelText = "Particular",
-            modifier = modifier
-        )
-        KiwokoRadioButton(
-            selected = true,
-            labelText = "Ayuntamiento",
-            modifier = modifier
-        )
-        KiwokoRadioButton(
-            labelText = "Veterinario",
-            modifier = modifier
-        )
-        KiwokoRadioButton(
-            labelText = "Centro de acogida",
-            modifier = modifier
-        )
+
+        ShelterType.values().forEach { shelterType ->
+            KiwokoRadioButton(
+                selected = shelterType == selected,
+                labelText = shelterType.toString(),
+                modifier = modifier,
+                onClick = { onItemClick(shelterType) }
+            ) }
     }
 }
 

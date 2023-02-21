@@ -80,7 +80,7 @@ val Typography.moderatRadioButtonLabel: TextStyle
         return  TextStyle(
             fontFamily = ModeratFamily,
             fontWeight = FontWeight.Light,
-            fontSize = 12.sp,
+            fontSize = 10.sp,
             letterSpacing = 0.03.em
         )
     }
