@@ -1,8 +1,11 @@
 package com.mockknights.petshelter.ui.detail
 
 import android.content.res.Resources
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -14,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -24,6 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.google.android.libraries.places.api.Places
+import com.mockknights.petshelter.BuildConfig
 import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.ShelterType
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
@@ -39,8 +45,11 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val detailState by detailViewModel.detailState.collectAsState()
+    val localContext = LocalContext.current
 
     LaunchedEffect(key1 = id) {
+        Places.initialize(localContext, BuildConfig.MAPS_API_KEY)
+        detailViewModel.placesClient = Places.createClient(localContext)
         detailViewModel.getShelterDetail(id)
     }
 
@@ -69,12 +78,7 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                 ImageRow(
                     photoUrl = detailState.photoURL
                 )
-                UserDataField(
-                    fieldLabel = "Dirección",
-                    userData = detailState.address.latitude.toString() + " " + detailState.address.longitude.toString(),
-                    doneAction = ImeAction.Next,
-                    onUpdateValue = { text -> detailViewModel.onUpdatedDataField(text, DetailFieldType.ADDRESS) }
-                )
+                SuggestedAddresses(viewModel = detailViewModel)
                 UserDataField(
                     fieldLabel = "Teléfono",
                     userData = detailState.phoneNumber,
@@ -93,6 +97,58 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                     })
             }
         }
+    }
+}
+
+@Composable
+fun SuggestedAddresses(viewModel: DetailViewModel) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        var text by remember { mutableStateOf("") }
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.toDp().dp),
+        ) {
+            UserDataFieldLabel("Dirección")
+            OutlinedTextField(
+                value = text,
+                textStyle = MaterialTheme.typography.moderatTextField,
+                singleLine = true,
+                shape = RoundedCornerShape(4.dp),
+                modifier = Modifier
+                    .fillMaxWidth(),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = GrayKiwoko,
+                    unfocusedBorderColor = GrayKiwoko,
+                ),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Next,
+                ),
+                onValueChange = {
+                    text = it
+                    viewModel.onUpdatedDataField(text, DetailFieldType.ADDRESS)
+                    viewModel.searchPlaces(it)
+                }
+            )
+        }
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(viewModel.locationAutofill.take(3)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            text = it.address
+                            viewModel.locationAutofill.clear()
+                            viewModel.getCoordinates(it)
+                        }
+                ) {
+                    Text(it.address)
+                }
+            }
+        }
+        Spacer(Modifier.height(16.dp))
     }
 }
 
