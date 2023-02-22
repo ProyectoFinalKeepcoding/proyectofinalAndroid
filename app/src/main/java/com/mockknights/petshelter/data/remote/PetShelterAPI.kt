@@ -2,6 +2,7 @@ package com.mockknights.petshelter.data.remote
 
 import com.mockknights.petshelter.data.remote.response.PetShelterRemote
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface PetShelterAPI {
 
@@ -14,7 +15,8 @@ interface PetShelterAPI {
     @GET("shelters")
     suspend fun getAllPetShelter(): List<PetShelterRemote>
 
-
+    @GET("shelters/{id}")
+    suspend fun getShelter(@Path("id") id: String): PetShelterRemote
 
 
 }

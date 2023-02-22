@@ -88,15 +88,17 @@ fun KiwokoIconButton(name: String, icon: Int, modifier: Modifier, onClick: () ->
                     .fillMaxWidth()
                     .weight(6.6f)
             )
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = "Call", // decorative element
-                tint = Color.White,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(3.3f)
-                    .size(45.dp)
-            )
+            if(icon != 0) {
+                Icon(
+                    painter = painterResource(id = icon),
+                    contentDescription = "Call", // decorative element
+                    tint = Color.White,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(3.3f)
+                        .size(45.dp)
+                )
+            }
         }
     }
 }

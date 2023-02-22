@@ -25,4 +25,8 @@ class RepositoryImpl @Inject constructor(
     override suspend fun getToken(): Flow<String> {
         return remoteDataSource.getToken()
     }
+
+    override suspend fun getShelter(id: String): Flow<PetShelter> {
+        return remoteDataSource.getShelter(id).map { petShelter -> mapper.mapOnePetShelterRemoteToPresentation(petShelter) }
+    }
 }

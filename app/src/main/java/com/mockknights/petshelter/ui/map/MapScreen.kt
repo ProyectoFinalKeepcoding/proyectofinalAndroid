@@ -194,9 +194,9 @@ fun MyGoogleMaps(petShelter: List<PetShelter>,
         for (i in petShelter) {
             Marker(
                 MarkerState(LatLng(i.address.latitude, i.address.longitude)),
-                icon = bitmapDescriptorFromVector(LocalContext.current, onPlacingPoint(i.shelterType)),
+                icon = bitmapDescriptorFromVector(LocalContext.current, onPlacingPoint(i.shelterType.stringValue)),
                 title = i.name,
-                snippet = i.shelterType,
+                snippet = i.shelterType.toString(),
                 onClick = { onPointClicked(i.name) }
             )
         }
