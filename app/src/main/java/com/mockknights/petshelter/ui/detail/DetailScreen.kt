@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -33,6 +32,7 @@ import com.mockknights.petshelter.BuildConfig
 import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.ShelterType
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
+import com.mockknights.petshelter.ui.components.UserAddressField
 import com.mockknights.petshelter.ui.theme.*
 
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt())
@@ -45,11 +45,8 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val detailState by detailViewModel.detailState.collectAsState()
-    val localContext = LocalContext.current
 
     LaunchedEffect(key1 = id) {
-        Places.initialize(localContext, BuildConfig.MAPS_API_KEY)
-        detailViewModel.placesClient = Places.createClient(localContext)
         detailViewModel.getShelterDetail(id)
     }
 
@@ -78,7 +75,11 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                 ImageRow(
                     photoUrl = detailState.photoURL
                 )
-                SuggestedAddresses(viewModel = detailViewModel)
+                UserAddressField(
+                    onUpdateData = { text ->
+                        detailViewModel.onUpdatedDataField(text, DetailFieldType.ADDRESS)
+                    }
+                )
                 UserDataField(
                     fieldLabel = "Teléfono",
                     userData = detailState.phoneNumber,
@@ -97,58 +98,6 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                     })
             }
         }
-    }
-}
-
-@Composable
-fun SuggestedAddresses(viewModel: DetailViewModel) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        var text by remember { mutableStateOf("") }
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.toDp().dp),
-        ) {
-            UserDataFieldLabel("Dirección")
-            OutlinedTextField(
-                value = text,
-                textStyle = MaterialTheme.typography.moderatTextField,
-                singleLine = true,
-                shape = RoundedCornerShape(4.dp),
-                modifier = Modifier
-                    .fillMaxWidth(),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = GrayKiwoko,
-                    unfocusedBorderColor = GrayKiwoko,
-                ),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Next,
-                ),
-                onValueChange = {
-                    text = it
-                    viewModel.onUpdatedDataField(text, DetailFieldType.ADDRESS)
-                    viewModel.searchPlaces(it)
-                }
-            )
-        }
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(viewModel.locationAutofill.take(3)) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            text = it.address
-                            viewModel.locationAutofill.clear()
-                            viewModel.getCoordinates(it)
-                        }
-                ) {
-                    Text(it.address)
-                }
-            }
-        }
-        Spacer(Modifier.height(16.dp))
     }
 }
 
@@ -260,7 +209,6 @@ fun UserDataFieldLabel(fieldLabel: String = "Dirección") {
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Preview
 @Composable
 fun UserDataFieldTextField(
