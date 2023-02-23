@@ -33,6 +33,7 @@ fun UserDataFieldTextField(
     OutlinedTextField(
         value = text,
         placeholder = { TextPlaceholder(placeholderText) },
+        visualTransformation = if (isPassword) PasswordVisualTransformation(mask = '*') else VisualTransformation.None,
         textStyle = MaterialTheme.typography.moderatTextField,
         singleLine = true,
         shape = RoundedCornerShape(4.dp),
