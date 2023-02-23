@@ -17,7 +17,7 @@ fun AppNavigation () {
 
         composable(Screens.Welcome.route) {
             WelcomeScreen( navigateToLogin = {
-                navController.navigate(Screens.Detail.route) // TODO: CHANGE TO LOGIN WHEN IMPLEMENTED
+                navController.navigate(Screens.Login.route)
             }, navigateToMap = {
                 navController.navigate((Screens.Map.route))
             })
@@ -29,7 +29,7 @@ fun AppNavigation () {
                 navController.navigate(Screens.Welcome.route)
             }, navigateToRegister = {
                 navController.navigate(Screens.Register.route)
-            }, navigateToPetShelter = {
+            }, navigateToDetail = {
                 navController.navigate(Screens.Detail.route)
             })
         }

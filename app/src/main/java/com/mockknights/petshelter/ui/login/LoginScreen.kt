@@ -1,6 +1,7 @@
 package com.mockknights.petshelter.ui.login
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -21,14 +22,14 @@ import com.mockknights.petshelter.ui.theme.RedKiwoko
 @Preview(showSystemUi = true)
 @Composable
 fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),
-    navigateToPetShelter: () -> (Unit) = {},
-    navigateToWelcome: () -> (Unit)= {},
-    navigateToRegister: () -> (Unit) = {}) {
+                 navigateToDetail: () -> (Unit) = {},
+                 navigateToWelcome: () -> (Unit)= {},
+                 navigateToRegister: () -> (Unit) = {}) {
 
     val success by viewModel.stateLogin.collectAsState()
     LaunchedEffect(key1 = success) {
         if (success.equals(LoginState.Succes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjb20ubW9ja2tuaWdodHMucGV0c2hlbHRlciIsInN1YiI6IkFDNTdBNkMzLUQ2RTYtNEY2OC04RkQzLTU2MEU1MkVGRTc2NiJ9.oKwuGiFAjxnQgJn0Az59jfs3JhJOYwz7IJoIOCKLhLs"))) {
-            navigateToPetShelter()
+            navigateToDetail()
         }
     }
 
@@ -45,7 +46,7 @@ fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),
             verticalArrangement = Arrangement.Center)
         {
             Text(text = "Ya tengo cuenta")
-            LoginForm(viewModel = viewModel)
+            LoginForm(viewModel = viewModel, navigateToDetail = navigateToDetail)
             Spacer(modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp))
@@ -57,7 +58,7 @@ fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),
 }
 
 @Composable
-fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel) {
+fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel, navigateToDetail: () -> (Unit) = {}) {
     Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 
         var user by remember { mutableStateOf("isma") }
@@ -76,7 +77,11 @@ fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel) {
                 isPassword = true)
         }
         CreateWelcomeButton(name = "LOGIN", modifier = Modifier.fillMaxWidth(),colorButton = RedKiwoko, colorText = Color.White) {
-            viewModel.getToken(user, password)
+            if(viewModel.sharedPreferences.contains("TOKEN")) {
+                navigateToDetail()
+            } else {
+                viewModel.getToken(user, password)
+            }
         }
         
         Text(text = "¿Has olvidado tu contraseña?" , Modifier.clickable{  })
