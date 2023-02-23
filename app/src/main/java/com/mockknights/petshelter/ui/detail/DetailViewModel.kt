@@ -31,64 +31,6 @@ class DetailViewModel@Inject constructor(private val repository: Repository): Vi
     private val _detailState = MutableStateFlow(PetShelter("", "", "","", Address(0.0, 0.0), ShelterType.PARTICULAR, ""))
     val detailState: MutableStateFlow<PetShelter> get() = _detailState
 
-    lateinit var placesClient: PlacesClient
-
-    val locationAutofill = mutableStateListOf<AutocompleteResult>()
-
-    private var job: Job? = null
-
-    private var currentLatLong by mutableStateOf(LatLng(0.0, 0.0))
-
-    fun searchPlaces(query: String) {
-        job?.cancel()
-        locationAutofill.clear()
-        job = viewModelScope.launch {
-            val request = FindAutocompletePredictionsRequest
-                .builder()
-                // Suggestions are limited to Europe and north of Africa
-                .setLocationBias(
-                    RectangularBounds.newInstance(
-                        LatLng(30.0, 30.0),
-                        LatLng(70.0, 70.0)
-                    )
-                )
-                .setQuery(query)
-                .build()
-            placesClient
-                .findAutocompletePredictions(request)
-                .addOnSuccessListener { response ->
-                    locationAutofill += response.autocompletePredictions.map {
-                        AutocompleteResult(
-                            it.getFullText(null).toString(),
-                            it.placeId
-                        )
-                    }
-                }
-                .addOnFailureListener {
-                    it.printStackTrace()
-                    println(it.cause)
-                    println(it.message)
-                }
-        }
-    }
-
-    fun getCoordinates(result: AutocompleteResult) {
-        val placeFields = listOf(Place.Field.LAT_LNG)
-        val request = FetchPlaceRequest.newInstance(result.placeId, placeFields)
-        placesClient.fetchPlace(request)
-            .addOnSuccessListener {
-                if (it != null) {
-                    currentLatLong = it.place.latLng!!
-                }
-            }
-            .addOnFailureListener {
-                it.printStackTrace()
-            }
-    }
-
-
-
-
     fun getShelterDetail(id: String) {
         viewModelScope.launch {
             val result = repository.getShelter(id).flowOn(Dispatchers.IO)

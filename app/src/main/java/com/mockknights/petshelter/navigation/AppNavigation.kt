@@ -43,10 +43,9 @@ fun AppNavigation () {
                 nullable = false
             })
         ) { backStackEntry ->
-            backStackEntry.arguments?.getString(Screens.Detail.ARG_ID)
-                ?.let { id -> DetailScreen(id) }
-//            DetailScreen(id = "ca57ecd4-c6a0-4b9d-9c48-46fe33305214")
-//            DetailScreen(id = "4e11a6a6-0a6e-41eb-a60c-7de39df32cd6")
+            backStackEntry.arguments?.getString(Screens.Detail.ARG_ID)?.let { id ->
+                DetailScreen(id)
+            }
         }
 
         composable(Screens.Map.route) {

@@ -1,13 +1,9 @@
 package com.mockknights.petshelter.ui.detail
 
 import android.content.res.Resources
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,23 +12,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.google.android.libraries.places.api.Places
-import com.mockknights.petshelter.BuildConfig
 import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.ShelterType
+import com.mockknights.petshelter.ui.components.BoldTitle
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
 import com.mockknights.petshelter.ui.components.UserAddressField
+import com.mockknights.petshelter.ui.components.UserDataFieldTextField
 import com.mockknights.petshelter.ui.theme.*
 
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt())
@@ -119,11 +113,11 @@ fun UserNameRow(userName: String = "Long username to check how it looks") {
         Spacer(
             modifier = modifier
         )
-        UserName(
+        BoldTitle(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(6.8f),
-            userName = userName
+            title = userName
         )
         Icon(
             modifier = modifier,
@@ -132,17 +126,7 @@ fun UserNameRow(userName: String = "Long username to check how it looks") {
         )
     }
 }
-@Preview
-@Composable
-fun UserName(modifier: Modifier = Modifier, userName: String = "UserName") {
-    Text(
-        modifier = modifier,
-        text = userName,
-        style = MaterialTheme.typography.moderatUsername,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
-    )
-}
+
 
 @Preview
 @Composable
@@ -208,40 +192,6 @@ fun UserDataFieldLabel(fieldLabel: String = "Dirección") {
         style = MaterialTheme.typography.moderatDataFieldLabel
     )
 }
-
-@Preview
-@Composable
-fun UserDataFieldTextField(
-    userData: String = "Avenida Europa, 2",
-    keyboardType: KeyboardType = KeyboardType.Text,
-    doneAction: ImeAction = ImeAction.Done,
-    onUpdateValue: (String) -> Unit = { },
-) {
-
-    var text by remember { mutableStateOf(userData) }
-
-    OutlinedTextField(
-        value = text,
-        textStyle = MaterialTheme.typography.moderatTextField,
-        singleLine = true,
-        shape = RoundedCornerShape(4.dp),
-        modifier = Modifier
-            .fillMaxWidth(),
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = GrayKiwoko,
-            unfocusedBorderColor = GrayKiwoko,
-        ),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = doneAction,
-            keyboardType = keyboardType
-        ),
-        onValueChange = {
-            text = it
-            onUpdateValue(it)
-        }
-    )
-}
-
 
 @Composable
 fun RadioButtonsRow(currentSelection: ShelterType, onItemClick: (ShelterType) -> Unit = {}) {

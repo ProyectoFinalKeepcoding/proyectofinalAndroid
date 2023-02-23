@@ -44,6 +44,7 @@ import com.google.maps.android.compose.*
 import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
+import com.mockknights.petshelter.ui.components.LogoBox
 import com.mockknights.petshelter.ui.theme.moderatMediumTitle
 import kotlinx.coroutines.*
 
@@ -136,28 +137,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 }
             )
         }
-    }
-}
-@Composable
-fun LogoBox(modifier: Modifier) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Center
-    ) {
-        val logoMarker: Painter = painterResource(id = R.drawable.logomarker)
-        val logoTypescript: Painter = painterResource(id = R.drawable.logo)
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Image(painter = logoMarker, contentDescription = "Logo marker")
-            Spacer(modifier = Modifier.size(1.dp))
-            Image(painter = logoTypescript, contentDescription = "Logo typescript")
-        }
-
     }
 }
 
