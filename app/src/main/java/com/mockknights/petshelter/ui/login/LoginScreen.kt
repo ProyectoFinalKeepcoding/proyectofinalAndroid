@@ -1,7 +1,6 @@
 package com.mockknights.petshelter.ui.login
 
 import android.annotation.SuppressLint
-import android.content.SharedPreferences
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -21,15 +20,16 @@ import com.mockknights.petshelter.ui.theme.RedKiwoko
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Preview(showSystemUi = true)
 @Composable
-fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),
-                 navigateToDetail: () -> (Unit) = {},
-                 navigateToWelcome: () -> (Unit)= {},
-                 navigateToRegister: () -> (Unit) = {}) {
+fun LoginScreen (
+    viewModel: LoginViewModel = hiltViewModel(),
+    navigateToDetail: (String) -> Unit = {},
+    navigateToWelcome: () -> (Unit)= {},
+    navigateToRegister: () -> (Unit) = {}) {
 
     val success by viewModel.stateLogin.collectAsState()
     LaunchedEffect(key1 = success) {
         if (success.equals(LoginState.Succes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjb20ubW9ja2tuaWdodHMucGV0c2hlbHRlciIsInN1YiI6IkFDNTdBNkMzLUQ2RTYtNEY2OC04RkQzLTU2MEU1MkVGRTc2NiJ9.oKwuGiFAjxnQgJn0Az59jfs3JhJOYwz7IJoIOCKLhLs"))) {
-            navigateToDetail()
+            navigateToDetail(viewModel.sharedPreferences.getString("TOKEN", null)!!)
         }
     }
 
@@ -58,7 +58,7 @@ fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),
 }
 
 @Composable
-fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel, navigateToDetail: () -> (Unit) = {}) {
+fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel, navigateToDetail: (String) -> (Unit) = {}) {
     Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 
         var user by remember { mutableStateOf("isma") }
@@ -78,7 +78,7 @@ fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel, navigateToDet
         }
         CreateWelcomeButton(name = "LOGIN", modifier = Modifier.fillMaxWidth(),colorButton = RedKiwoko, colorText = Color.White) {
             if(viewModel.sharedPreferences.contains("TOKEN")) {
-                navigateToDetail()
+                navigateToDetail(viewModel.sharedPreferences.getString("TOKEN", null)!!)
             } else {
                 viewModel.getToken(user, password)
             }
