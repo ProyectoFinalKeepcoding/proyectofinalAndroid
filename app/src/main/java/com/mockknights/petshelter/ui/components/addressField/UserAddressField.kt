@@ -65,6 +65,7 @@ fun UserAddressField(viewModel: UserAddressFieldViewModel = hiltViewModel(), onU
                 }
             )
         }
+        // Suggestions column, only 3 results
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {

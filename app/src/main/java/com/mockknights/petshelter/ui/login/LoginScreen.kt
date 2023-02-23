@@ -27,7 +27,7 @@ fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),
 
     val success by viewModel.stateLogin.collectAsState()
     LaunchedEffect(key1 = success) {
-        if (success.equals(LoginState.Succes(""))) {
+        if (success.equals(LoginState.Succes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjb20ubW9ja2tuaWdodHMucGV0c2hlbHRlciIsInN1YiI6IkFDNTdBNkMzLUQ2RTYtNEY2OC04RkQzLTU2MEU1MkVGRTc2NiJ9.oKwuGiFAjxnQgJn0Az59jfs3JhJOYwz7IJoIOCKLhLs"))) {
             navigateToPetShelter()
         }
     }
@@ -44,10 +44,12 @@ fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center)
         {
+            Text(text = "Ya tengo cuenta")
             LoginForm(viewModel = viewModel)
             Spacer(modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp))
+            //Text(text = "No tengo cuenta")
             Register(navigateToRegister)
         }
     }
@@ -58,8 +60,8 @@ fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),
 fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel) {
     Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 
-        var user by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
+        var user by remember { mutableStateOf("isma") }
+        var password by remember { mutableStateOf("123456") }
 
         FormField(
             value = user,
@@ -70,17 +72,21 @@ fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel) {
             FormField(
                 value = password,
                 onValueChange = { password = it },
-                placeholder = "Password")
+                placeholder = "Password",
+                isPassword = true)
         }
         CreateWelcomeButton(name = "LOGIN", modifier = Modifier.fillMaxWidth(),colorButton = RedKiwoko, colorText = Color.White) {
             viewModel.getToken(user, password)
         }
+        
+        Text(text = "¿Has olvidado tu contraseña?" , Modifier.clickable{  })
     }
 }
 
 @Composable
 fun Register(navigateToRegister: () -> (Unit) = {}) {
-    Text(text = "¿AUN NO ESTAS REGISTRADO? Registrate", Modifier.clickable{ navigateToRegister() })
+    Text(text = "No tengo cuenta")
+    Text(text = "Registrarme", Modifier.clickable{ navigateToRegister() })
 }
 
 

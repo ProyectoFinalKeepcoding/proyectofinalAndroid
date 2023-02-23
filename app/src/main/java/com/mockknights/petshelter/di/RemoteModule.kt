@@ -21,10 +21,10 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RemoteModule {
 
-//    @Provides
-//    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-//        return context.getSharedPreferences("NAME", Context.MODE_PRIVATE)
-//    }
+    @Provides
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences("NAME", Context.MODE_PRIVATE)
+    }
 
     @Provides
     fun provideMoshi(): Moshi {
@@ -45,23 +45,28 @@ object RemoteModule {
 
     @Provides
     fun provideOkHttpClient(
-        httpLoggingInterceptor: HttpLoggingInterceptor
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        sharedPreferences: SharedPreferences
     ): OkHttpClient {
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val originalRequest = chain.request()
-                val newUrl = originalRequest.url.newBuilder()
-                    .build()
 
                 val newRequest = originalRequest.newBuilder()
-                    .url(newUrl)
-                    .addHeader("ApiKey", "mWIwALVZo3a0evMfbUgkl/gLvRis1/w99To0AamBN+0=")
+                    .header("ApiKey", "mWIwALVZo3a0evMfbUgkl/gLvRis1/w99To0AamBN+0=")
                     .build()
                 chain.proceed(newRequest)
             }
             .authenticator { _, response ->
-                response.request.newBuilder()
-                    .build()
+                if(response.request.url.encodedPath.contains("api/auth/signin")) {
+                    response.request.newBuilder()
+                        .header("Authorization", "${sharedPreferences.getString("CREDENTIAL", null)}")
+                        .build()
+                }
+                else {
+                    response.request.newBuilder()
+                        .build()
+                }
             }
             .addInterceptor(httpLoggingInterceptor)
             .build()
