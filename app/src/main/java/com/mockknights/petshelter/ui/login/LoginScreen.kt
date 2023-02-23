@@ -28,11 +28,11 @@ fun LoginScreen (
 
     val success by viewModel.stateLogin.collectAsState()
     LaunchedEffect(key1 = success) {
-        if (success.equals(LoginState.Succes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjb20ubW9ja2tuaWdodHMucGV0c2hlbHRlciIsInN1YiI6IkFDNTdBNkMzLUQ2RTYtNEY2OC04RkQzLTU2MEU1MkVGRTc2NiJ9.oKwuGiFAjxnQgJn0Az59jfs3JhJOYwz7IJoIOCKLhLs"))) {
-            navigateToDetail(viewModel.sharedPreferences.getString("TOKEN", null)!!)
+        if (success is LoginState.Success) {
+            navigateToDetail((success as LoginState.Success).id)
+            viewModel.resetState()
         }
     }
-
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar() {
@@ -46,7 +46,7 @@ fun LoginScreen (
             verticalArrangement = Arrangement.Center)
         {
             Text(text = "Ya tengo cuenta")
-            LoginForm(viewModel = viewModel, navigateToDetail = navigateToDetail)
+            LoginForm(viewModel = viewModel, success = success, navigateToDetail = navigateToDetail)
             Spacer(modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp))
@@ -58,10 +58,10 @@ fun LoginScreen (
 }
 
 @Composable
-fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel, navigateToDetail: (String) -> (Unit) = {}) {
+fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel,  success: LoginState, navigateToDetail: (String) -> (Unit) = {}) {
     Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 
-        var user by remember { mutableStateOf("isma") }
+        var user by remember { mutableStateOf("fran") }
         var password by remember { mutableStateOf("123456") }
 
         FormField(
@@ -77,8 +77,8 @@ fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel, navigateToDet
                 isPassword = true)
         }
         CreateWelcomeButton(name = "LOGIN", modifier = Modifier.fillMaxWidth(),colorButton = RedKiwoko, colorText = Color.White) {
-            if(viewModel.sharedPreferences.contains("TOKEN")) {
-                navigateToDetail(viewModel.sharedPreferences.getString("TOKEN", null)!!)
+            if(success is LoginState.Success) {
+                navigateToDetail(success.id)
             } else {
                 viewModel.getToken(user, password)
             }

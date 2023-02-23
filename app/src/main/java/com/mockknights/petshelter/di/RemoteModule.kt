@@ -12,6 +12,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -51,8 +52,7 @@ object RemoteModule {
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val originalRequest = chain.request()
-
-                val newRequest = originalRequest.newBuilder()
+                val newRequest: Request = originalRequest.newBuilder()
                     .header("ApiKey", "mWIwALVZo3a0evMfbUgkl/gLvRis1/w99To0AamBN+0=")
                     .build()
                 chain.proceed(newRequest)

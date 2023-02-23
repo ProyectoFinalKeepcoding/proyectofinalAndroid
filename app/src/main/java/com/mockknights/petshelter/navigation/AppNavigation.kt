@@ -32,7 +32,7 @@ fun AppNavigation () {
             }, navigateToRegister = {
                 navController.navigate(Screens.Register.route)
             }, navigateToDetail = {
-                navController.navigate(Screens.Detail.getRoute("ca57ecd4-c6a0-4b9d-9c48-46fe33305214"))
+                navController.navigate(Screens.Detail.getRoute(it))
             })
         }
 
