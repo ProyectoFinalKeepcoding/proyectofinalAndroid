@@ -22,6 +22,7 @@ import com.mockknights.petshelter.BuildConfig
 import com.mockknights.petshelter.ui.components.addressField.UserAddressFieldViewModel
 import com.mockknights.petshelter.ui.detail.UserDataFieldLabel
 import com.mockknights.petshelter.ui.detail.toDp
+import com.mockknights.petshelter.ui.detail.toPx
 import com.mockknights.petshelter.ui.theme.GrayKiwoko
 import com.mockknights.petshelter.ui.theme.moderatTextField
 
@@ -73,6 +74,7 @@ fun UserAddressField(viewModel: UserAddressFieldViewModel = hiltViewModel(), onU
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
                         .clickable {
                             text = it.address
                             viewModel.locationAutofill.clear()
