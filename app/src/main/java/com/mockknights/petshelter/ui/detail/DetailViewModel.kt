@@ -48,29 +48,25 @@ class DetailViewModel@Inject constructor(private val repository: Repository): Vi
         }
     }
 
-    fun onUpdatedDataField(text: String, fieldType: DetailFieldType) {
-        updateDataField(text, fieldType)
+    fun onUpdatedPhone(phone: String) {
+        updatePhone(phone)
     }
-    private fun updateDataField(text: String, fieldType: DetailFieldType) {
-        val newDetailState = getDetailStateByFieldType(text, fieldType)
+    private fun updatePhone(phone: String) {
+        val newDetailState = _detailState.value.copy(phoneNumber = phone)
         viewModelScope.launch (Dispatchers.IO) {
             _detailState.value = newDetailState
         }
     }
-    private fun getDetailStateByFieldType(text: String, fieldType: DetailFieldType): PetShelter {
-        return when (fieldType) {
-            DetailFieldType.ADDRESS -> _detailState.value // TODO: Implement after managing addresses with google api
-            DetailFieldType.PHONE -> _detailState.value.copy(phoneNumber = text)
+
+    fun onUpdatedAddress(latitude: String, longitude: String) {
+        updateAddress(latitude, longitude)
+    }
+    private fun updateAddress(latitude: String, longitude: String) {
+        val newDetailState = _detailState.value.copy(address = Address(latitude.toDouble(), longitude.toDouble()))
+        viewModelScope.launch (Dispatchers.IO) {
+            _detailState.value = newDetailState
         }
     }
 }
 
-enum class DetailFieldType {
-    ADDRESS, PHONE
-}
 
-
-data class AutocompleteResult(
-    val address: String,
-    val placeId: String
-)

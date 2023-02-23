@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -27,9 +28,12 @@ import com.mockknights.petshelter.ui.theme.GrayKiwoko
 import com.mockknights.petshelter.ui.theme.moderatTextField
 
 @Composable
-fun UserAddressField(viewModel: UserAddressFieldViewModel = hiltViewModel(), onUpdateData: (String) -> Unit) {
+fun UserAddressField(
+    viewModel: UserAddressFieldViewModel = hiltViewModel(),
+    onUpdateData: (String, String) -> Unit = {_, _ -> (Unit)},) {
 
     val localContext = LocalContext.current
+    val currentLocation = viewModel.currentLatLong.collectAsState().value
 
     LaunchedEffect(key1 = "initializePlacesClient"){
         Places.initialize(localContext, BuildConfig.MAPS_API_KEY)
@@ -59,9 +63,13 @@ fun UserAddressField(viewModel: UserAddressFieldViewModel = hiltViewModel(), onU
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Next,
                 ),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        onUpdateData(currentLocation.latitude.toString(), currentLocation.longitude.toString())
+                    }
+                ),
                 onValueChange = {
                     text = it
-                    onUpdateData(it)
                     viewModel.searchPlaces(it)
                 }
             )

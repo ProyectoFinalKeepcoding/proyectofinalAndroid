@@ -12,10 +12,12 @@ import com.google.android.libraries.places.api.model.RectangularBounds
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.domain.Repository
-import com.mockknights.petshelter.ui.detail.AutocompleteResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,7 +27,9 @@ class UserAddressFieldViewModel@Inject constructor(private val repository: Repos
     lateinit var placesClient: PlacesClient
     val locationAutofill = mutableStateListOf<AutocompleteResult>()
     private var job: Job? = null
-    private var currentLatLong by mutableStateOf(LatLng(0.0, 0.0))
+
+    private val _currentLatLong = MutableStateFlow(LatLng(0.0, 0.0))
+    val currentLatLong: MutableStateFlow<LatLng> get() = _currentLatLong
 
 
     fun searchPlaces(query: String) {
@@ -67,7 +71,9 @@ class UserAddressFieldViewModel@Inject constructor(private val repository: Repos
         placesClient.fetchPlace(request)
             .addOnSuccessListener {
                 if (it != null) {
-                    currentLatLong = it.place.latLng!!
+                    viewModelScope.launch(Dispatchers.IO) {
+                        currentLatLong.emit(it.place.latLng!!)
+                    }
                 }
             }
             .addOnFailureListener {
@@ -75,3 +81,8 @@ class UserAddressFieldViewModel@Inject constructor(private val repository: Repos
             }
     }
 }
+
+data class AutocompleteResult(
+    val address: String,
+    val placeId: String
+)

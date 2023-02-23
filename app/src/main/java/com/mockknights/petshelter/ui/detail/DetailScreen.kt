@@ -70,16 +70,16 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                     photoUrl = detailState.photoURL
                 )
                 UserAddressField(
-                    onUpdateData = { text ->
-                        detailViewModel.onUpdatedDataField(text, DetailFieldType.ADDRESS)
+                    onUpdateData = { latitude, longitude ->
+                        detailViewModel.onUpdatedAddress(latitude, longitude)
                     }
                 )
                 UserDataField(
                     fieldLabel = "Teléfono",
                     userData = detailState.phoneNumber,
                     keyboardType = KeyboardType.Phone,
-                    onUpdateValue = { text ->
-                        detailViewModel.onUpdatedDataField(text, DetailFieldType.PHONE)
+                    onUpdateValue = { phone ->
+                        detailViewModel.onUpdatedPhone(phone)
                     }
                 )
                 RadioButtonsRow(
