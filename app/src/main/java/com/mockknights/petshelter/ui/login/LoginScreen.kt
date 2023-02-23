@@ -44,10 +44,12 @@ fun LoginScreen (viewModel: LoginViewModel = hiltViewModel(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center)
         {
+            Text(text = "Ya tengo cuenta")
             LoginForm(viewModel = viewModel)
             Spacer(modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp))
+            //Text(text = "No tengo cuenta")
             Register(navigateToRegister)
         }
     }
@@ -70,17 +72,21 @@ fun LoginForm(extended: Boolean = true, viewModel: LoginViewModel) {
             FormField(
                 value = password,
                 onValueChange = { password = it },
-                placeholder = "Password")
+                placeholder = "Password",
+                isPassword = true)
         }
         CreateWelcomeButton(name = "LOGIN", modifier = Modifier.fillMaxWidth(),colorButton = RedKiwoko, colorText = Color.White) {
             viewModel.getToken(user, password)
         }
+        
+        Text(text = "¿Has olvidado tu contraseña?" , Modifier.clickable{  })
     }
 }
 
 @Composable
 fun Register(navigateToRegister: () -> (Unit) = {}) {
-    Text(text = "¿AUN NO ESTAS REGISTRADO? Registrate", Modifier.clickable{ navigateToRegister() })
+    Text(text = "No tengo cuenta")
+    Text(text = "Registrarme", Modifier.clickable{ navigateToRegister() })
 }
 
 
