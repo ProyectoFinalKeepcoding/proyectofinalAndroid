@@ -84,6 +84,9 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                     keyboardType = KeyboardType.Phone,
                     onUpdateValue = { phone ->
                         detailViewModel.onUpdatedPhone(phone)
+                    },
+                    onDone = {
+                        focusManager.clearFocus()
                     }
                 )
                 RadioButtonsRow(
@@ -173,7 +176,8 @@ fun UserDataField(
     userData: String = "Avenida Europa, 2",
     keyboardType: KeyboardType = KeyboardType.Text,
     doneAction: ImeAction = ImeAction.Done,
-    onUpdateValue: (String) -> Unit = { }
+    onUpdateValue: (String) -> Unit = { },
+    onDone: () -> Unit = { }
     ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.toDp().dp),
@@ -183,7 +187,8 @@ fun UserDataField(
             userData = userData,
             keyboardType = keyboardType,
             doneAction = doneAction,
-            onUpdateValue = { onUpdateValue(it)}
+            onUpdateValue = { onUpdateValue(it)},
+            onDone = onDone
         )
     }
 }

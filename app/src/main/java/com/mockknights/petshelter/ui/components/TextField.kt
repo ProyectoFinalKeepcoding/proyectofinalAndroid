@@ -2,6 +2,7 @@ package com.mockknights.petshelter.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -25,7 +26,8 @@ fun UserDataFieldTextField(
     doneAction: ImeAction = ImeAction.Done,
     placeholderText: String = "Placeholder",
     isPassword: Boolean = false,
-    onUpdateValue: (String) -> Unit = { }
+    onUpdateValue: (String) -> Unit = { },
+    onDone : () -> Unit = { }
 ) {
 
     var text by remember { mutableStateOf(userData) }
@@ -46,6 +48,11 @@ fun UserDataFieldTextField(
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = doneAction,
             keyboardType = keyboardType
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onDone()
+            }
         ),
         onValueChange = {
             text = it
