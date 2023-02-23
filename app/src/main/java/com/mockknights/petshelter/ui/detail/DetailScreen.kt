@@ -10,8 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -38,6 +40,7 @@ fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density.toInt
 fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel()) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
     val detailState by detailViewModel.detailState.collectAsState()
 
     LaunchedEffect(key1 = id) {
@@ -72,6 +75,7 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                 UserAddressField(
                     onUpdateData = { latitude, longitude ->
                         detailViewModel.onUpdatedAddress(latitude, longitude)
+                        focusManager.moveFocus(FocusDirection.Down)
                     }
                 )
                 UserDataField(
