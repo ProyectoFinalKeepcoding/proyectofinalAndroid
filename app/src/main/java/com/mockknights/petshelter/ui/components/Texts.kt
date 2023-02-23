@@ -34,8 +34,7 @@ fun TextPlaceholder(text: String = "Placeholder") {
     Text(
         text = text,
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable { },
+            .fillMaxWidth(),
         style = MaterialTheme.typography.moderatTextField,
         color = GrayKiwoko,
         textAlign = TextAlign.Left

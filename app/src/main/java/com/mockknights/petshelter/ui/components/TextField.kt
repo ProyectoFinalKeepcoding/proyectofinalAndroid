@@ -32,7 +32,7 @@ fun UserDataFieldTextField(
 
     OutlinedTextField(
         value = text,
-        placeholder = { TextPlaceholder(placeholderText)},
+        placeholder = { TextPlaceholder(placeholderText) },
         textStyle = MaterialTheme.typography.moderatTextField,
         singleLine = true,
         shape = RoundedCornerShape(4.dp),
