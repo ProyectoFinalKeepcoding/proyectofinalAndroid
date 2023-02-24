@@ -7,6 +7,7 @@ import com.mockknights.petshelter.data.remote.request.RegisterRequest
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.domain.Repository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -24,9 +25,9 @@ class RepositoryImpl @Inject constructor(
         return result
     }
 
-    override suspend fun getToken(): Flow<String> {
+    override suspend fun getToken(): Flow<List<String>> {
         val response = remoteDataSource.getToken()
-        val token = response.toString()
+        val token = response.firstOrNull()?.toString()
         if(!token.isNullOrEmpty()) {
             sharedPreferences.edit().putString("TOKEN", token).apply()
         }
@@ -37,5 +38,7 @@ class RepositoryImpl @Inject constructor(
         remoteDataSource.register(registerRequest)
     }
 
-
+    override suspend fun getShelter(id: String): Flow<PetShelter> {
+        return remoteDataSource.getShelter(id).map { petShelter -> mapper.mapOnePetShelterRemoteToPresentation(petShelter) }
+    }
 }
