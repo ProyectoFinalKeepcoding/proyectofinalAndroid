@@ -1,12 +1,14 @@
 package com.mockknights.petshelter.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.mockknights.petshelter.ui.detail.DetailScreen
 import com.mockknights.petshelter.ui.login.LoginScreen
 import com.mockknights.petshelter.ui.map.MapScreen
-import com.mockknights.petshelter.ui.petshelter.PetShelterScreen
 import com.mockknights.petshelter.ui.register.RegisterScreen
 import com.mockknights.petshelter.ui.welcome.WelcomeScreen
 
@@ -29,13 +31,21 @@ fun AppNavigation () {
                 navController.navigate(Screens.Welcome.route)
             }, navigateToRegister = {
                 navController.navigate(Screens.Register.route)
-            }, navigateToPetShelter = {
-                navController.navigate(Screens.PetShelter.route)
+            }, navigateToDetail = {
+                navController.navigate(Screens.Detail.getRoute(it))
             })
         }
 
-        composable(Screens.PetShelter.route) {
-            PetShelterScreen()
+        composable(
+            Screens.Detail.route,
+            arguments = listOf(navArgument(Screens.Detail.ARG_ID) {
+                type = NavType.StringType
+                nullable = false
+            })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString(Screens.Detail.ARG_ID)?.let { id ->
+                DetailScreen(id)
+            }
         }
 
         composable(Screens.Map.route) {
