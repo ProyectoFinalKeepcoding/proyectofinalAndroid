@@ -3,6 +3,7 @@ package com.mockknights.petshelter.data
 import android.content.SharedPreferences
 import com.mockknights.petshelter.data.remote.RemoteDataSource
 import com.mockknights.petshelter.data.remote.mappers.PetShelterMapper
+import com.mockknights.petshelter.data.remote.request.RegisterRequest
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.domain.Repository
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +30,12 @@ class RepositoryImpl @Inject constructor(
         if(!token.isNullOrEmpty()) {
             sharedPreferences.edit().putString("TOKEN", token).apply()
         }
-
         return response
     }
+
+    override suspend fun register(registerRequest: RegisterRequest) {
+        remoteDataSource.register(registerRequest)
+    }
+
+
 }

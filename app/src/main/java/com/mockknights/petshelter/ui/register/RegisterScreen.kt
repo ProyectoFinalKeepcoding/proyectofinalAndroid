@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mockknights.petshelter.data.remote.request.RegisterRequest
+import com.mockknights.petshelter.data.remote.response.Address
 import com.mockknights.petshelter.ui.components.CreateWelcomeButton
 import com.mockknights.petshelter.ui.components.FormField
 import com.mockknights.petshelter.ui.theme.RedKiwoko
@@ -38,19 +40,20 @@ fun RegisterScreen (viewModel: RegisterViewModel = hiltViewModel()) {
             verticalArrangement = Arrangement.Center
         )
         {
-            RegisterForm()
+            RegisterForm(viewModel)
         }
     }
 }
 
 
 @Composable
-fun RegisterForm() {
+fun RegisterForm(viewModel: RegisterViewModel) {
 
     var user by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var direccion by remember { mutableStateOf("") }
+    var direccion by remember { mutableStateOf(Address(0.0, 0.0)) }
     var telefono by remember { mutableStateOf("") }
+    var shelterType by remember { mutableStateOf("") }
 
 
     Text(text = "Crear una nueva cuenta")
@@ -61,14 +64,14 @@ fun RegisterForm() {
     FormField(value = password, onValueChange = {password = it }, placeholder = "Contraseña", isPassword = true)
 
     Text(text = "Direccion")
-    FormField(value = direccion, onValueChange = {direccion = it }, placeholder = "Direccion")
+    FormField(value = direccion.toString(), onValueChange = {}, placeholder = "Direccion")
 
     Text(text = "Telefono")
     FormField(value = telefono, onValueChange = {telefono = it }, placeholder = "Numero de Telefono")
 
 
     CreateWelcomeButton(name = "Crear cuenta", modifier = Modifier.fillMaxWidth(), colorButton = RedKiwoko, colorText = Color.White) {
-
+        viewModel.register(RegisterRequest(user, password, telefono, direccion, shelterType))
     }
 }
 

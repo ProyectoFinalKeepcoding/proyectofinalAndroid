@@ -1,6 +1,5 @@
 package com.mockknights.petshelter.ui.login
 
-import com.mockknights.petshelter.navigation.Screens
 
 sealed class LoginState {
     data class Succes(val token: String): LoginState()
