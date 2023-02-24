@@ -20,6 +20,21 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+        // This allows to get the api key dinamically from local.properties
+        Properties properties = new Properties()
+        if (rootProject.file("local.properties").exists()) {
+            properties.load(
+                    rootProject
+                            .file("local.properties")
+                            .newDataInputStream()
+            )
+        }
+        buildConfigField(
+                "String",
+                "MAPS_API_KEY",
+                properties.getProperty("MAPS_API_KEY")
+        )
+
     }
 
     buildTypes {
