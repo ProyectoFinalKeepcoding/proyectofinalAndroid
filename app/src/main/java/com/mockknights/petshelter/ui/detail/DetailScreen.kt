@@ -196,9 +196,6 @@ fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "usernam
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
             cursorColor = RedKiwoko,
-            disabledLabelColor = Color.Transparent,
-            focusedLabelColor = Color.Transparent,
-            unfocusedLabelColor = Color.Transparent,
         ),
         modifier = modifier,
     )
