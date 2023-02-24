@@ -100,8 +100,8 @@ fun LoginForm(
             .fillMaxWidth()
     ) {
 
-        var user by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
+        var user by remember { mutableStateOf("joak") }
+        var password by remember { mutableStateOf("123456") }
 
         BoldTitle(
             title = "Ya tengo cuenta"

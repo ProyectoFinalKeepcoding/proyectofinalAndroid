@@ -67,6 +67,16 @@ class DetailViewModel@Inject constructor(private val repository: Repository): Vi
             _detailState.value = newDetailState
         }
     }
+
+    fun onEditName(name: String) {
+        updateUserName(name)
+    }
+    private fun updateUserName(name: String) {
+        val newDetailState = _detailState.value.copy(name = name)
+        viewModelScope.launch (Dispatchers.IO) {
+            _detailState.value = newDetailState
+        }
+    }
 }
 
 

@@ -1,6 +1,8 @@
 package com.mockknights.petshelter.ui.detail
 
 import android.content.res.Resources
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,13 +13,19 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,7 +75,10 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
         ) {
             if (detailState.name != "") { // If the data is not loaded yet, don't show anything
                 UserNameRow(
-                    userName = detailState.name
+                    userName = detailState.name,
+                    onEditName = {
+
+                    }
                 )
                 ImageRow(
                     photoUrl = detailState.photoURL
@@ -103,9 +114,21 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Preview
 @Composable
-fun UserNameRow(userName: String = "Long username to check how it looks") {
+fun UserNameRow(
+    userName: String = "Long username to check how it looks",
+    onEditName: () -> Unit = {}
+) {
+
+    val enabled = remember { mutableStateOf(false) }
+    val focusRequester =  remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(enabled.value) {
+        if(enabled.value) focusRequester.requestFocus()
+    }
 
     Row(
         modifier = Modifier
@@ -120,18 +143,62 @@ fun UserNameRow(userName: String = "Long username to check how it looks") {
         Spacer(
             modifier = modifier
         )
-        BoldTitle(
+        UserNameTextField(
             modifier = Modifier
+                .focusRequester(focusRequester)
                 .fillMaxWidth()
                 .weight(6.8f),
-            title = userName
+            userName = userName,
+            enabled = enabled.value
         )
         Icon(
-            modifier = modifier,
+            modifier = modifier
+                .clickable(
+                    onClick = {
+                        // When clicked enable text field or hide keyboard when disabling
+                        enabled.value = !enabled.value
+                        if(!enabled.value) keyboardController?.hide()
+                              },
+                ),
             painter = painterResource(id = R.drawable.pencil),
             contentDescription = "Edit username"
         )
     }
+}
+
+@Preview
+@Composable
+fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "username", enabled: Boolean = false, ) {
+
+    val textFieldValue = remember { mutableStateOf(
+        TextFieldValue(
+            text = userName,
+            selection = TextRange(0, 0)
+        )
+    )
+    }
+
+    LaunchedEffect(key1 = enabled) {
+          if(enabled) textFieldValue.value = TextFieldValue(text = userName, selection = TextRange(0, userName.length))
+    }
+
+    TextField(
+        enabled = enabled,
+        placeholder = { BoldTitle(title = userName) },
+        value = textFieldValue.value,
+        onValueChange = { textFieldValue.value = it },
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            cursorColor = RedKiwoko,
+            disabledLabelColor = Color.Transparent,
+            focusedLabelColor = Color.Transparent,
+            unfocusedLabelColor = Color.Transparent,
+        ),
+        modifier = modifier,
+    )
 }
 
 
