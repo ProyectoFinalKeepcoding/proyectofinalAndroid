@@ -1,9 +1,11 @@
 package com.mockknights.petshelter.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.mockknights.petshelter.ui.detail.DetailScreen
 import com.mockknights.petshelter.ui.login.LoginScreen
 import com.mockknights.petshelter.ui.map.MapScreen
@@ -17,7 +19,7 @@ fun AppNavigation () {
 
         composable(Screens.Welcome.route) {
             WelcomeScreen( navigateToLogin = {
-                navController.navigate(Screens.Detail.route) // TODO: CHANGE TO LOGIN WHEN IMPLEMENTED
+                navController.navigate(Screens.Login.route)
             }, navigateToMap = {
                 navController.navigate((Screens.Map.route))
             })
@@ -29,14 +31,21 @@ fun AppNavigation () {
                 navController.navigate(Screens.Welcome.route)
             }, navigateToRegister = {
                 navController.navigate(Screens.Register.route)
-            }, navigateToPetShelter = {
-                navController.navigate(Screens.Detail.route)
+            }, navigateToDetail = {
+                navController.navigate(Screens.Detail.getRoute(it))
             })
         }
 
-        composable(Screens.Detail.route) {
-            DetailScreen(id = "ca57ecd4-c6a0-4b9d-9c48-46fe33305214")
-//            DetailScreen(id = "4e11a6a6-0a6e-41eb-a60c-7de39df32cd6")
+        composable(
+            Screens.Detail.route,
+            arguments = listOf(navArgument(Screens.Detail.ARG_ID) {
+                type = NavType.StringType
+                nullable = false
+            })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString(Screens.Detail.ARG_ID)?.let { id ->
+                DetailScreen(id)
+            }
         }
 
         composable(Screens.Map.route) {

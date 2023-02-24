@@ -1,23 +1,31 @@
 package com.mockknights.petshelter.ui.detail
 
 import android.content.res.Resources
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,7 +34,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.ShelterType
+import com.mockknights.petshelter.ui.components.BoldTitle
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
+import com.mockknights.petshelter.ui.components.UserAddressField
+import com.mockknights.petshelter.ui.components.UserDataFieldTextField
 import com.mockknights.petshelter.ui.theme.*
 
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt())
@@ -38,6 +49,7 @@ fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density.toInt
 fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel()) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
     val detailState by detailViewModel.detailState.collectAsState()
 
     LaunchedEffect(key1 = id) {
@@ -64,23 +76,29 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
         ) {
             if (detailState.name != "") { // If the data is not loaded yet, don't show anything
                 UserNameRow(
-                    userName = detailState.name
+                    userName = detailState.name,
+                    onEditName = {
+
+                    }
                 )
                 ImageRow(
                     photoUrl = detailState.photoURL
                 )
-                UserDataField(
-                    fieldLabel = "Dirección",
-                    userData = detailState.address.latitude.toString() + " " + detailState.address.longitude.toString(),
-                    doneAction = ImeAction.Next,
-                    onUpdateValue = { text -> detailViewModel.onUpdatedDataField(text, DetailFieldType.ADDRESS) }
+                UserAddressField(
+                    onUpdateData = { latitude, longitude ->
+                        detailViewModel.onUpdatedAddress(latitude, longitude)
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
                 )
                 UserDataField(
                     fieldLabel = "Teléfono",
                     userData = detailState.phoneNumber,
                     keyboardType = KeyboardType.Phone,
-                    onUpdateValue = { text ->
-                        detailViewModel.onUpdatedDataField(text, DetailFieldType.PHONE)
+                    onUpdateValue = { phone ->
+                        detailViewModel.onUpdatedPhone(phone)
+                    },
+                    onDone = {
+                        focusManager.clearFocus()
                     }
                 )
                 RadioButtonsRow(
@@ -97,9 +115,21 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Preview
 @Composable
-fun UserNameRow(userName: String = "Long username to check how it looks") {
+fun UserNameRow(
+    userName: String = "Long username to check how it looks",
+    onEditName: () -> Unit = {}
+) {
+
+    val enabled = remember { mutableStateOf(false) }
+    val focusRequester =  remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(enabled.value) {
+        if(enabled.value) focusRequester.requestFocus()
+    }
 
     Row(
         modifier = Modifier
@@ -114,30 +144,63 @@ fun UserNameRow(userName: String = "Long username to check how it looks") {
         Spacer(
             modifier = modifier
         )
-        UserName(
+        UserNameTextField(
             modifier = Modifier
+                .focusRequester(focusRequester)
                 .fillMaxWidth()
                 .weight(6.8f),
-            userName = userName
+            userName = userName,
+            enabled = enabled.value
         )
         Icon(
-            modifier = modifier,
+            modifier = modifier
+                .clickable(
+                    onClick = {
+                        // When clicked enable text field or hide keyboard when disabling
+                        enabled.value = !enabled.value
+                        if(!enabled.value) keyboardController?.hide()
+                              },
+                ),
             painter = painterResource(id = R.drawable.pencil),
             contentDescription = "Edit username"
         )
     }
 }
+
 @Preview
 @Composable
-fun UserName(modifier: Modifier = Modifier, userName: String = "UserName") {
-    Text(
-        modifier = modifier,
-        text = userName,
-        style = MaterialTheme.typography.moderatUsername,
+fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "username", enabled: Boolean = false, ) {
+
+    val textFieldValue = remember { mutableStateOf(
+        TextFieldValue(
+            text = userName,
+            selection = TextRange(0, 0)
+        )
+    )
+    }
+
+    LaunchedEffect(key1 = enabled) {
+          if(enabled) textFieldValue.value = TextFieldValue(text = userName, selection = TextRange(0, userName.length))
+    }
+
+    TextField(
+        enabled = enabled,
+        textStyle = MaterialTheme.typography.moderatUsername,
         maxLines = 1,
-        overflow = TextOverflow.Ellipsis
+        value = textFieldValue.value,
+        onValueChange = { textFieldValue.value = it },
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.Transparent,
+            disabledTextColor = Color.Black,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            cursorColor = RedKiwoko,
+        ),
+        modifier = modifier,
     )
 }
+
 
 @Preview
 @Composable
@@ -180,7 +243,8 @@ fun UserDataField(
     userData: String = "Avenida Europa, 2",
     keyboardType: KeyboardType = KeyboardType.Text,
     doneAction: ImeAction = ImeAction.Done,
-    onUpdateValue: (String) -> Unit = { }
+    onUpdateValue: (String) -> Unit = { },
+    onDone: () -> Unit = { }
     ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.toDp().dp),
@@ -190,7 +254,8 @@ fun UserDataField(
             userData = userData,
             keyboardType = keyboardType,
             doneAction = doneAction,
-            onUpdateValue = { onUpdateValue(it)}
+            onUpdateValue = { onUpdateValue(it)},
+            onDone = onDone
         )
     }
 }
@@ -203,41 +268,6 @@ fun UserDataFieldLabel(fieldLabel: String = "Dirección") {
         style = MaterialTheme.typography.moderatDataFieldLabel
     )
 }
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Preview
-@Composable
-fun UserDataFieldTextField(
-    userData: String = "Avenida Europa, 2",
-    keyboardType: KeyboardType = KeyboardType.Text,
-    doneAction: ImeAction = ImeAction.Done,
-    onUpdateValue: (String) -> Unit = { },
-) {
-
-    var text by remember { mutableStateOf(userData) }
-
-    OutlinedTextField(
-        value = text,
-        textStyle = MaterialTheme.typography.moderatTextField,
-        singleLine = true,
-        shape = RoundedCornerShape(4.dp),
-        modifier = Modifier
-            .fillMaxWidth(),
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = GrayKiwoko,
-            unfocusedBorderColor = GrayKiwoko,
-        ),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = doneAction,
-            keyboardType = keyboardType
-        ),
-        onValueChange = {
-            text = it
-            onUpdateValue(it)
-        }
-    )
-}
-
 
 @Composable
 fun RadioButtonsRow(currentSelection: ShelterType, onItemClick: (ShelterType) -> Unit = {}) {

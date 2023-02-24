@@ -1,46 +1,63 @@
 package com.mockknights.petshelter.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.mockknights.petshelter.ui.theme.GrayKiwoko
+import com.mockknights.petshelter.ui.theme.moderatTextField
 
 
+@Preview
 @Composable
-fun FormField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
+fun UserDataFieldTextField(
+    userData: String = "Data in the field",
+    keyboardType: KeyboardType = KeyboardType.Text,
+    doneAction: ImeAction = ImeAction.Done,
+    placeholderText: String = "Placeholder",
     isPassword: Boolean = false,
+    onUpdateValue: (String) -> Unit = { },
+    onDone : () -> Unit = { }
 ) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = Modifier.fillMaxWidth(),
-        placeholder = {
-            FormFieldPlaceHolder(placeholder)
+
+    var text by remember { mutableStateOf(userData) }
+
+    OutlinedTextField(
+        value = text,
+        placeholder = { TextPlaceholder(placeholderText) },
+        visualTransformation = if (isPassword) PasswordVisualTransformation(mask = '*') else VisualTransformation.None,
+        textStyle = MaterialTheme.typography.moderatTextField,
+        singleLine = true,
+        shape = RoundedCornerShape(4.dp),
+        modifier = Modifier
+            .fillMaxWidth(),
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = GrayKiwoko,
+            unfocusedBorderColor = GrayKiwoko,
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = doneAction,
+            keyboardType = keyboardType
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onDone()
+            }
+        ),
+        onValueChange = {
+            text = it
+            onUpdateValue(it)
         },
-        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None
-
-    )
+        )
 }
 
-@Composable
-fun FormFieldPlaceHolder(placeholder: String) {
-    Text(text = placeholder)
-}
-
-@Preview(showBackground = true)
-@Composable
-fun FormFieldPreview() {
-    FormField(
-        "Email",
-        {},
-        placeholder = "Password",
-        true,
-    )
-}

@@ -7,7 +7,7 @@ import retrofit2.http.Path
 interface PetShelterAPI {
 
     @GET("auth/signin")
-    suspend fun getToken(): String
+    suspend fun getToken(): List<String>
 
     @GET("auth/signup")
     suspend fun register()
