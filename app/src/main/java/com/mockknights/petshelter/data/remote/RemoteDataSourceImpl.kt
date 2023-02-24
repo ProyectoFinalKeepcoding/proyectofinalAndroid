@@ -13,12 +13,17 @@ class RemoteDataSourceImpl @Inject constructor(private val api: PetShelterAPI): 
         return flow { emit(result) }
     }
 
-    override suspend fun getToken(): Flow<String> {
+    override suspend fun getToken(): Flow<List<String>> {
         val result = api.getToken()
         return flow { emit(result) }
     }
 
     override suspend fun register(registerRequest: RegisterRequest) {
         api.register(registerRequest)
+    }
+
+    override suspend fun getShelter(id: String): Flow<PetShelterRemote> {
+        val result = api.getShelter(id)
+        return flow { emit(result) }
     }
 }
