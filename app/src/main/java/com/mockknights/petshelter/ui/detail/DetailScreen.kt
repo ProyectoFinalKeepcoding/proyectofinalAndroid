@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -184,11 +185,13 @@ fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "usernam
 
     TextField(
         enabled = enabled,
-        placeholder = { BoldTitle(title = userName) },
+        textStyle = MaterialTheme.typography.moderatUsername,
+        maxLines = 1,
         value = textFieldValue.value,
         onValueChange = { textFieldValue.value = it },
         colors = TextFieldDefaults.textFieldColors(
             backgroundColor = Color.Transparent,
+            disabledTextColor = Color.Black,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
