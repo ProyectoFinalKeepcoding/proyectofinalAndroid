@@ -28,13 +28,17 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel@Inject constructor(private val repository: Repository): ViewModel() {
 
-    private val _detailState = MutableStateFlow(PetShelter("", "", "","", Address(0.0, 0.0), ShelterType.PARTICULAR, ""))
-    val detailState: MutableStateFlow<PetShelter> get() = _detailState
+//    private val _detailState = MutableStateFlow(PetShelter("", "", "","", Address(0.0, 0.0), ShelterType.PARTICULAR, ""))
+//    val detailState: MutableStateFlow<PetShelter> get() = _detailState
+
+    private val _detailState = MutableStateFlow<DetailState>(DetailState.Loading)
+    val detailState: MutableStateFlow<DetailState> get() = _detailState
+
 
     fun getShelterDetail(id: String) {
         viewModelScope.launch {
             val result = repository.getShelter(id).flowOn(Dispatchers.IO)
-            _detailState.value = result.first()
+            _detailState.value = DetailState.Success(result.first())
         }
     }
 
@@ -42,39 +46,37 @@ class DetailViewModel@Inject constructor(private val repository: Repository): Vi
         updateShelterType(shelterType)
     }
     private fun updateShelterType(shelterType: ShelterType) {
-        val newDetailState = _detailState.value.copy(shelterType = shelterType)
-        viewModelScope.launch (Dispatchers.IO) {
-            _detailState.value = newDetailState
-        }
+        val updatedShelter = (_detailState.value as DetailState.Success).petShelter.copy(shelterType = shelterType)
+        setValueOnIOThread(DetailState.Success(updatedShelter))
     }
 
     fun onUpdatedPhone(phone: String) {
         updatePhone(phone)
     }
     private fun updatePhone(phone: String) {
-        val newDetailState = _detailState.value.copy(phoneNumber = phone)
-        viewModelScope.launch (Dispatchers.IO) {
-            _detailState.value = newDetailState
-        }
+        val updatedShelter = (_detailState.value as DetailState.Success).petShelter.copy(phoneNumber = phone)
+        setValueOnIOThread(DetailState.Success(updatedShelter))
     }
 
     fun onUpdatedAddress(latitude: String, longitude: String) {
         updateAddress(latitude, longitude)
     }
     private fun updateAddress(latitude: String, longitude: String) {
-        val newDetailState = _detailState.value.copy(address = Address(latitude.toDouble(), longitude.toDouble()))
-        viewModelScope.launch (Dispatchers.IO) {
-            _detailState.value = newDetailState
-        }
+        val updatedShelter = (_detailState.value as DetailState.Success).petShelter.copy(address = Address(latitude.toDouble(), longitude.toDouble()))
+        setValueOnIOThread(DetailState.Success(updatedShelter))
     }
 
     fun onEditName(name: String) {
         updateUserName(name)
     }
     private fun updateUserName(name: String) {
-        val newDetailState = _detailState.value.copy(name = name)
-        viewModelScope.launch (Dispatchers.IO) {
-            _detailState.value = newDetailState
+        val updatedShelter = (_detailState.value as DetailState.Success).petShelter.copy(name = name)
+        setValueOnIOThread(DetailState.Success(updatedShelter))
+    }
+
+    private fun setValueOnIOThread(value: DetailState) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _detailState.value = value
         }
     }
 }

@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.ShelterType
@@ -74,15 +77,18 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.toDp().dp)
         ) {
-            if (detailState.name != "") { // If the data is not loaded yet, don't show anything
+            if (detailState is DetailState.Success) { // If the data is not loaded yet, don't show anything
+            val shelter = (detailState as DetailState.Success).petShelter
                 UserNameRow(
-                    userName = detailState.name,
-                    onEditName = {
-
+                    userName = shelter.name,
+                    onEditName = { newName ->
+                        detailViewModel.onEditName(newName)
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
                     }
                 )
                 ImageRow(
-                    photoUrl = detailState.photoURL
+                    photoUrl = shelter.photoURL
                 )
                 UserAddressField(
                     onUpdateData = { latitude, longitude ->
@@ -92,7 +98,7 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                 )
                 UserDataField(
                     fieldLabel = "Teléfono",
-                    userData = detailState.phoneNumber,
+                    userData = shelter.phoneNumber,
                     keyboardType = KeyboardType.Phone,
                     onUpdateValue = { phone ->
                         detailViewModel.onUpdatedPhone(phone)
@@ -102,7 +108,7 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                     }
                 )
                 RadioButtonsRow(
-                    currentSelection = detailState.shelterType,
+                    currentSelection = shelter.shelterType,
                     onItemClick = { shelterType -> detailViewModel.onUpdatedShelterType(shelterType) }
                 )
                 ButtonRow(
@@ -114,22 +120,12 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
     }
 }
 
-
-@OptIn(ExperimentalComposeUiApi::class)
 @Preview
 @Composable
 fun UserNameRow(
     userName: String = "Long username to check how it looks",
-    onEditName: () -> Unit = {}
+    onEditName: (String) -> Unit = {}
 ) {
-
-    val enabled = remember { mutableStateOf(false) }
-    val focusRequester =  remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    LaunchedEffect(enabled.value) {
-        if(enabled.value) focusRequester.requestFocus()
-    }
 
     Row(
         modifier = Modifier
@@ -138,39 +134,26 @@ fun UserNameRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val modifier = Modifier
-            .fillMaxWidth()
-            .weight(1.6f)
         Spacer(
-            modifier = modifier
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1.6f)
         )
         UserNameTextField(
             modifier = Modifier
-                .focusRequester(focusRequester)
                 .fillMaxWidth()
-                .weight(6.8f),
+                .weight(8.4f),
             userName = userName,
-            enabled = enabled.value
-        )
-        Icon(
-            modifier = modifier
-                .clickable(
-                    onClick = {
-                        // When clicked enable text field or hide keyboard when disabling
-                        enabled.value = !enabled.value
-                        if(!enabled.value) keyboardController?.hide()
-                              },
-                ),
-            painter = painterResource(id = R.drawable.pencil),
-            contentDescription = "Edit username"
+            onDone = { onEditName(it) }
         )
     }
 }
 
 @Preview
 @Composable
-fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "username", enabled: Boolean = false, ) {
+fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "username", onDone: (String) -> Unit = {}) {
 
+    val enabled = remember { mutableStateOf(false) }
     val textFieldValue = remember { mutableStateOf(
         TextFieldValue(
             text = userName,
@@ -178,13 +161,17 @@ fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "usernam
         )
     )
     }
+    val focusRequester =  remember { FocusRequester() }
 
-    LaunchedEffect(key1 = enabled) {
-          if(enabled) textFieldValue.value = TextFieldValue(text = userName, selection = TextRange(0, userName.length))
+    LaunchedEffect(key1 = enabled.value) {
+          if(enabled.value) {
+              textFieldValue.value = TextFieldValue(text = userName, selection = TextRange(0, userName.length))
+              focusRequester.requestFocus()
+          }
     }
 
     TextField(
-        enabled = enabled,
+        enabled = enabled.value,
         textStyle = MaterialTheme.typography.moderatUsername,
         maxLines = 1,
         value = textFieldValue.value,
@@ -197,7 +184,31 @@ fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "usernam
             disabledIndicatorColor = Color.Transparent,
             cursorColor = RedKiwoko,
         ),
-        modifier = modifier,
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                enabled.value = !enabled.value
+                onDone(textFieldValue.value.text)
+            }
+        ),
+        modifier = modifier
+            .focusRequester(focusRequester),
+        trailingIcon = {
+            IconButton (
+                onClick = {
+                    enabled.value = !enabled.value
+                    onDone(textFieldValue.value.text)
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.pencil),
+                    contentDescription = "Edit username"
+                )
+            }
+
+        }
     )
 }
 
