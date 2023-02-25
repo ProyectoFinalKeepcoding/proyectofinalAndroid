@@ -78,7 +78,7 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
             verticalArrangement = Arrangement.spacedBy(24.toDp().dp)
         ) {
             if (detailState is DetailState.Success) { // If the data is not loaded yet, don't show anything
-            val shelter = (detailState as DetailState.Success).petShelter
+                val shelter = (detailState as DetailState.Success).petShelter
                 UserNameRow(
                     userName = shelter.name,
                     onEditName = { newName ->
@@ -91,6 +91,7 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                     photoUrl = shelter.photoURL
                 )
                 UserAddressField(
+                    currentAddress = shelter.address,
                     onUpdateData = { latitude, longitude ->
                         detailViewModel.onUpdatedAddress(latitude, longitude)
                         focusManager.moveFocus(FocusDirection.Down)
