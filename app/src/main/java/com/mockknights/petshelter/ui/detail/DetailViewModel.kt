@@ -1,5 +1,7 @@
 package com.mockknights.petshelter.ui.detail
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -79,6 +81,18 @@ class DetailViewModel@Inject constructor(private val repository: Repository): Vi
             _detailState.value = value
         }
     }
+
+    fun onImageClicked() {
+        updateImage()
+    }
+    private fun updateImage() {
+        val petShelter = (_detailState.value as DetailState.Success).petShelter
+        if (petShelter.photoURL.isNotEmpty()) return // already has an image url, not needed to set one
+        val updatedShelter = (_detailState.value as DetailState.Success).petShelter.copy(photoURL = "${petShelter.id}.png")
+        setValueOnIOThread(DetailState.Success(updatedShelter))
+        Log.d("DetailViewModel", "Image url is now: ${(detailState.value as DetailState.Success).petShelter.photoURL}")
+    }
+
 }
 
 

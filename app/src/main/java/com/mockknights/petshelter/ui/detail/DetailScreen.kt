@@ -1,6 +1,8 @@
 package com.mockknights.petshelter.ui.detail
 
 import android.content.res.Resources
+import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +37,7 @@ import com.mockknights.petshelter.domain.ShelterType
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
 import com.mockknights.petshelter.ui.components.UserAddressField
 import com.mockknights.petshelter.ui.components.UserDataFieldTextField
+import com.mockknights.petshelter.ui.components.detailImage.DetailImage
 import com.mockknights.petshelter.ui.theme.*
 
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt())
@@ -82,7 +85,10 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                     }
                 )
                 ImageRow(
-                    photoUrl = shelter.photoURL
+                    photoUrl = shelter.photoURL,
+                    onImageClicked = {
+                        detailViewModel.onImageClicked()
+                    }
                 )
                 UserAddressField(
                     currentAddress = shelter.address,
@@ -104,7 +110,9 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                 )
                 RadioButtonsRow(
                     currentSelection = shelter.shelterType,
-                    onItemClick = { shelterType -> detailViewModel.onUpdatedShelterType(shelterType) }
+                    onItemClick = { shelterType ->
+                        detailViewModel.onUpdatedShelterType(shelterType)
+                    }
                 )
                 ButtonRow(
                     onClick = {
@@ -211,11 +219,15 @@ fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "usernam
 
 @Preview
 @Composable
-fun ImageRow(photoUrl: String = "0F484421-1D54-4A2D-806D-8BAAD2CA1158.png") {
+fun ImageRow(
+    photoUrl: String = "0F484421-1D54-4A2D-806D-8BAAD2CA1158.png",
+    onImageClicked: () -> Unit = {}
+) {
+
     Row(
-modifier = Modifier
-    .fillMaxWidth()
-    .wrapContentHeight(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(
@@ -223,17 +235,14 @@ modifier = Modifier
                 .fillMaxWidth()
                 .weight(1.6f)
         )
-        AsyncImage(
-            model = if (photoUrl.isNotEmpty()) "http://10.0.2.2:8080/$photoUrl" else R.drawable.ic_launcher_background,
-            contentDescription = "image",
-            placeholder = painterResource(R.drawable.ic_launcher_background),
-            alignment = Alignment.Center,
-            contentScale = ContentScale.Crop,
+        DetailImage(
+            photoUrl = photoUrl,
             modifier = Modifier
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(25.dp))
                 .fillMaxSize()
-                .weight(6.8f)
+                .weight(6.8f),
+            onImageSelected = { onImageClicked() }
         )
         Spacer(
             modifier = Modifier
