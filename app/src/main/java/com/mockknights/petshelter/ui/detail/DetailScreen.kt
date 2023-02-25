@@ -1,8 +1,6 @@
 package com.mockknights.petshelter.ui.detail
 
 import android.content.res.Resources
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +13,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -29,15 +26,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.ShelterType
-import com.mockknights.petshelter.ui.components.BoldTitle
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
 import com.mockknights.petshelter.ui.components.UserAddressField
 import com.mockknights.petshelter.ui.components.UserDataFieldTextField
@@ -81,7 +75,7 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                 val shelter = (detailState as DetailState.Success).petShelter
                 UserNameRow(
                     userName = shelter.name,
-                    onEditName = { newName ->
+                    onNameEdited = { newName ->
                         detailViewModel.onEditName(newName)
                         keyboardController?.hide()
                         focusManager.clearFocus()
@@ -125,7 +119,7 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
 @Composable
 fun UserNameRow(
     userName: String = "Long username to check how it looks",
-    onEditName: (String) -> Unit = {}
+    onNameEdited: (String) -> Unit = {}
 ) {
 
     Row(
@@ -145,7 +139,7 @@ fun UserNameRow(
                 .fillMaxWidth()
                 .weight(8.4f),
             userName = userName,
-            onDone = { onEditName(it) }
+            onDone = { onNameEdited(it) }
         )
     }
 }
@@ -174,7 +168,7 @@ fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "usernam
     TextField(
         enabled = enabled.value,
         textStyle = MaterialTheme.typography.moderatUsername,
-        maxLines = 1,
+        singleLine = true,
         value = textFieldValue.value,
         onValueChange = { textFieldValue.value = it },
         colors = TextFieldDefaults.textFieldColors(
@@ -190,8 +184,8 @@ fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "usernam
         ),
         keyboardActions = KeyboardActions(
             onDone = {
-                enabled.value = !enabled.value
-                onDone(textFieldValue.value.text)
+                    enabled.value = !enabled.value
+                    onDone(textFieldValue.value.text)
             }
         ),
         modifier = modifier
@@ -199,13 +193,14 @@ fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "usernam
         trailingIcon = {
             IconButton (
                 onClick = {
-                    enabled.value = !enabled.value
-                    onDone(textFieldValue.value.text)
+                        enabled.value = !enabled.value
+                        onDone(textFieldValue.value.text)
                 }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.pencil),
-                    contentDescription = "Edit username"
+                    contentDescription = "Edit username",
+                    tint = RedKiwoko
                 )
             }
 
