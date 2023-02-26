@@ -1,11 +1,13 @@
 package com.mockknights.petshelter.ui.detail
 
 import android.content.res.Resources
-import androidx.compose.foundation.background
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,7 +15,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -27,17 +28,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.ShelterType
-import com.mockknights.petshelter.ui.components.BoldTitle
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
 import com.mockknights.petshelter.ui.components.UserAddressField
 import com.mockknights.petshelter.ui.components.UserDataFieldTextField
+import com.mockknights.petshelter.ui.components.detailImage.DetailImage
 import com.mockknights.petshelter.ui.theme.*
 
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt())
@@ -74,17 +74,25 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.toDp().dp)
         ) {
-            if (detailState.name != "") { // If the data is not loaded yet, don't show anything
+            if (detailState is DetailState.Success) { // If the data is not loaded yet, don't show anything
+                val shelter = (detailState as DetailState.Success).petShelter
                 UserNameRow(
-                    userName = detailState.name,
-                    onEditName = {
-
+                    userName = shelter.name,
+                    onNameEdited = { newName ->
+                        detailViewModel.onEditName(newName)
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
                     }
                 )
                 ImageRow(
-                    photoUrl = detailState.photoURL
+                    photoUrl = shelter.photoURL,
+                    shelterId = shelter.id,
+                    onImageClicked = {
+                        detailViewModel.onImageClicked()
+                    }
                 )
                 UserAddressField(
+                    currentAddress = shelter.address,
                     onUpdateData = { latitude, longitude ->
                         detailViewModel.onUpdatedAddress(latitude, longitude)
                         focusManager.moveFocus(FocusDirection.Down)
@@ -92,7 +100,7 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                 )
                 UserDataField(
                     fieldLabel = "Teléfono",
-                    userData = detailState.phoneNumber,
+                    userData = shelter.phoneNumber,
                     keyboardType = KeyboardType.Phone,
                     onUpdateValue = { phone ->
                         detailViewModel.onUpdatedPhone(phone)
@@ -102,34 +110,26 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                     }
                 )
                 RadioButtonsRow(
-                    currentSelection = detailState.shelterType,
-                    onItemClick = { shelterType -> detailViewModel.onUpdatedShelterType(shelterType) }
+                    currentSelection = shelter.shelterType,
+                    onItemClick = { shelterType ->
+                        detailViewModel.onUpdatedShelterType(shelterType)
+                    }
                 )
                 ButtonRow(
                     onClick = {
-                        // TODO: Viewmodel action
+                        detailViewModel.onSaveClicked()
                     })
             }
         }
     }
 }
 
-
-@OptIn(ExperimentalComposeUiApi::class)
 @Preview
 @Composable
 fun UserNameRow(
     userName: String = "Long username to check how it looks",
-    onEditName: () -> Unit = {}
+    onNameEdited: (String) -> Unit = {}
 ) {
-
-    val enabled = remember { mutableStateOf(false) }
-    val focusRequester =  remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    LaunchedEffect(enabled.value) {
-        if(enabled.value) focusRequester.requestFocus()
-    }
 
     Row(
         modifier = Modifier
@@ -138,39 +138,26 @@ fun UserNameRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val modifier = Modifier
-            .fillMaxWidth()
-            .weight(1.6f)
         Spacer(
-            modifier = modifier
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1.6f)
         )
         UserNameTextField(
             modifier = Modifier
-                .focusRequester(focusRequester)
                 .fillMaxWidth()
-                .weight(6.8f),
+                .weight(8.4f),
             userName = userName,
-            enabled = enabled.value
-        )
-        Icon(
-            modifier = modifier
-                .clickable(
-                    onClick = {
-                        // When clicked enable text field or hide keyboard when disabling
-                        enabled.value = !enabled.value
-                        if(!enabled.value) keyboardController?.hide()
-                              },
-                ),
-            painter = painterResource(id = R.drawable.pencil),
-            contentDescription = "Edit username"
+            onDone = { onNameEdited(it) }
         )
     }
 }
 
 @Preview
 @Composable
-fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "username", enabled: Boolean = false, ) {
+fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "username", onDone: (String) -> Unit = {}) {
 
+    val enabled = remember { mutableStateOf(false) }
     val textFieldValue = remember { mutableStateOf(
         TextFieldValue(
             text = userName,
@@ -178,15 +165,19 @@ fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "usernam
         )
     )
     }
+    val focusRequester =  remember { FocusRequester() }
 
-    LaunchedEffect(key1 = enabled) {
-          if(enabled) textFieldValue.value = TextFieldValue(text = userName, selection = TextRange(0, userName.length))
+    LaunchedEffect(key1 = enabled.value) {
+          if(enabled.value) {
+              textFieldValue.value = TextFieldValue(text = userName, selection = TextRange(0, userName.length))
+              focusRequester.requestFocus()
+          }
     }
 
     TextField(
-        enabled = enabled,
+        enabled = enabled.value,
         textStyle = MaterialTheme.typography.moderatUsername,
-        maxLines = 1,
+        singleLine = true,
         value = textFieldValue.value,
         onValueChange = { textFieldValue.value = it },
         colors = TextFieldDefaults.textFieldColors(
@@ -197,18 +188,48 @@ fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "usernam
             disabledIndicatorColor = Color.Transparent,
             cursorColor = RedKiwoko,
         ),
-        modifier = modifier,
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                    enabled.value = !enabled.value
+                    onDone(textFieldValue.value.text)
+            }
+        ),
+        modifier = modifier
+            .focusRequester(focusRequester),
+        trailingIcon = {
+            IconButton (
+                onClick = {
+                        enabled.value = !enabled.value
+                        onDone(textFieldValue.value.text)
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.pencil),
+                    contentDescription = "Edit username",
+                    tint = RedKiwoko
+                )
+            }
+
+        }
     )
 }
 
 
 @Preview
 @Composable
-fun ImageRow(photoUrl: String = "0F484421-1D54-4A2D-806D-8BAAD2CA1158.png") {
+fun ImageRow(
+    photoUrl: String = "0F484421-1D54-4A2D-806D-8BAAD2CA1158.png",
+    shelterId: String = "0F484421-1D54-4A2D-806D-8BAAD2CA1158",
+    onImageClicked: () -> Unit = {}
+) {
+
     Row(
-modifier = Modifier
-    .fillMaxWidth()
-    .wrapContentHeight(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(
@@ -216,17 +237,15 @@ modifier = Modifier
                 .fillMaxWidth()
                 .weight(1.6f)
         )
-        AsyncImage(
-            model = if (photoUrl.isNotEmpty()) "http://10.0.2.2:8080/$photoUrl" else R.drawable.ic_launcher_background,
-            contentDescription = "image",
-            placeholder = painterResource(R.drawable.ic_launcher_background),
-            alignment = Alignment.Center,
-            contentScale = ContentScale.Crop,
+        DetailImage(
+            photoUrl = photoUrl,
+            shelterId = shelterId,
             modifier = Modifier
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(25.dp))
                 .fillMaxSize()
-                .weight(6.8f)
+                .weight(6.8f),
+            onImageSelected = { onImageClicked() }
         )
         Spacer(
             modifier = Modifier

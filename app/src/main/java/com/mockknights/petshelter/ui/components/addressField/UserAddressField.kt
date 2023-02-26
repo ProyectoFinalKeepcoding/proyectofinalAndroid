@@ -20,37 +20,39 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.libraries.places.api.Places
 import com.mockknights.petshelter.BuildConfig
+import com.mockknights.petshelter.data.remote.response.Address
 import com.mockknights.petshelter.ui.components.addressField.UserAddressFieldViewModel
 import com.mockknights.petshelter.ui.detail.UserDataFieldLabel
 import com.mockknights.petshelter.ui.detail.toDp
-import com.mockknights.petshelter.ui.detail.toPx
 import com.mockknights.petshelter.ui.theme.GrayKiwoko
 import com.mockknights.petshelter.ui.theme.moderatTextField
 
 @Composable
 fun UserAddressField(
     viewModel: UserAddressFieldViewModel = hiltViewModel(),
+    currentAddress: Address = Address(40.4168, 3.7038), // Madrid
     onUpdateData: (String, String) -> Unit = {_, _ -> (Unit)},) {
 
     val localContext = LocalContext.current
     val currentLocation = viewModel.currentLatLong.collectAsState().value
+    val addressAsString = viewModel.addressAsString.collectAsState()
 
-    LaunchedEffect(key1 = "initializePlacesClient"){
+    LaunchedEffect(Unit){
         Places.initialize(localContext, BuildConfig.MAPS_API_KEY)
         viewModel.placesClient = Places.createClient(localContext)
+        viewModel.onRequestAddressAsString(currentAddress, localContext)
     }
 
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        var text by remember { mutableStateOf("") }
         Column(
             verticalArrangement = Arrangement.spacedBy(12.toDp().dp),
         ) {
             UserDataFieldLabel("Dirección")
             OutlinedTextField(
-                value = text,
+                value = addressAsString.value,
                 textStyle = MaterialTheme.typography.moderatTextField,
                 singleLine = true,
                 shape = RoundedCornerShape(4.dp),
@@ -69,7 +71,7 @@ fun UserAddressField(
                     }
                 ),
                 onValueChange = {
-                    text = it
+                    viewModel.updateAddressAsString(it)
                     viewModel.searchPlaces(it)
                 }
             )
@@ -84,7 +86,7 @@ fun UserAddressField(
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp)
                         .clickable {
-                            text = it.address
+                            viewModel.updateAddressAsString(it.address)
                             viewModel.locationAutofill.clear()
                             viewModel.getCoordinates(it)
                         }
@@ -96,3 +98,5 @@ fun UserAddressField(
         Spacer(Modifier.height(16.dp))
     }
 }
+
+
