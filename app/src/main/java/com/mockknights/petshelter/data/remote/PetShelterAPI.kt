@@ -1,7 +1,12 @@
 package com.mockknights.petshelter.data.remote
 
 import com.mockknights.petshelter.data.remote.response.PetShelterRemote
+import okhttp3.MultipartBody
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
+import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface PetShelterAPI {
@@ -18,5 +23,11 @@ interface PetShelterAPI {
     @GET("shelters/{id}")
     suspend fun getShelter(@Path("id") id: String): PetShelterRemote
 
+    @Multipart
+    @POST("upload/{id}")
+    suspend fun uploadPhoto(
+        @Path("id") id: String,
+        @Part body: MultipartBody.Part
+    )
 
 }

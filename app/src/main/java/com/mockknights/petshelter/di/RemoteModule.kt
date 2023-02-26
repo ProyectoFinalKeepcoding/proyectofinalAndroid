@@ -63,6 +63,13 @@ object RemoteModule {
                         .header("Authorization", "${sharedPreferences.getString("CREDENTIAL", null)}")
                         .build()
                 }
+                else if(response.request.url.encodedPath.contains("api/upload")) {
+                    val response = response.request.newBuilder()
+                        .header("Authorization", "Bearer ${sharedPreferences.getString("TOKEN", null)}")
+                        .build()
+                    Log.d("RESPONSE AUTH", "${response.header("Authorization")}")
+                    response
+                }
                 else {
                     response.request.newBuilder()
                         .build()

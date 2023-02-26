@@ -3,6 +3,7 @@ package com.mockknights.petshelter.data.remote
 import com.mockknights.petshelter.data.remote.response.PetShelterRemote
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 class RemoteDataSourceImpl @Inject constructor(private val api: PetShelterAPI): RemoteDataSource {
@@ -20,5 +21,9 @@ class RemoteDataSourceImpl @Inject constructor(private val api: PetShelterAPI): 
     override suspend fun getShelter(id: String): Flow<PetShelterRemote> {
         val result = api.getShelter(id)
         return flow { emit(result) }
+    }
+
+    override suspend fun uploadPhoto(id: String, body: MultipartBody.Part) {
+        api.uploadPhoto(id, body)
     }
 }

@@ -86,6 +86,7 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                 )
                 ImageRow(
                     photoUrl = shelter.photoURL,
+                    shelterId = shelter.id,
                     onImageClicked = {
                         detailViewModel.onImageClicked()
                     }
@@ -221,6 +222,7 @@ fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "usernam
 @Composable
 fun ImageRow(
     photoUrl: String = "0F484421-1D54-4A2D-806D-8BAAD2CA1158.png",
+    shelterId: String = "0F484421-1D54-4A2D-806D-8BAAD2CA1158",
     onImageClicked: () -> Unit = {}
 ) {
 
@@ -237,6 +239,7 @@ fun ImageRow(
         )
         DetailImage(
             photoUrl = photoUrl,
+            shelterId = shelterId,
             modifier = Modifier
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(25.dp))

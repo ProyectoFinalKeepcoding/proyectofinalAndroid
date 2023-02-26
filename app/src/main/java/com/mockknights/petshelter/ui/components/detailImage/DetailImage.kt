@@ -8,9 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.mockknights.petshelter.R
@@ -19,23 +19,28 @@ import com.mockknights.petshelter.R
 @Composable
 fun DetailImage(
     modifier: Modifier = Modifier,
+    shelterId: String = "5B4A63DF-F5B8-4306-B264-2C56CF05C613",
+    detailImageViewModel: DetailImageViewModel = hiltViewModel(),
     photoUrl: String = "",
     onImageSelected: () -> Unit = {},
-//    detailImageViewModel: DetailImageViewModel = hiltViewModel()
 ) {
+    val localContext = LocalContext.current
     val originalImageUrl by remember { mutableStateOf("http://10.0.2.2:8080/$photoUrl") }
     var selectedImage by remember { mutableStateOf(Uri.parse("http://10.0.2.2:8080/$photoUrl")) }
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         selectedImage = uri
         onImageSelected()
+        if(uri != null) detailImageViewModel.onSelectedImage(uri, shelterId, localContext)
+        // If clicked outside the gallery, a person placeholder image will be uploaded and shown
+        else detailImageViewModel.onSelectedImage(Uri.parse("android.resource://com.mockknights.petshelter/${R.drawable.person_image}"), shelterId, localContext)
     }
 
     AsyncImage(
-        model = if(photoUrl.isEmpty()) R.drawable.person
+        model = if(photoUrl.isEmpty()) R.drawable.person_image
                 else if(selectedImage != null) selectedImage.toString()
-                else originalImageUrl,
+                else R.drawable.person_image,
         contentDescription = "image",
-        placeholder = painterResource(R.drawable.person),
+        placeholder = painterResource(R.drawable.person_image),
         alignment = Alignment.Center,
         contentScale = ContentScale.Crop,
         modifier = modifier
