@@ -30,4 +30,10 @@ interface PetShelterAPI {
         @Part body: MultipartBody.Part
     )
 
+    @POST("update/{id}")
+    suspend fun updateShelter(
+        @Path("id") id: String,
+        @Body shelter: PetShelterRemote
+    )
+
 }

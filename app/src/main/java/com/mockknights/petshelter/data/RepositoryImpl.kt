@@ -42,4 +42,8 @@ class RepositoryImpl @Inject constructor(
     override suspend fun uploadPhoto(id: String, body: MultipartBody.Part) {
         remoteDataSource.uploadPhoto(id, body)
     }
+
+    override suspend fun updateShelter(id: String, shelter: PetShelter) {
+        remoteDataSource.updateShelter(id, mapper.mapOnePetShelterPresentationToRemote(shelter))
+    }
 }

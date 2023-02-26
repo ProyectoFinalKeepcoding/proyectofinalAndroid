@@ -25,13 +25,13 @@ fun DetailImage(
     onImageSelected: () -> Unit = {},
 ) {
     val localContext = LocalContext.current
-    val originalImageUrl by remember { mutableStateOf("http://10.0.2.2:8080/$photoUrl") }
     var selectedImage by remember { mutableStateOf(Uri.parse("http://10.0.2.2:8080/$photoUrl")) }
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         selectedImage = uri
         onImageSelected()
+        // If selected an image from the gallery, upload it to the server
         if(uri != null) detailImageViewModel.onSelectedImage(uri, shelterId, localContext)
-        // If clicked outside the gallery, a person placeholder image will be uploaded and shown
+        // If clicked outside the gallery or cancelled, a person placeholder image will be uploaded and shown
         else detailImageViewModel.onSelectedImage(Uri.parse("android.resource://com.mockknights.petshelter/${R.drawable.person_image}"), shelterId, localContext)
     }
 

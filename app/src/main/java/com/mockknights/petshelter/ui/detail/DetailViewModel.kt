@@ -93,6 +93,14 @@ class DetailViewModel@Inject constructor(private val repository: Repository): Vi
         Log.d("DetailViewModel", "Image url is now: ${(detailState.value as DetailState.Success).petShelter.photoURL}")
     }
 
+    fun onSaveClicked() {
+        val petShelter = (_detailState.value as DetailState.Success).petShelter
+        val id = petShelter.id
+        viewModelScope.launch {
+            repository.updateShelter(id, petShelter)
+        }
+    }
+
 }
 
 

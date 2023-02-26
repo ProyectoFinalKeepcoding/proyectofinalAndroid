@@ -22,4 +22,16 @@ class PetShelterMapper @Inject constructor() {
 
         )
     }
+
+    fun mapOnePetShelterPresentationToRemote(petShelter: PetShelter): PetShelterRemote {
+        return PetShelterRemote(
+            petShelter.id,
+            petShelter.name,
+            petShelter.password ?: "",
+            petShelter.phoneNumber,
+            petShelter.address,
+            petShelter.shelterType,
+            petShelter.photoURL ?: ""
+        )
+    }
 }

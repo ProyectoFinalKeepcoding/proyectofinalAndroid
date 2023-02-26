@@ -8,7 +8,7 @@ interface RemoteDataSource {
     suspend fun getAllPetShelter(): Flow<List<PetShelterRemote>>
     suspend fun getToken(): Flow<List<String>>
     suspend fun getShelter(id: String): Flow<PetShelterRemote>
-
     suspend fun uploadPhoto(id: String, body: MultipartBody.Part)
+    suspend fun updateShelter(id: String, shelter: PetShelterRemote)
 }
 

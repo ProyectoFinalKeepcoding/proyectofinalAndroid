@@ -26,4 +26,8 @@ class RemoteDataSourceImpl @Inject constructor(private val api: PetShelterAPI): 
     override suspend fun uploadPhoto(id: String, body: MultipartBody.Part) {
         api.uploadPhoto(id, body)
     }
+
+    override suspend fun updateShelter(id: String, shelter: PetShelterRemote) {
+        api.updateShelter(id, shelter)
+    }
 }

@@ -117,7 +117,7 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
                 )
                 ButtonRow(
                     onClick = {
-                        // TODO: Viewmodel action
+                        detailViewModel.onSaveClicked()
                     })
             }
         }
