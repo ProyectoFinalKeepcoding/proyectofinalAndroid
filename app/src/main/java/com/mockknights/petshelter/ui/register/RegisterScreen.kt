@@ -19,7 +19,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.mockknights.petshelter.data.remote.request.RegisterRequest
 import com.mockknights.petshelter.data.remote.response.Address
 import com.mockknights.petshelter.ui.components.CreateWelcomeButton
-import com.mockknights.petshelter.ui.components.FormField
+import com.mockknights.petshelter.ui.components.UserAddressField
+import com.mockknights.petshelter.ui.components.UserDataFieldTextField
 import com.mockknights.petshelter.ui.theme.RedKiwoko
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -58,16 +59,16 @@ fun RegisterForm(viewModel: RegisterViewModel) {
 
     Text(text = "Crear una nueva cuenta")
     Text(text = "Usuario")
-    FormField(value = user, onValueChange = { user = it }, placeholder = "Usuario")
+    UserDataFieldTextField(placeholderText = "Usuario", onUpdateValue = { user = it })
 
     Text(text = "Contraseña")
-    FormField(value = password, onValueChange = {password = it }, placeholder = "Contraseña", isPassword = true)
+    UserDataFieldTextField(placeholderText = "Contraseña", onUpdateValue = { password = it })
 
     Text(text = "Direccion")
-    FormField(value = direccion.toString(), onValueChange = {}, placeholder = "Direccion")
+    UserDataFieldTextField(placeholderText = "Direccion", onUpdateValue = { /*direccion.latitude = it.toDouble()*/ })
 
     Text(text = "Telefono")
-    FormField(value = telefono, onValueChange = {telefono = it }, placeholder = "Numero de Telefono")
+    UserDataFieldTextField(placeholderText = "Numero de Telefono", onUpdateValue = { telefono = it })
 
 
     CreateWelcomeButton(name = "Crear cuenta", modifier = Modifier.fillMaxWidth(), colorButton = RedKiwoko, colorText = Color.White) {

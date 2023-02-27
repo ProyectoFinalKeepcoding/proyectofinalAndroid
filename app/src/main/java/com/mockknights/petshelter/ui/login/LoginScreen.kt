@@ -78,6 +78,8 @@ fun LoginScreen (
                 modifier = Modifier
                     .fillMaxSize()
                     .weight(3.3f),
+                navigateToRegister = { navigateToRegister() }
+
             )
         }
     }
