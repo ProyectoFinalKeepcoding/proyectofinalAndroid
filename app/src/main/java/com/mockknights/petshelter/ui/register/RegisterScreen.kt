@@ -36,7 +36,10 @@ import com.mockknights.petshelter.ui.theme.RedKiwoko
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Preview(showSystemUi = true)
 @Composable
-fun RegisterScreen (viewModel: RegisterViewModel = hiltViewModel()) {
+fun RegisterScreen (
+    viewModel: RegisterViewModel = hiltViewModel(),
+    navigateToLogin: () -> Unit = {}
+) {
 
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
@@ -56,6 +59,7 @@ fun RegisterScreen (viewModel: RegisterViewModel = hiltViewModel()) {
             RegisterForm(
                 onRegister = { registerRequest ->
                     viewModel.register(registerRequest)
+                    navigateToLogin()
                 }
             )
         }
@@ -139,7 +143,13 @@ fun RegisterForm(onRegister: (RegisterRequest) -> Unit = {}) {
         )
 
         ButtonRow(
-            onClick = { onRegister(RegisterRequest(user, password, address, phone, shelterType)) },
+            onClick = {
+                if(user.isEmpty() ||
+                    password.isEmpty() ||
+                    (address.latitude == 0.0 && address.longitude == 0.0) ||
+                    phone.isEmpty()) return@ButtonRow
+                onRegister(RegisterRequest(user, password, address, phone, shelterType))
+                      },
         )
     }
 }

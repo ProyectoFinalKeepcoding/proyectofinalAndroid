@@ -27,13 +27,16 @@ fun AppNavigation () {
         }
 
         composable(Screens.Login.route) {
-            LoginScreen(navigateToWelcome = {
+            LoginScreen(
+                navigateToWelcome = {
                 navController.navigate(Screens.Welcome.route)
-            }, navigateToRegister = {
+                },
+                navigateToRegister = {
                 navController.navigate(Screens.Register.route)
-            }, navigateToDetail = {
+                 },
+                navigateToDetail = {
                 navController.navigate(Screens.Detail.getRoute(it))
-            })
+                })
         }
 
         composable(
@@ -53,7 +56,11 @@ fun AppNavigation () {
         }
 
         composable(Screens.Register.route) {
-            RegisterScreen()
+            RegisterScreen(
+                navigateToLogin = {
+                    navController.navigate(Screens.Login.route)
+                }
+            )
         }
     }
 
