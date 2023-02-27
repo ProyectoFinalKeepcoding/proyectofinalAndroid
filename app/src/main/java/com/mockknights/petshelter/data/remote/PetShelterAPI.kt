@@ -1,5 +1,6 @@
 package com.mockknights.petshelter.data.remote
 
+import com.mockknights.petshelter.data.remote.request.RegisterRequest
 import com.mockknights.petshelter.data.remote.response.PetShelterRemote
 import okhttp3.MultipartBody
 import retrofit2.http.Body
@@ -15,7 +16,7 @@ interface PetShelterAPI {
     suspend fun getToken(): List<String>
 
     @GET("auth/signup")
-    suspend fun register()
+    suspend fun register(@Body registerRequest: RegisterRequest)
 
     @GET("shelters")
     suspend fun getAllPetShelter(): List<PetShelterRemote>

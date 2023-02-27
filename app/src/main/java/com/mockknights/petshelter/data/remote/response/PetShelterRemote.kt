@@ -2,7 +2,6 @@ package com.mockknights.petshelter.data.remote.response
 
 import com.mockknights.petshelter.domain.ShelterType
 import com.squareup.moshi.Json
-import java.util.UUID
 
 data class PetShelterRemote (
     @Json(name = "id") val id: String,

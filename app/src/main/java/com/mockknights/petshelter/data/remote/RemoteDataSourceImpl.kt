@@ -1,5 +1,6 @@
 package com.mockknights.petshelter.data.remote
 
+import com.mockknights.petshelter.data.remote.request.RegisterRequest
 import com.mockknights.petshelter.data.remote.response.PetShelterRemote
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,6 +17,10 @@ class RemoteDataSourceImpl @Inject constructor(private val api: PetShelterAPI): 
     override suspend fun getToken(): Flow<List<String>> {
         val result = api.getToken()
         return flow { emit(result) }
+    }
+
+    override suspend fun register(registerRequest: RegisterRequest) {
+        api.register(registerRequest)
     }
 
     override suspend fun getShelter(id: String): Flow<PetShelterRemote> {

@@ -38,6 +38,7 @@ class LoginViewModel @Inject constructor(
 
 
     fun getToken(user: String, password: String) {
+        setValueOnMainThread(LoginState.loading)
         // Delete shared preferences for key CREDENTIAL
         sharedPreferences.edit().remove("CREDENTIAL").apply() // TODO: Manage login when the user has already logged in
         sharedPreferences.edit().remove("TOKEN").apply()

@@ -16,7 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mockknights.petshelter.data.remote.request.RegisterRequest
+import com.mockknights.petshelter.data.remote.response.Address
 import com.mockknights.petshelter.ui.components.CreateWelcomeButton
+import com.mockknights.petshelter.ui.components.UserAddressField
+import com.mockknights.petshelter.ui.components.UserDataFieldTextField
 import com.mockknights.petshelter.ui.theme.RedKiwoko
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -37,37 +41,38 @@ fun RegisterScreen (viewModel: RegisterViewModel = hiltViewModel()) {
             verticalArrangement = Arrangement.Center
         )
         {
-            RegisterForm()
+            RegisterForm(viewModel)
         }
     }
 }
 
 
 @Composable
-fun RegisterForm() {
+fun RegisterForm(viewModel: RegisterViewModel) {
 
     var user by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var direccion by remember { mutableStateOf("") }
+    var direccion by remember { mutableStateOf(Address(0.0, 0.0)) }
     var telefono by remember { mutableStateOf("") }
+    var shelterType by remember { mutableStateOf("") }
 
 
-//    Text(text = "Crear una nueva cuenta")
-//    Text(text = "Usuario")
-//    FormField(value = user, onValueChange = { user = it }, placeholder = "Usuario")
-//
-//    Text(text = "Contraseña")
-//    FormField(value = password, onValueChange = {password = it }, placeholder = "Contraseña", isPassword = true)
-//
-//    Text(text = "Direccion")
-//    FormField(value = direccion, onValueChange = {direccion = it }, placeholder = "Direccion")
-//
-//    Text(text = "Telefono")
-//    FormField(value = telefono, onValueChange = {telefono = it }, placeholder = "Numero de Telefono")
+    Text(text = "Crear una nueva cuenta")
+    Text(text = "Usuario")
+    UserDataFieldTextField(placeholderText = "Usuario", onUpdateValue = { user = it })
+
+    Text(text = "Contraseña")
+    UserDataFieldTextField(placeholderText = "Contraseña", onUpdateValue = { password = it })
+
+    Text(text = "Direccion")
+    UserDataFieldTextField(placeholderText = "Direccion", onUpdateValue = { /*direccion.latitude = it.toDouble()*/ })
+
+    Text(text = "Telefono")
+    UserDataFieldTextField(placeholderText = "Numero de Telefono", onUpdateValue = { telefono = it })
 
 
     CreateWelcomeButton(name = "Crear cuenta", modifier = Modifier.fillMaxWidth(), colorButton = RedKiwoko, colorText = Color.White) {
-
+        viewModel.register(RegisterRequest(user, password, telefono, direccion, shelterType))
     }
 }
 
