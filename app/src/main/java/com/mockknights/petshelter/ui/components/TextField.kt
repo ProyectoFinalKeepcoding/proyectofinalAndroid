@@ -1,5 +1,7 @@
 package com.mockknights.petshelter.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -14,9 +16,38 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mockknights.petshelter.ui.detail.UserDataFieldLabel
+import com.mockknights.petshelter.ui.detail.toDp
 import com.mockknights.petshelter.ui.theme.GrayKiwoko
 import com.mockknights.petshelter.ui.theme.moderatTextField
 
+@Preview
+@Composable
+fun UserDataField(
+    fieldLabel: String = "Dirección",
+    userData: String = "Avenida Europa, 2",
+    placeholderText: String = "Placeholder",
+    keyboardType: KeyboardType = KeyboardType.Text,
+    doneAction: ImeAction = ImeAction.Done,
+    isPassword: Boolean = false,
+    onUpdateValue: (String) -> Unit = { },
+    onDone: () -> Unit = { }
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.toDp().dp),
+    ) {
+        UserDataFieldLabel(fieldLabel)
+        UserDataFieldTextField(
+            userData = userData,
+            keyboardType = keyboardType,
+            placeholderText = placeholderText,
+            doneAction = doneAction,
+            isPassword = isPassword,
+            onUpdateValue = { onUpdateValue(it)},
+            onDone = onDone
+        )
+    }
+}
 
 @Preview
 @Composable

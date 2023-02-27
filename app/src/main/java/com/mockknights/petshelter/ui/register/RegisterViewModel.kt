@@ -28,7 +28,6 @@ class RegisterViewModel @Inject constructor(private val repository: Repository):
 
 
     fun register(registerRequest: RegisterRequest) {
-
         viewModelScope.launch {
             repository.register(registerRequest)
         }
