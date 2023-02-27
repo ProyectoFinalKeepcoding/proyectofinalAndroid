@@ -1,6 +1,7 @@
 package com.mockknights.petshelter.ui.login
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mockknights.petshelter.domain.Repository
@@ -47,11 +48,14 @@ class LoginViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            repository.getToken().flowOn(Dispatchers.IO).collect() { tokenAndId ->
-                if(tokenAndId.isNotEmpty()) setValueOnMainThread(LoginState.Success(token = tokenAndId[0], id = tokenAndId[1]))
-                else setValueOnMainThread(LoginState.Failure(error = "Error while retrieving the token: Token is empty"))
+            try {
+                repository.getToken().flowOn(Dispatchers.IO).collect() { tokenAndId ->
+                    if(tokenAndId.isNotEmpty()) setValueOnMainThread(LoginState.Success(token = tokenAndId[0], id = tokenAndId[1]))
+                    else setValueOnMainThread(LoginState.Failure(error = "Error while retrieving the token: Token is empty"))
+                }
+            } catch (e: Exception) {
+                setValueOnMainThread(LoginState.Failure(error = e.message.toString()))
             }
         }
     }
-
 }

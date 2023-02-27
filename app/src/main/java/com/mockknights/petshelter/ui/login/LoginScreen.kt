@@ -3,13 +3,19 @@ package com.mockknights.petshelter.ui.login
 import android.annotation.SuppressLint
 import android.content.res.Resources
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,6 +32,7 @@ import com.mockknights.petshelter.ui.theme.moderatTextField
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt())
 fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density.toInt())
 
+@OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Preview(showSystemUi = true)
 @Composable
@@ -34,6 +41,9 @@ fun LoginScreen (
     navigateToDetail: (String) -> Unit = {},
     navigateToWelcome: () -> (Unit)= {},
     navigateToRegister: () -> (Unit) = {}) {
+
+
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val success by viewModel.stateLogin.collectAsState()
     LaunchedEffect(key1 = success) {
@@ -54,7 +64,11 @@ fun LoginScreen (
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(25.toDp().dp),
+                .padding(25.toDp().dp).pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        keyboardController?.hide()
+                    })
+                },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center)
         {
@@ -102,6 +116,8 @@ fun LoginForm(
             .fillMaxWidth()
     ) {
 
+        val focusManager = LocalFocusManager.current
+
         var user by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
 
@@ -113,6 +129,7 @@ fun LoginForm(
             userData = user,
             placeholderText = "Usuario",
             doneAction = ImeAction.Next,
+            onDone = { focusManager.moveFocus(FocusDirection.Down) },
             onUpdateValue = { user = it },
         )
 

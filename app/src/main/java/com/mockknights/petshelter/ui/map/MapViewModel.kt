@@ -2,6 +2,7 @@ package com.mockknights.petshelter.ui.map
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import androidx.compose.material.*
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -63,8 +64,12 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
 
     fun getAllPetShelter() {
         viewModelScope.launch {
-            repository.getAllPetShelter().flowOn(Dispatchers.IO).collect() {
-                setValueOnMainThreadShelter(it)
+            try {
+                repository.getAllPetShelter().flowOn(Dispatchers.IO).collect() {
+                    setValueOnMainThreadShelter(it)
+                }
+            } catch (e: Exception) {
+                Log.d("MapViewModel", e.message.toString())
             }
         }
     }
