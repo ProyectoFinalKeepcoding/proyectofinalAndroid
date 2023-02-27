@@ -1,6 +1,7 @@
 package com.mockknights.petshelter.ui.login
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mockknights.petshelter.domain.Repository
@@ -57,5 +58,4 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
-
 }

@@ -1,5 +1,6 @@
 package com.mockknights.petshelter.ui.register
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mockknights.petshelter.data.remote.request.RegisterRequest
@@ -29,7 +30,13 @@ class RegisterViewModel @Inject constructor(private val repository: Repository):
 
     fun register(registerRequest: RegisterRequest) {
         viewModelScope.launch {
-            repository.register(registerRequest)
+            try {
+                repository.register(registerRequest)
+
+            } catch (e: Exception) {
+                setValueOnMainThread(RegisterState.Failure(error = e.message.toString()))
+                Log.d("RegisterViewModel", e.message.toString())
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package com.mockknights.petshelter.di
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.android.volley.toolbox.HttpResponse
 import com.mockknights.petshelter.data.remote.PetShelterAPI
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -14,8 +15,10 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.net.HttpURLConnection
 import javax.inject.Singleton
 
 @Module
@@ -29,10 +32,9 @@ object RemoteModule {
 
     @Provides
     fun provideMoshi(): Moshi {
-        val moshi = Moshi.Builder()
+        return Moshi.Builder()
             .addLast(KotlinJsonAdapterFactory())
             .build()
-        return moshi
     }
 
     @Provides
@@ -85,19 +87,17 @@ object RemoteModule {
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        var retrofit = Retrofit.Builder()
+        return Retrofit.Builder()
             .baseUrl("http://10.0.2.2:8080/api/")
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
             .build()
-        return retrofit
     }
 
     @Provides
     @Singleton
     fun provideAPI(retrofit: Retrofit): PetShelterAPI {
-        var api: PetShelterAPI = retrofit.create(PetShelterAPI::class.java)
-        return api
+        return retrofit.create(PetShelterAPI::class.java)
     }
 
 
