@@ -15,7 +15,7 @@ interface PetShelterAPI {
     @GET("auth/signin")
     suspend fun getToken(): List<String>
 
-    @GET("auth/signup")
+    @POST("auth/signup")
     suspend fun register(@Body registerRequest: RegisterRequest)
 
     @GET("shelters")

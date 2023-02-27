@@ -9,6 +9,6 @@ data class RegisterRequest(
     val name: String = "",
     val password: String = "",
     val address: Address = Address(0.0, 0.0),
-    val phone: String = "",
+    val phoneNumber: String = "",
     val shelterType: ShelterType = ShelterType.PARTICULAR,
 )
