@@ -1,7 +1,6 @@
 package com.mockknights.petshelter.ui.register
 
 import android.annotation.SuppressLint
-import android.provider.Telephony.Mms.Addr
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -31,7 +30,6 @@ import com.mockknights.petshelter.data.remote.response.Address
 import com.mockknights.petshelter.domain.ShelterType
 import com.mockknights.petshelter.ui.components.*
 import com.mockknights.petshelter.ui.detail.toDp
-import com.mockknights.petshelter.ui.theme.RedKiwoko
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Preview(showSystemUi = true)
