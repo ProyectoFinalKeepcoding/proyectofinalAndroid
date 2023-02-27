@@ -1,8 +1,6 @@
 package com.mockknights.petshelter.ui.detail
 
 import android.content.res.Resources
-import android.net.Uri
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,7 +17,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -27,16 +24,14 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
 import com.mockknights.petshelter.R
-import com.mockknights.petshelter.domain.ShelterType
-import com.mockknights.petshelter.ui.components.KiwokoIconButton
+import com.mockknights.petshelter.ui.components.ButtonRow
+import com.mockknights.petshelter.ui.components.RadioButtonsRow
 import com.mockknights.petshelter.ui.components.UserAddressField
-import com.mockknights.petshelter.ui.components.UserDataFieldTextField
+import com.mockknights.petshelter.ui.components.UserDataField
 import com.mockknights.petshelter.ui.components.detailImage.DetailImage
 import com.mockknights.petshelter.ui.theme.*
 
@@ -257,30 +252,6 @@ fun ImageRow(
 
 @Preview
 @Composable
-fun UserDataField(
-    fieldLabel: String = "Dirección",
-    userData: String = "Avenida Europa, 2",
-    keyboardType: KeyboardType = KeyboardType.Text,
-    doneAction: ImeAction = ImeAction.Done,
-    onUpdateValue: (String) -> Unit = { },
-    onDone: () -> Unit = { }
-    ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.toDp().dp),
-    ) {
-        UserDataFieldLabel(fieldLabel)
-        UserDataFieldTextField(
-            userData = userData,
-            keyboardType = keyboardType,
-            doneAction = doneAction,
-            onUpdateValue = { onUpdateValue(it)},
-            onDone = onDone
-        )
-    }
-}
-
-@Preview
-@Composable
 fun UserDataFieldLabel(fieldLabel: String = "Dirección") {
     Text(
         text = fieldLabel,
@@ -288,97 +259,6 @@ fun UserDataFieldLabel(fieldLabel: String = "Dirección") {
     )
 }
 
-@Composable
-fun RadioButtonsRow(currentSelection: ShelterType, onItemClick: (ShelterType) -> Unit = {}) {
 
-    val currentlySelectedShelterType = remember { mutableStateOf(currentSelection) }
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.toDp().dp),
-    ) {
-        UserDataFieldLabel(fieldLabel = "¿Qué soy?")
-        RadioButtonsGroup(
-            selected = currentlySelectedShelterType.value,
-            onItemClick = { shelterType ->
-                onItemClick(shelterType)
-                currentlySelectedShelterType.value = shelterType
-            }
-        )
-    }
-}
 
-@Composable
-fun KiwokoRadioButton(selected: Boolean = false, labelText: String = "Particular", modifier: Modifier, onClick: () -> Unit = {}) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.toDp().dp),
-        modifier = modifier
-            .wrapContentSize()
-    ) {
-        RadioButton(
-            modifier = Modifier
-                .size(40.toDp().dp),
-            selected = selected,
-            colors = RadioButtonDefaults.colors(
-                selectedColor = RedKiwoko,
-                unselectedColor = GrayKiwoko,
-            ),
-            onClick = { onClick() }
-        )
-        Text(
-            text = labelText,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.moderatRadioButtonLabel,
-        )
-    }
-}
-
-@Preview
-@Composable
-fun RadioButtonsGroup(selected: ShelterType = ShelterType.PARTICULAR, onItemClick: (ShelterType) -> Unit = {}) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-    ) {
-        val modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f)
-
-        ShelterType.values().forEach { shelterType ->
-            KiwokoRadioButton(
-                selected = shelterType == selected,
-                labelText = shelterType.toString(),
-                modifier = modifier,
-                onClick = { onItemClick(shelterType) }
-            ) }
-    }
-}
-
-@Preview
-@Composable
-fun ButtonRow(onClick: () -> Unit = {}) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .weight(2f)
-        )
-        KiwokoIconButton(
-            name = "Guardar cambios",
-            icon = 0,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(6f),
-            onClick = onClick
-        )
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .weight(2f)
-        )
-    }
-}

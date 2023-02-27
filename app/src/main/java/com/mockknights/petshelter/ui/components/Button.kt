@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,13 +22,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mockknights.petshelter.ui.theme.RedKiwoko
-import com.mockknights.petshelter.ui.theme.moderatButtonBold
-import com.mockknights.petshelter.ui.theme.moderatLightTitle
-import com.mockknights.petshelter.ui.theme.moderatMediumTitle
+import com.mockknights.petshelter.domain.ShelterType
+import com.mockknights.petshelter.ui.detail.UserDataFieldLabel
+import com.mockknights.petshelter.ui.detail.toDp
+import com.mockknights.petshelter.ui.theme.*
 
 @Composable
 fun CreateWelcomeButton(name: String, modifier: Modifier, colorButton: Color, colorText: Color, onClick: () -> Unit) {
@@ -57,6 +61,34 @@ fun CreateWelcomeButton(name: String, modifier: Modifier, colorButton: Color, co
     }
 }
 
+
+@Preview
+@Composable
+fun ButtonRow(onClick: () -> Unit = {}) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Spacer(modifier = Modifier
+            .fillMaxWidth()
+            .weight(2f)
+        )
+        KiwokoIconButton(
+            name = "Guardar cambios",
+            icon = 0,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(6f),
+            onClick = onClick
+        )
+        Spacer(modifier = Modifier
+            .fillMaxWidth()
+            .weight(2f)
+        )
+    }
+}
 
 @Composable
 fun KiwokoIconButton(name: String, icon: Int, modifier: Modifier, onClick: () -> Unit) {
@@ -103,6 +135,72 @@ fun KiwokoIconButton(name: String, icon: Int, modifier: Modifier, onClick: () ->
     }
 }
 
+@Composable
+fun RadioButtonsRow(currentSelection: ShelterType = ShelterType.PARTICULAR, onItemClick: (ShelterType) -> Unit = {}) {
+
+    val currentlySelectedShelterType = remember { mutableStateOf(currentSelection) }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.toDp().dp),
+    ) {
+        UserDataFieldLabel(fieldLabel = "¿Qué soy?")
+        RadioButtonsGroup(
+            selected = currentlySelectedShelterType.value,
+            onItemClick = { shelterType ->
+                onItemClick(shelterType)
+                currentlySelectedShelterType.value = shelterType
+            }
+        )
+    }
+}
+
+@Composable
+fun KiwokoRadioButton(selected: Boolean = false, labelText: String = "Particular", modifier: Modifier, onClick: () -> Unit = {}) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(24.toDp().dp),
+        modifier = modifier
+            .wrapContentSize()
+    ) {
+        RadioButton(
+            modifier = Modifier
+                .size(40.toDp().dp),
+            selected = selected,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = RedKiwoko,
+                unselectedColor = GrayKiwoko,
+            ),
+            onClick = { onClick() }
+        )
+        Text(
+            text = labelText,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.moderatRadioButtonLabel,
+        )
+    }
+}
+
+@Preview
+@Composable
+fun RadioButtonsGroup(selected: ShelterType = ShelterType.PARTICULAR, onItemClick: (ShelterType) -> Unit = {}) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+    ) {
+        val modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
+
+        ShelterType.values().forEach { shelterType ->
+            KiwokoRadioButton(
+                selected = shelterType == selected,
+                labelText = shelterType.toString(),
+                modifier = modifier,
+                onClick = { onItemClick(shelterType) }
+            ) }
+    }
+}
 
 fun Modifier.shadow(
     color: Color = Color.Black,
@@ -141,3 +239,4 @@ fun Modifier.shadow(
         }
     }
 )
+

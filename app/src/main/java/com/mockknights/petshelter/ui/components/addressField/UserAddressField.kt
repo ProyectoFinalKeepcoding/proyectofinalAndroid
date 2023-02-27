@@ -53,6 +53,7 @@ fun UserAddressField(
             UserDataFieldLabel("Dirección")
             OutlinedTextField(
                 value = addressAsString.value,
+                placeholder = { TextPlaceholder("Dirección") },
                 textStyle = MaterialTheme.typography.moderatTextField,
                 singleLine = true,
                 shape = RoundedCornerShape(4.dp),
@@ -95,7 +96,6 @@ fun UserAddressField(
                 }
             }
         }
-        Spacer(Modifier.height(16.dp))
     }
 }
 
