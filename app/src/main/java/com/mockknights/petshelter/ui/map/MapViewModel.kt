@@ -49,8 +49,8 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
     private val _currentUserLocation = mutableStateOf(LatLng(40.4167047, -3.7035825)) // Madrid by default
     private val currentUserLocation: MutableState<LatLng> get() = _currentUserLocation
 
-    private val _cameraPositionState = mutableStateOf(CameraPositionState(CameraPosition.fromLatLngZoom(currentUserLocation.value, 6f)))
-    val cameraPositionState: MutableState<CameraPositionState> get() = _cameraPositionState
+    private val _cameraPositionState = MutableStateFlow(CameraPositionState(CameraPosition.fromLatLngZoom(currentUserLocation.value, 6f)))
+    val cameraPositionState: MutableStateFlow<CameraPositionState> get() = _cameraPositionState
 
     private fun setValueOnMainThreadShelter(value: List<PetShelter>) {
         viewModelScope.launch(Dispatchers.Main) {
@@ -122,6 +122,7 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
             fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
                 location?.let {nullCheckedLocation ->
                     _currentUserLocation.value = LatLng(nullCheckedLocation.latitude, nullCheckedLocation.longitude)
+                    _cameraPositionState.value = CameraPositionState(CameraPosition.fromLatLngZoom(currentUserLocation.value, 6f))
                 }
             }
         }
@@ -129,6 +130,7 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
 
     fun moveCameraToUserLocation(coroutineScope: CoroutineScope) {
         val update = CameraUpdateFactory.newCameraPosition(CameraPosition(currentUserLocation.value, 9f, 0f, 0f))
+        Log.d("CURRENTLOCATION", currentUserLocation.value.toString())
         coroutineScope.launch {
             _cameraPositionState.value.animate(update)
         }

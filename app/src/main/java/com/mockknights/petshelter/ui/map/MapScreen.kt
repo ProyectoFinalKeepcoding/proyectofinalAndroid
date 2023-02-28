@@ -62,7 +62,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     // PetShelter list
     val petShelters = viewModel.petShelter.collectAsState().value
     // Get camera position
-    val cameraPositionState = remember { viewModel.cameraPositionState }
+    val cameraPositionState = viewModel.cameraPositionState.collectAsState().value
     // This launcher is used to request permissions
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -105,7 +105,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
                     MyGoogleMaps(petShelters,
                         locationGranted = viewModel.locationPermissionGranted.value,
-                        cameraPositionState = cameraPositionState.value,
+                        cameraPositionState = cameraPositionState,
                         modifier = Modifier
                             .fillMaxSize()
                             .weight(7.7f),
@@ -298,8 +298,8 @@ fun ButtonsColumn(modifier: Modifier) {
         ) {
             // TODO: Call!!
         }
-        Spacer(modifier = Modifier.
-            fillMaxSize()
+        Spacer(modifier = Modifier
+            .fillMaxSize()
             .weight(0.5f))
 
         KiwokoIconButton(
