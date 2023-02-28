@@ -4,24 +4,20 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
-import android.widget.Space
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -60,7 +56,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     // Local context to get resources
     val mapScreenContext = LocalContext.current
     // PetShelter list
-    val petShelters = viewModel.petShelter.collectAsState().value
+    val petShelters = viewModel.petShelters.collectAsState().value
     // Get camera position
     val cameraPositionState = viewModel.cameraPositionState.collectAsState().value
     // This launcher is used to request permissions
@@ -126,14 +122,14 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 }
             }
             KiwokoIconButton(
-                name = "Me!",
-                icon = R.drawable.logomarker,
+                name = "Refugio más cercano",
+                icon = 0,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .width(LocalConfiguration.current.screenWidthDp.dp / 2)
+                    .fillMaxWidth()
                     .padding(16.dp),
                 onClick = {
-                    if(viewModel.locationPermissionGranted.value) viewModel.moveCameraToUserLocation(coroutineScope)
+                    viewModel.onClosestShelterClicked(coroutineScope)
                 }
             )
         }
