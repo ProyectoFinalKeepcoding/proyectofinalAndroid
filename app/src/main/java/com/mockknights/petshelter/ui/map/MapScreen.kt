@@ -154,11 +154,16 @@ fun MyGoogleMaps(petShelter: List<PetShelter>,
     val properties = MapProperties( // Important: not remembered, as it has to be recomposed entirely for purposes of repainting user location
         mapType = MapType.NORMAL,
         isMyLocationEnabled = locationGranted,
-        //latLngBoundsForCameraTarget = LatLngBounds(marker2, marker3)
     )
 
     // Settings of the map
-    val uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = true, tiltGesturesEnabled = true))}
+    val uiSettings by remember {
+        mutableStateOf(
+            MapUiSettings(
+                zoomControlsEnabled = false,
+                tiltGesturesEnabled = true,
+                myLocationButtonEnabled = false,
+            ))}
 
     GoogleMap(modifier = modifier,
         cameraPositionState = cameraPositionState,
