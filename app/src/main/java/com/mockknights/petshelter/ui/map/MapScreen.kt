@@ -4,6 +4,8 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.DisplayMetrics
+import android.view.WindowManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -41,6 +43,7 @@ import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
 import com.mockknights.petshelter.ui.components.LogoBox
+import com.mockknights.petshelter.ui.detail.toDp
 import com.mockknights.petshelter.ui.theme.moderatMediumTitle
 import kotlinx.coroutines.*
 
@@ -127,6 +130,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
+                    .height((LocalConfiguration.current.screenHeightDp / 7.19).dp)
                     .padding(16.dp),
                 onClick = {
                     viewModel.onClosestShelterClicked(coroutineScope)

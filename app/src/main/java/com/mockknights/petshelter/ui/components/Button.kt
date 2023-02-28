@@ -91,7 +91,7 @@ fun ButtonRow(onClick: () -> Unit = {}) {
 }
 
 @Composable
-fun KiwokoIconButton(name: String, icon: Int, modifier: Modifier, onClick: () -> Unit) {
+fun KiwokoIconButton(name: String, icon: Int, modifier: Modifier, onClick: () -> Unit = {}) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(backgroundColor = RedKiwoko),
