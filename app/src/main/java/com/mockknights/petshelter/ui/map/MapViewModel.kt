@@ -3,11 +3,13 @@ package com.mockknights.petshelter.ui.map
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
 import androidx.compose.material.*
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.PackageManagerCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
@@ -217,7 +219,12 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
         localContext.startActivity(intent)
     }
 
-    fun onGo(address: Address) {
-
+    fun onGo(address: Address, localContext: Context) {
+        val gmmIntentUri = Uri.parse("google.navigation:q=${address.latitude},${address.longitude}&mode=w") // w = walking
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        mapIntent.setPackage("com.google.android.apps.maps")
+        mapIntent.resolveActivity(localContext.packageManager)?.let {
+            localContext.startActivity(mapIntent)
+        }
     }
 }

@@ -88,7 +88,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                         viewModel.onCall(shelter.phoneNumber, mapScreenContext)
                     },
                     onGo = {
-                        viewModel.onGo(shelter.address)
+                        viewModel.onGo(shelter.address, mapScreenContext)
                     })
             } else {
                 ModalBox(null, null, null)
