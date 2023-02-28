@@ -83,7 +83,13 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 ModalBox(
                     title = shelter.name,
                     phoneNumber = shelter.phoneNumber,
-                    photoUrl = shelter.photoURL)
+                    photoUrl = shelter.photoURL,
+                    onCall = {
+                        viewModel.onCall(shelter.phoneNumber, mapScreenContext)
+                    },
+                    onGo = {
+                        viewModel.onGo(shelter.address, mapScreenContext)
+                    })
             } else {
                 ModalBox(null, null, null)
             }
@@ -191,7 +197,13 @@ fun MyGoogleMaps(petShelter: List<PetShelter>,
 // least 8 dp of padding.
 @Preview
 @Composable
-fun ModalBox(title: String? = "Title", phoneNumber: String? = "918158899", photoUrl: String? = "") {
+fun ModalBox(
+    title: String? = "Title",
+    phoneNumber: String? = "918158899",
+    photoUrl: String? = "",
+    onCall: () -> Unit = {},
+    onGo: () -> Unit = {}
+) {
     val configuration = LocalConfiguration.current
     val modalHeight = configuration.screenHeightDp.dp / 3
     Box(
@@ -215,7 +227,9 @@ fun ModalBox(title: String? = "Title", phoneNumber: String? = "918158899", photo
                 photoUrl = photoUrl ?:"",
                 modifier = Modifier
                     .fillMaxSize()
-                    .weight(7.4f)
+                    .weight(7.4f),
+                onCall = onCall,
+                onGo = onGo,
             )
         }
     }
@@ -247,7 +261,12 @@ fun TitleBox(title: String, modifier: Modifier) {
 }
 
 @Composable
-fun ImageAndButtonsRow(photoUrl: String, modifier: Modifier) {
+fun ImageAndButtonsRow(
+    photoUrl: String,
+    modifier: Modifier,
+    onCall: () -> Unit = {},
+    onGo: () -> Unit = {})
+{
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.Start,
@@ -263,7 +282,9 @@ fun ImageAndButtonsRow(photoUrl: String, modifier: Modifier) {
             modifier = Modifier
                 .fillMaxSize()
                 .weight(4.7f)
-                .padding(horizontal = 8.dp, vertical = 8.dp)
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            onCall = onCall,
+            onGo = onGo
         )
     }
 }
@@ -288,7 +309,11 @@ fun ImageColumn(photoUrl: String, modifier: Modifier) {
 }
 
 @Composable
-fun ButtonsColumn(modifier: Modifier) {
+fun ButtonsColumn(
+    modifier: Modifier,
+    onCall: () -> Unit = {},
+    onGo: () -> Unit = {}
+) {
     Column(
         modifier = modifier.padding(vertical = 16.dp),
         verticalArrangement = Arrangement.Center,
@@ -301,7 +326,7 @@ fun ButtonsColumn(modifier: Modifier) {
                 .fillMaxSize()
                 .weight(1f)
         ) {
-            // TODO: Call!!
+            onCall()
         }
         Spacer(modifier = Modifier
             .fillMaxSize()
@@ -314,7 +339,7 @@ fun ButtonsColumn(modifier: Modifier) {
                 .fillMaxSize()
                 .weight(1f)
         ) {
-            // TODO: Go!!
+            onGo()
         }
     }
 }

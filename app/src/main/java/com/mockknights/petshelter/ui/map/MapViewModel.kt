@@ -2,6 +2,8 @@ package com.mockknights.petshelter.ui.map
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.material.*
 import androidx.compose.runtime.MutableState
@@ -14,6 +16,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.mockknights.petshelter.R
+import com.mockknights.petshelter.data.remote.response.Address
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.domain.Repository
 import com.mockknights.petshelter.domain.ShelterType
@@ -64,13 +67,13 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
     }
 
     init {
-        getAllPetShelter()
+        getPetShelters()
     }
 
-    fun getAllPetShelter() {
+    private fun getPetShelters() {
         viewModelScope.launch {
             try {
-                repository.getAllPetShelter().flowOn(Dispatchers.IO).collect() {
+                repository.getAllPetShelter().flowOn(Dispatchers.IO).collect {
                     setValueOnMainThreadShelter(it)
                 }
             } catch (e: Exception) {
@@ -207,5 +210,19 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
                 pow(sin(dLon / 2), 2.0)
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
         return earthRadius * c
+    }
+
+    fun onCall(phone: String, localContext: Context) {
+        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
+        localContext.startActivity(intent)
+    }
+
+    fun onGo(address: Address, localContext: Context) {
+        val gmmIntentUri = Uri.parse("google.navigation:q=${address.latitude},${address.longitude}&mode=w") // w = walking
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        mapIntent.setPackage("com.google.android.apps.maps")
+        mapIntent.resolveActivity(localContext.packageManager)?.let {
+            localContext.startActivity(mapIntent)
+        }
     }
 }
