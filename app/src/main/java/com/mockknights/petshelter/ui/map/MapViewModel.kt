@@ -3,13 +3,11 @@ package com.mockknights.petshelter.ui.map
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
 import androidx.compose.material.*
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.core.content.PackageManagerCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
@@ -69,13 +67,13 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
     }
 
     init {
-        getAllPetShelter()
+        getPetShelters()
     }
 
-    fun getAllPetShelter() {
+    private fun getPetShelters() {
         viewModelScope.launch {
             try {
-                repository.getAllPetShelter().flowOn(Dispatchers.IO).collect() {
+                repository.getAllPetShelter().flowOn(Dispatchers.IO).collect {
                     setValueOnMainThreadShelter(it)
                 }
             } catch (e: Exception) {
