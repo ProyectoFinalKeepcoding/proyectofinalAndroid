@@ -4,24 +4,22 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
-import android.widget.Space
+import android.util.DisplayMetrics
+import android.view.WindowManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -45,6 +43,7 @@ import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
 import com.mockknights.petshelter.ui.components.LogoBox
+import com.mockknights.petshelter.ui.detail.toDp
 import com.mockknights.petshelter.ui.theme.moderatMediumTitle
 import kotlinx.coroutines.*
 
@@ -60,9 +59,9 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     // Local context to get resources
     val mapScreenContext = LocalContext.current
     // PetShelter list
-    val petShelters = viewModel.petShelter.collectAsState().value
+    val petShelters = viewModel.petShelters.collectAsState().value
     // Get camera position
-    val cameraPositionState = remember { viewModel.cameraPositionState }
+    val cameraPositionState = viewModel.cameraPositionState.collectAsState().value
     // This launcher is used to request permissions
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -105,7 +104,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
                     MyGoogleMaps(petShelters,
                         locationGranted = viewModel.locationPermissionGranted.value,
-                        cameraPositionState = cameraPositionState.value,
+                        cameraPositionState = cameraPositionState,
                         modifier = Modifier
                             .fillMaxSize()
                             .weight(7.7f),
@@ -126,14 +125,15 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 }
             }
             KiwokoIconButton(
-                name = "Me!",
-                icon = R.drawable.logomarker,
+                name = "Refugio más cercano",
+                icon = 0,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .width(LocalConfiguration.current.screenWidthDp.dp / 2)
+                    .fillMaxWidth()
+                    .height((LocalConfiguration.current.screenHeightDp / 7.19).dp)
                     .padding(16.dp),
                 onClick = {
-                    if(viewModel.locationPermissionGranted.value) viewModel.moveCameraToUserLocation(coroutineScope)
+                    viewModel.onClosestShelterClicked(coroutineScope)
                 }
             )
         }
@@ -154,11 +154,16 @@ fun MyGoogleMaps(petShelter: List<PetShelter>,
     val properties = MapProperties( // Important: not remembered, as it has to be recomposed entirely for purposes of repainting user location
         mapType = MapType.NORMAL,
         isMyLocationEnabled = locationGranted,
-        //latLngBoundsForCameraTarget = LatLngBounds(marker2, marker3)
     )
 
     // Settings of the map
-    val uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = true, tiltGesturesEnabled = true))}
+    val uiSettings by remember {
+        mutableStateOf(
+            MapUiSettings(
+                zoomControlsEnabled = false,
+                tiltGesturesEnabled = true,
+                myLocationButtonEnabled = false,
+            ))}
 
     GoogleMap(modifier = modifier,
         cameraPositionState = cameraPositionState,
@@ -298,8 +303,8 @@ fun ButtonsColumn(modifier: Modifier) {
         ) {
             // TODO: Call!!
         }
-        Spacer(modifier = Modifier.
-            fillMaxSize()
+        Spacer(modifier = Modifier
+            .fillMaxSize()
             .weight(0.5f))
 
         KiwokoIconButton(

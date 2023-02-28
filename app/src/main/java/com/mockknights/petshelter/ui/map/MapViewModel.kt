@@ -23,15 +23,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.lang.StrictMath.pow
+import java.lang.StrictMath.toRadians
 import javax.inject.Inject
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 @OptIn(ExperimentalMaterialApi::class)
 @HiltViewModel
 class MapViewModel @Inject constructor(private val repository: Repository): ViewModel() {
 
-    private val _petShelter = MutableStateFlow(emptyList<PetShelter>())
-    val petShelter: MutableStateFlow<List<PetShelter>> get() = _petShelter
+    private val _petShelters = MutableStateFlow(emptyList<PetShelter>())
+    val petShelters: MutableStateFlow<List<PetShelter>> get() = _petShelters
 
     private val _modalShelterList = MutableStateFlow(emptyList<PetShelter>())
     val modalShelterList: MutableStateFlow<List<PetShelter>> get() = _modalShelterList
@@ -49,12 +54,12 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
     private val _currentUserLocation = mutableStateOf(LatLng(40.4167047, -3.7035825)) // Madrid by default
     private val currentUserLocation: MutableState<LatLng> get() = _currentUserLocation
 
-    private val _cameraPositionState = mutableStateOf(CameraPositionState(CameraPosition.fromLatLngZoom(currentUserLocation.value, 6f)))
-    val cameraPositionState: MutableState<CameraPositionState> get() = _cameraPositionState
+    private val _cameraPositionState = MutableStateFlow(CameraPositionState(CameraPosition.fromLatLngZoom(currentUserLocation.value, 6f)))
+    val cameraPositionState: MutableStateFlow<CameraPositionState> get() = _cameraPositionState
 
     private fun setValueOnMainThreadShelter(value: List<PetShelter>) {
         viewModelScope.launch(Dispatchers.Main) {
-            _petShelter.value = value
+            _petShelters.value = value
         }
     }
 
@@ -75,7 +80,7 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
     }
 
     fun setModalShelter(shelterName: String) {
-        val modalPetShelter = petShelter.value.filter { it.name == shelterName }
+        val modalPetShelter = petShelters.value.filter { it.name == shelterName }
         viewModelScope.launch(Dispatchers.Main) {
             _modalShelterList.value = modalPetShelter
         }
@@ -122,6 +127,7 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
             fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
                 location?.let {nullCheckedLocation ->
                     _currentUserLocation.value = LatLng(nullCheckedLocation.latitude, nullCheckedLocation.longitude)
+                    _cameraPositionState.value = CameraPositionState(CameraPosition.fromLatLngZoom(currentUserLocation.value, 6f))
                 }
             }
         }
@@ -132,5 +138,74 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
         coroutineScope.launch {
             _cameraPositionState.value.animate(update)
         }
+    }
+
+    private fun moveCameraToLocation(coroutineScope: CoroutineScope, location: LatLng) {
+        val update = CameraUpdateFactory.newCameraPosition(CameraPosition(location, 9f, 0f, 0f))
+        coroutineScope.launch {
+            _cameraPositionState.value.animate(update)
+        }
+    }
+
+    fun onClosestShelterClicked(coroutineScope: CoroutineScope) {
+        // If there is no shelter, do nothing
+        if (petShelters.value.isEmpty()) return
+        // Get closest shelter and move camera to it
+        val closestShelter = getClosestShelter()
+        closestShelter?.let { unwrappedClosestShelter ->
+            modalShelterList.value = listOf(unwrappedClosestShelter)
+            toggleModal(coroutineScope)
+            moveCameraToLocation(
+                coroutineScope = coroutineScope,
+                location = LatLng(unwrappedClosestShelter.address.latitude, unwrappedClosestShelter.address.longitude)
+            )
+        }
+    }
+
+    private fun getClosestShelter(): PetShelter? {
+        // If there is no shelter, return an empty shelter
+        if (petShelters.value.isEmpty()) return null
+        // When permission is granted, the user location is the origin
+        val origin: LatLng? = if (locationPermissionGranted.value) currentUserLocation.value else null
+        // If there is an origin, get the closest shelter
+        var closestShelter: PetShelter? = null
+        origin?.let {unwrappedOrigin ->
+            closestShelter = petShelters.value
+                .filter { petShelter ->
+                    petShelter.address.latitude - unwrappedOrigin.latitude <= 1 &&
+                            petShelter.address.longitude - unwrappedOrigin.longitude <= 1
+                }
+                .sortedWith { shelter1, shelter2 ->
+                    val coordinatesShelter1 =
+                        LatLng(shelter1.address.latitude, shelter1.address.longitude)
+                    val coordinatesShelter2 =
+                        LatLng(shelter2.address.latitude, shelter2.address.longitude)
+                    when {
+                        distanceBetween(unwrappedOrigin, coordinatesShelter1) == distanceBetween(
+                            unwrappedOrigin,
+                            coordinatesShelter2
+                        ) -> 0
+                        distanceBetween(unwrappedOrigin, coordinatesShelter1) < distanceBetween(
+                            unwrappedOrigin,
+                            coordinatesShelter2
+                        ) -> -1
+                        else -> 1
+                    }
+                }
+                .firstOrNull()
+        }
+        return closestShelter
+    }
+
+    private fun distanceBetween(origin: LatLng, destination: LatLng): Double {
+        val earthRadius = 6371 // Radius of the earth in km
+        val dLat = Math.toRadians(destination.latitude - origin.latitude)  // Increment of latitude
+        val dLon = Math.toRadians(destination.longitude - origin.longitude) // Increment of longitude
+        // Haversine formula
+        val a = pow(sin(dLat / 2), 2.0) +
+                cos(toRadians(origin.latitude)) * cos(Math.toRadians(destination.latitude)) *
+                pow(sin(dLon / 2), 2.0)
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        return earthRadius * c
     }
 }
