@@ -30,17 +30,17 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel@Inject constructor(private val repository: Repository): ViewModel() {
 
-//    private val _detailState = MutableStateFlow(PetShelter("", "", "","", Address(0.0, 0.0), ShelterType.PARTICULAR, ""))
-//    val detailState: MutableStateFlow<PetShelter> get() = _detailState
-
     private val _detailState = MutableStateFlow<DetailState>(DetailState.Loading)
     val detailState: MutableStateFlow<DetailState> get() = _detailState
-
 
     fun getShelterDetail(id: String) {
         viewModelScope.launch {
             val result = repository.getShelter(id).flowOn(Dispatchers.IO)
-            _detailState.value = DetailState.Success(result.first())
+            try {
+                _detailState.value = DetailState.Success(result.first())
+            } catch (e: NoSuchElementException) {
+                _detailState.value = DetailState.Error("No shelter found with id: $id")
+            }
         }
     }
 
@@ -48,32 +48,54 @@ class DetailViewModel@Inject constructor(private val repository: Repository): Vi
         updateShelterType(shelterType)
     }
     private fun updateShelterType(shelterType: ShelterType) {
-        val updatedShelter = (_detailState.value as DetailState.Success).petShelter.copy(shelterType = shelterType)
-        setValueOnIOThread(DetailState.Success(updatedShelter))
+        val updatedShelter = (_detailState.value as? DetailState.Success)?.petShelter?.copy(shelterType = shelterType)
+        updatedShelter?.let { setValueOnIOThread(DetailState.Success(it)) }
     }
 
     fun onUpdatedPhone(phone: String) {
         updatePhone(phone)
     }
     private fun updatePhone(phone: String) {
-        val updatedShelter = (_detailState.value as DetailState.Success).petShelter.copy(phoneNumber = phone)
-        setValueOnIOThread(DetailState.Success(updatedShelter))
+        val updatedShelter = (_detailState.value as? DetailState.Success)?.petShelter?.copy(phoneNumber = phone)
+        updatedShelter?.let { setValueOnIOThread(DetailState.Success(it)) }
     }
 
     fun onUpdatedAddress(latitude: String, longitude: String) {
         updateAddress(latitude, longitude)
     }
     private fun updateAddress(latitude: String, longitude: String) {
-        val updatedShelter = (_detailState.value as DetailState.Success).petShelter.copy(address = Address(latitude.toDouble(), longitude.toDouble()))
-        setValueOnIOThread(DetailState.Success(updatedShelter))
+        val updatedShelter = (_detailState.value as? DetailState.Success)?.petShelter?.copy(address = Address(latitude.toDouble(), longitude.toDouble()))
+        updatedShelter?.let { setValueOnIOThread(DetailState.Success(it)) }
     }
 
     fun onEditName(name: String) {
         updateUserName(name)
     }
     private fun updateUserName(name: String) {
-        val updatedShelter = (_detailState.value as DetailState.Success).petShelter.copy(name = name)
+        val updatedShelter = (_detailState.value as? DetailState.Success)?.petShelter?.copy(name = name)
+        updatedShelter?.let { setValueOnIOThread(DetailState.Success(it)) }
+    }
+
+    fun onImageClicked() {
+        updateImage()
+    }
+    private fun updateImage() {
+        val detailStateSuccess = _detailState.value as? DetailState.Success
+        detailStateSuccess ?: return
+        val petShelter = detailStateSuccess.petShelter
+        if (petShelter.photoURL.isNotEmpty()) return // already has an image url, not needed to set one
+        val updatedShelter = petShelter.copy(photoURL = "${petShelter.id}.png")
         setValueOnIOThread(DetailState.Success(updatedShelter))
+    }
+
+    fun onSaveClicked() {
+        val petShelter = (_detailState.value as? DetailState.Success)?.petShelter
+        petShelter?.let {
+            val id = it.id
+            viewModelScope.launch {
+                repository.updateShelter(id, it)
+            }
+        }
     }
 
     private fun setValueOnIOThread(value: DetailState) {
@@ -81,26 +103,6 @@ class DetailViewModel@Inject constructor(private val repository: Repository): Vi
             _detailState.value = value
         }
     }
-
-    fun onImageClicked() {
-        updateImage()
-    }
-    private fun updateImage() {
-        val petShelter = (_detailState.value as DetailState.Success).petShelter
-        if (petShelter.photoURL.isNotEmpty()) return // already has an image url, not needed to set one
-        val updatedShelter = (_detailState.value as DetailState.Success).petShelter.copy(photoURL = "${petShelter.id}.png")
-        setValueOnIOThread(DetailState.Success(updatedShelter))
-        Log.d("DetailViewModel", "Image url is now: ${(detailState.value as DetailState.Success).petShelter.photoURL}")
-    }
-
-    fun onSaveClicked() {
-        val petShelter = (_detailState.value as DetailState.Success).petShelter
-        val id = petShelter.id
-        viewModelScope.launch {
-            repository.updateShelter(id, petShelter)
-        }
-    }
-
 }
 
 
