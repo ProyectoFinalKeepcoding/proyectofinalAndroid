@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.android.volley.toolbox.HttpResponse
 import com.mockknights.petshelter.data.remote.PetShelterAPI
+import com.mockknights.petshelter.data.remote.mappers.PetShelterMapper
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -25,6 +26,10 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RemoteModule {
 
+    @Provides
+    fun provideMapper(): PetShelterMapper {
+        return PetShelterMapper()
+    }
     @Provides
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
         return context.getSharedPreferences("NAME", Context.MODE_PRIVATE)
