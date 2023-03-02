@@ -36,7 +36,7 @@ class DetailViewModel@Inject constructor(private val repository: Repository, pri
 
     fun getShelterDetail(id: String) {
         viewModelScope.launch(coroutineDispatcher) {
-            val result = repository.getShelter(id).flowOn(Dispatchers.IO)
+            val result = repository.getShelter(id).flowOn(coroutineDispatcher)
             try {
                 _detailState.value = DetailState.Success(result.first())
             } catch (e: NoSuchElementException) {
@@ -102,9 +102,6 @@ class DetailViewModel@Inject constructor(private val repository: Repository, pri
     private fun setValueOnIOThread(value: DetailState) {
         viewModelScope.launch(coroutineDispatcher) {
             _detailState.value = value
-            if((value as DetailState.Success).petShelter.name == "namemodified") {
-                println("DetailViewModel: detailState value name after assigning it: ${(_detailState.value as DetailState.Success).petShelter.name}")
-            }
         }
     }
 }
