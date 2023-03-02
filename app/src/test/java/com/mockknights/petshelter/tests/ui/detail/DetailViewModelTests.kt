@@ -126,7 +126,7 @@ class DetailViewModelTests {
         sut.getShelterDetail(FakeDetailData.successId)
         advanceUntilIdle()
 
-        // WHEN updated the shelter name
+        // WHEN updated the shelter address
         sut.onUpdatedAddress("0.0", "0.0")
         advanceUntilIdle()
 
@@ -144,7 +144,7 @@ class DetailViewModelTests {
         sut.getShelterDetail(FakeDetailData.successId)
         advanceUntilIdle()
 
-        // WHEN updated the shelter name
+        // WHEN updated the shelter type
         sut.onUpdatedShelterType(ShelterType.PARTICULAR)
         advanceUntilIdle()
 
@@ -186,7 +186,7 @@ class DetailViewModelTests {
         sut.onSaveClicked()
         advanceUntilIdle()
 
-        // THEN, the modified value id.png
+        // THEN, the value is updated in the fake remote data source
         val detailStateShelter = (sut.detailState.value as DetailState.Success).petShelter
         val updatedShelter = fakeRemoteDataSource.updatedShelter
         Truth.assertThat(updatedShelter).isInstanceOf(PetShelterRemote::class.java)
