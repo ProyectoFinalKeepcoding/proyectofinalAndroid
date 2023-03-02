@@ -9,7 +9,7 @@ class PetShelterMapper @Inject constructor() {
     fun mapPetShelterRemoteToPresentation(petShelterListRemote: List<PetShelterRemote>): List<PetShelter> {
         return petShelterListRemote.map { mapOnePetShelterRemoteToPresentation(it) }
     }
-
+    
     fun mapOnePetShelterRemoteToPresentation(petShelterRemote: PetShelterRemote): PetShelter {
         return PetShelter(
             petShelterRemote.id,

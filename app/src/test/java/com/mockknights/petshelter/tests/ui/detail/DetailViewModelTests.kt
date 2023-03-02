@@ -54,6 +54,7 @@ class DetailViewModelTests {
 
     @Test
     fun `WHEN getShelterDetail with correct id THEN success value is set`() = runTest {
+
         // GIVEN the setup conditions
         ioDispatcher = StandardTestDispatcher(testScheduler)
         sut = DetailViewModel(repository, ioDispatcher)
@@ -63,10 +64,12 @@ class DetailViewModelTests {
         collectFlowJob = launch(UnconfinedTestDispatcher(testScheduler)) {
             repository.getShelter(FakeDetailData.successId).toList(actualList)
         }
+
         // WHEN get the actual detailState with a valid id after the flow is collected
         collectFlowJob.join()
         println("TEST1: collection done")
         sut.getShelterDetail(FakeDetailData.successId)
+
         // THEN
         // The fake data source will emit the same value as the actualList
         advanceUntilIdle()
@@ -81,6 +84,7 @@ class DetailViewModelTests {
 
     @Test
     fun `WHEN getShelterDetail with incorrect id THEN failure value is set`() = runTest {
+
         // GIVEN getShelterDetail with invalid id, overriding the setup conditions
         ioDispatcher = StandardTestDispatcher(testScheduler)
         sut = DetailViewModel(repository, ioDispatcher)
@@ -90,9 +94,11 @@ class DetailViewModelTests {
             repository.getShelter(FakeDetailData.errorId).toList(actualList)
             println("TEST2: collection done")
         }
+
         // WHEN
         collectFlowJob.join()
         sut.getShelterDetail(FakeDetailData.errorId)
+
         // THEN
         advanceUntilIdle()
         println("TEST2: getshelter with error done")
@@ -105,6 +111,7 @@ class DetailViewModelTests {
 
     @Test
     fun `WHEN updated shelter name THEN shelter name is updated`() = runTest {
+
         // GIVEN the setup conditions
         ioDispatcher = StandardTestDispatcher(testScheduler)
         sut = DetailViewModel(repository, ioDispatcher)
@@ -126,8 +133,14 @@ class DetailViewModelTests {
 
         // WHEN updated the shelter properties
         sut.onEditName("${priorValue.name}modified")
+//            sut.onUpdatedPhone("${priorValue.name}0")
+//            sut.onUpdatedAddress("0.0", "0.0")
+//            sut.onUpdatedShelterType(ShelterType.PARTICULAR)
+//            sut.onImageClicked()
+
         advanceUntilIdle()
         println("TEST3: updated shelter name done, new name = namemodified")
+
         // THEN, the modified value is namemodified
         val modifiedValue = (sut.detailState.value as DetailState.Success).petShelter
         println("TEST3: actual modifiedValue name is ${modifiedValue.name}")
@@ -135,5 +148,9 @@ class DetailViewModelTests {
         println("TEST3: assertions reached")
         Truth.assertThat(modifiedValue).isInstanceOf(PetShelter::class.java)
         Truth.assertThat(modifiedValue.name).isEqualTo("${priorValue.name}modified")
+//        Truth.assertThat(modifiedValue.phoneNumber).isEqualTo("${priorValue.phoneNumber}0")
+//        Truth.assertThat(modifiedValue.address).isEqualTo(Address(0.0, 0.0))
+//        Truth.assertThat(modifiedValue.shelterType).isEqualTo(ShelterType.PARTICULAR)
+//        Truth.assertThat(modifiedValue.photoURL).isEqualTo("${priorValue.id}.png")
     }
 }
