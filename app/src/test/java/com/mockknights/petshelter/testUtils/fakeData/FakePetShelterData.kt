@@ -14,7 +14,7 @@ object FakePetShelterData {
             password = "password",
             phoneNumber = "630838080",
             address = Address(40.4167047, -3.7035825),
-            photoURL = "photoURL",
+            photoURL = "",
             shelterType = ShelterType.SHELTER_POINT
         )
     }
@@ -26,7 +26,7 @@ object FakePetShelterData {
             password = "password",
             phoneNumber = "630838080",
             address = Address(40.4167047, -3.7035825),
-            photoURL = "photoURL",
+            photoURL = "",
             shelterType = ShelterType.SHELTER_POINT
         )
     }

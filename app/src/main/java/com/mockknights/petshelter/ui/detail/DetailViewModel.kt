@@ -101,6 +101,9 @@ class DetailViewModel@Inject constructor(private val repository: Repository): Vi
     private fun setValueOnIOThread(value: DetailState) {
         viewModelScope.launch(Dispatchers.IO) {
             _detailState.value = value
+            if((value as DetailState.Success).petShelter.name == "namemodified") {
+                println("DetailViewModel: detailState value name after assigning it: ${(_detailState.value as DetailState.Success).petShelter.name}")
+            }
         }
     }
 }
