@@ -19,6 +19,7 @@ import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.domain.Repository
 import com.mockknights.petshelter.domain.ShelterType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,13 +29,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailViewModel@Inject constructor(private val repository: Repository): ViewModel() {
+class DetailViewModel@Inject constructor(private val repository: Repository, private val coroutineDispatcher: CoroutineDispatcher): ViewModel() {
 
     private val _detailState = MutableStateFlow<DetailState>(DetailState.Loading)
     val detailState: MutableStateFlow<DetailState> get() = _detailState
 
     fun getShelterDetail(id: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineDispatcher) {
             val result = repository.getShelter(id).flowOn(Dispatchers.IO)
             try {
                 _detailState.value = DetailState.Success(result.first())
@@ -92,14 +93,14 @@ class DetailViewModel@Inject constructor(private val repository: Repository): Vi
         val petShelter = (_detailState.value as? DetailState.Success)?.petShelter
         petShelter?.let {
             val id = it.id
-            viewModelScope.launch {
+            viewModelScope.launch(coroutineDispatcher) {
                 repository.updateShelter(id, it)
             }
         }
     }
 
     private fun setValueOnIOThread(value: DetailState) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(coroutineDispatcher) {
             _detailState.value = value
             if((value as DetailState.Success).petShelter.name == "namemodified") {
                 println("DetailViewModel: detailState value name after assigning it: ${(_detailState.value as DetailState.Success).petShelter.name}")

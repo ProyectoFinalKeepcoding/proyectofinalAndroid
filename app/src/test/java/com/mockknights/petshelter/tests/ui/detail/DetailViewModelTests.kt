@@ -14,7 +14,9 @@ import com.mockknights.petshelter.ui.detail.DetailViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -27,36 +29,35 @@ import org.robolectric.RuntimeEnvironment
 @OptIn(ExperimentalCoroutinesApi::class)
 class DetailViewModelTests {
 
+    lateinit var ioDispatcher: CoroutineDispatcher
     lateinit var fakeRemoteDataSource: FakeRemoteDataSource
     lateinit var repository: Repository
     lateinit var sut: DetailViewModel
     lateinit var actualList: MutableList<PetShelter>
     lateinit var collectFlowJob: Job
-    lateinit var getDetailStateJob: Job
-    lateinit var job: Job
 
     @Before
     fun setUp() = runTest {
-        // Create sut, repository and fake data source
+        // Create repository and fake data source
         fakeRemoteDataSource = FakeRemoteDataSource()
         repository = RepositoryImpl(
             remoteDataSource = fakeRemoteDataSource,
             sharedPreferences = RemoteModule.provideSharedPreferences(RuntimeEnvironment.getApplication().baseContext),
             mapper = RemoteModule.provideMapper(),
         )
-        sut = DetailViewModel(repository)
-        println("SET UP: sut setup")
     }
 
     @After
     fun tearDown() {
         collectFlowJob.cancel()
-        getDetailStateJob.cancel()
     }
 
     @Test
     fun `WHEN getShelterDetail with correct id THEN success value is set`() = runTest {
         // GIVEN the setup conditions
+        ioDispatcher = StandardTestDispatcher(testScheduler)
+        sut = DetailViewModel(repository, ioDispatcher)
+        println("TEST1: sut setup")
         // Create a list to collect the flow and collect it
         actualList = mutableListOf()
         collectFlowJob = launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -65,12 +66,10 @@ class DetailViewModelTests {
         // WHEN get the actual detailState with a valid id after the flow is collected
         collectFlowJob.join()
         println("TEST1: collection done")
-        getDetailStateJob = launch(UnconfinedTestDispatcher(testScheduler)) {
-            sut.getShelterDetail(FakeDetailData.successId)
-        }
+        sut.getShelterDetail(FakeDetailData.successId)
         // THEN
         // The fake data source will emit the same value as the actualList
-        getDetailStateJob.join()
+        advanceUntilIdle()
         println("TEST1: getShelterDetail with success done")
         println("TEST1: assertions reached")
         Truth.assertThat(actualList).isNotEmpty()
@@ -83,18 +82,19 @@ class DetailViewModelTests {
     @Test
     fun `WHEN getShelterDetail with incorrect id THEN failure value is set`() = runTest {
         // GIVEN getShelterDetail with invalid id, overriding the setup conditions
+        ioDispatcher = StandardTestDispatcher(testScheduler)
+        sut = DetailViewModel(repository, ioDispatcher)
+        println("TEST2: sut setup")
         actualList = mutableListOf()
         collectFlowJob = launch(UnconfinedTestDispatcher(testScheduler)) {
             repository.getShelter(FakeDetailData.errorId).toList(actualList)
             println("TEST2: collection done")
         }
-        collectFlowJob.join()
         // WHEN
-        getDetailStateJob = launch(UnconfinedTestDispatcher(testScheduler)) {
-            sut.getShelterDetail(FakeDetailData.errorId)
-        }
+        collectFlowJob.join()
+        sut.getShelterDetail(FakeDetailData.errorId)
         // THEN
-        getDetailStateJob.join()
+        advanceUntilIdle()
         println("TEST2: getshelter with error done")
         // The fake data source will emit an empty value
         println("TEST2: assertions reached")
@@ -106,6 +106,9 @@ class DetailViewModelTests {
     @Test
     fun `WHEN updated shelter name THEN shelter name is updated`() = runTest {
         // GIVEN the setup conditions
+        ioDispatcher = StandardTestDispatcher(testScheduler)
+        sut = DetailViewModel(repository, ioDispatcher)
+        println("TEST3: sut setup")
         // Create a list to collect the flow and collect it
         actualList = mutableListOf()
         collectFlowJob = launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -114,20 +117,16 @@ class DetailViewModelTests {
         collectFlowJob.join()
         println("TEST3: collection done")
         // Get the detail state with a valid id
-        getDetailStateJob = launch(UnconfinedTestDispatcher(testScheduler)) {
-            sut.getShelterDetail(FakeDetailData.successId)
-        }
-        getDetailStateJob.join()
+        sut.getShelterDetail(FakeDetailData.successId)
+        advanceUntilIdle()
         println("TEST3: getshelter with valid id done")
         // Get the detail state value
         val priorValue = (sut.detailState.value as DetailState.Success).petShelter
         println("TEST3: priorValue name is ${priorValue.name}")
 
         // WHEN updated the shelter properties
-        job = launch(UnconfinedTestDispatcher(testScheduler)) {
-            sut.onEditName("${priorValue.name}modified")
-        }
-        job.join()
+        sut.onEditName("${priorValue.name}modified")
+        advanceUntilIdle()
         println("TEST3: updated shelter name done, new name = namemodified")
         // THEN, the modified value is namemodified
         val modifiedValue = (sut.detailState.value as DetailState.Success).petShelter
@@ -136,7 +135,5 @@ class DetailViewModelTests {
         println("TEST3: assertions reached")
         Truth.assertThat(modifiedValue).isInstanceOf(PetShelter::class.java)
         Truth.assertThat(modifiedValue.name).isEqualTo("${priorValue.name}modified")
-        // FINALLY
-        job.cancel()
     }
 }
