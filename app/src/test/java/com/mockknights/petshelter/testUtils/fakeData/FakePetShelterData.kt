@@ -7,6 +7,17 @@ import com.mockknights.petshelter.domain.ShelterType
 
 object FakePetShelterData {
 
+    fun getEmptiedRemotePetShelter(): PetShelterRemote {
+        return PetShelterRemote(
+            id = "",
+            name = "",
+            password = "",
+            phoneNumber = "",
+            address = Address(0.0, 0.0),
+            photoURL = "",
+            shelterType = ShelterType.SHELTER_POINT
+        )
+    }
     fun getRemotePetShelter(): PetShelterRemote {
         return PetShelterRemote(
             id = "id",

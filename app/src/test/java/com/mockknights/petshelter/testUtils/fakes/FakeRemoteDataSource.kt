@@ -4,10 +4,13 @@ import com.mockknights.petshelter.data.remote.RemoteDataSource
 import com.mockknights.petshelter.data.remote.request.RegisterRequest
 import com.mockknights.petshelter.data.remote.response.PetShelterRemote
 import com.mockknights.petshelter.testUtils.fakeData.FakeDetailData
+import com.mockknights.petshelter.testUtils.fakeData.FakePetShelterData
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 
 class FakeRemoteDataSource: RemoteDataSource {
+
+    var updatedShelter = FakePetShelterData.getEmptiedRemotePetShelter()
     override suspend fun getAllPetShelter(): Flow<List<PetShelterRemote>> {
         TODO("Not yet implemented")
     }
@@ -29,7 +32,7 @@ class FakeRemoteDataSource: RemoteDataSource {
     }
 
     override suspend fun updateShelter(id: String, shelter: PetShelterRemote) {
-        TODO("Not yet implemented")
+        updatedShelter = shelter
     }
 
 }

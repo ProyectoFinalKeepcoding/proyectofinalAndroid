@@ -3,6 +3,7 @@ package com.mockknights.petshelter.tests.ui.detail
 import com.google.common.truth.Truth
 import com.mockknights.petshelter.data.RepositoryImpl
 import com.mockknights.petshelter.data.remote.response.Address
+import com.mockknights.petshelter.data.remote.response.PetShelterRemote
 import com.mockknights.petshelter.di.RemoteModule
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.domain.Repository
@@ -163,13 +164,32 @@ class DetailViewModelTests {
         // Get the detail state value
         val priorValue = (sut.detailState.value as DetailState.Success).petShelter
 
-        // WHEN clicked onImage, the photoURL is updated
+        // WHEN clicked onImage
         sut.onImageClicked()
         advanceUntilIdle()
 
-        // THEN, the modified value id.png
+        // THEN,the photoURL is updated  so the modified value id.png
         val modifiedValue = (sut.detailState.value as DetailState.Success).petShelter
         Truth.assertThat(modifiedValue).isInstanceOf(PetShelter::class.java)
         Truth.assertThat(modifiedValue.photoURL).isEqualTo("${priorValue.id}.png")
+    }
+
+    @Test
+    fun `WHEN onSave THEN shelter is updated`() = testScope.runTest {
+
+        // GIVEN the setup conditions
+        // Get the detail state with a valid id
+        sut.getShelterDetail(FakeDetailData.successId)
+        advanceUntilIdle()
+
+        // WHEN
+        sut.onSaveClicked()
+        advanceUntilIdle()
+
+        // THEN, the modified value id.png
+        val detailStateShelter = (sut.detailState.value as DetailState.Success).petShelter
+        val updatedShelter = fakeRemoteDataSource.updatedShelter
+        Truth.assertThat(updatedShelter).isInstanceOf(PetShelterRemote::class.java)
+        Truth.assertThat(updatedShelter.id).isEqualTo(detailStateShelter.id)
     }
 }
