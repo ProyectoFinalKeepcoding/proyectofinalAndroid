@@ -19,7 +19,7 @@ sealed class DetailState {
     data class Error(val message: String) : DetailState()
 
     /**
-     * This class represents the state of the detail data when it is loading. It is the default state
+     * This class represents the state of the detail data when it is Loading. It is the default state
      * of the detail data.
      */
     object Loading : DetailState()

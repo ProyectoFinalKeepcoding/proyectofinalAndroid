@@ -1,11 +1,11 @@
 package com.mockknights.petshelter.ui.login
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mockknights.petshelter.domain.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -16,11 +16,12 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val repository: Repository,
-    val sharedPreferences: SharedPreferences
+    val sharedPreferences: SharedPreferences,
+    private val coroutineDispatcher: CoroutineDispatcher
 ): ViewModel()
 {
 
-    private val _stateLogin = MutableStateFlow<LoginState>(LoginState.loading)
+    private val _stateLogin = MutableStateFlow<LoginState>(LoginState.Loading)
     val stateLogin: StateFlow<LoginState> get() = _stateLogin
 
     private fun setValueOnMainThread(value: LoginState) {
@@ -30,7 +31,7 @@ class LoginViewModel @Inject constructor(
     }
 
     fun resetState() {
-        setValueOnMainThread(LoginState.loading)
+        setValueOnMainThread(LoginState.Loading)
     }
 
     private fun getCredentials(user: String, pass: String): String {
@@ -39,7 +40,7 @@ class LoginViewModel @Inject constructor(
 
 
     fun getToken(user: String, password: String) {
-        setValueOnMainThread(LoginState.loading)
+        setValueOnMainThread(LoginState.Loading)
         // Delete shared preferences for key CREDENTIAL
         sharedPreferences.edit().remove("CREDENTIAL").apply() // TODO: Manage login when the user has already logged in
         sharedPreferences.edit().remove("TOKEN").apply()
@@ -49,9 +50,8 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                repository.getToken().flowOn(Dispatchers.IO).collect() { tokenAndId ->
-                    if(tokenAndId.isNotEmpty()) setValueOnMainThread(LoginState.Success(token = tokenAndId[0], id = tokenAndId[1]))
-                    else setValueOnMainThread(LoginState.Failure(error = "Error while retrieving the token: Token is empty"))
+                repository.getToken().flowOn(coroutineDispatcher).collect() { tokenAndId ->
+                     setValueOnMainThread(LoginState.Success(token = tokenAndId[0], id = tokenAndId[1]))
                 }
             } catch (e: Exception) {
                 setValueOnMainThread(LoginState.Failure(error = e.message.toString()))

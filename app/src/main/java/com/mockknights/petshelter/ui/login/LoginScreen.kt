@@ -104,7 +104,7 @@ fun LoginScreen (
 @Composable
 fun LoginForm(
     modifier: Modifier = Modifier,
-    success: LoginState = LoginState.loading,
+    success: LoginState = LoginState.Loading,
     onTokenRequested: (String, String) -> Unit = {_, _ -> (Unit)},
     navigateToDetail: (String) -> (Unit) = {}
 ) {
@@ -153,7 +153,7 @@ fun LoginForm(
 
 @Preview
 @Composable
-fun EnterButton(success: LoginState = LoginState.loading,
+fun EnterButton(success: LoginState = LoginState.Loading,
                 onTokenRequested: () -> (Unit) = {},
                 navigateToDetail: (String) -> (Unit) = {}
 ) {
