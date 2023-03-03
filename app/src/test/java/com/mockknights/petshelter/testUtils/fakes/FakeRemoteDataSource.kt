@@ -4,6 +4,7 @@ import com.mockknights.petshelter.data.remote.RemoteDataSource
 import com.mockknights.petshelter.data.remote.request.RegisterRequest
 import com.mockknights.petshelter.data.remote.response.PetShelterRemote
 import com.mockknights.petshelter.testUtils.fakeData.FakeDetailData
+import com.mockknights.petshelter.testUtils.fakeData.FakeLoginData
 import com.mockknights.petshelter.testUtils.fakeData.FakePetShelterData
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
@@ -11,12 +12,17 @@ import okhttp3.MultipartBody
 class FakeRemoteDataSource: RemoteDataSource {
 
     var updatedShelter = FakePetShelterData.getEmptiedRemotePetShelter()
+    var returnValidToken = true
+
     override suspend fun getAllPetShelter(): Flow<List<PetShelterRemote>> {
         TODO("Not yet implemented")
     }
 
     override suspend fun getToken(): Flow<List<String>> {
-        TODO("Not yet implemented")
+        return if(returnValidToken)
+            FakeLoginData.getToken(FakeLoginData.validUser, FakeLoginData.validPassword)
+        else
+            FakeLoginData.getToken("invalid", "invalid")
     }
 
     override suspend fun register(registerRequest: RegisterRequest) {

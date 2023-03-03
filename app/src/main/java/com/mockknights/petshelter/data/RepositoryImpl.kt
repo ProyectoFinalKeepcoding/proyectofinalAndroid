@@ -15,7 +15,6 @@ import javax.inject.Inject
 
 class RepositoryImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSource,
-    //private val localDataSource: LocalDataSource,
     private val sharedPreferences: SharedPreferences,
     private val mapper: PetShelterMapper
     ) : Repository {
