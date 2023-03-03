@@ -10,10 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import com.mockknights.petshelter.ui.theme.GrayKiwoko
-import com.mockknights.petshelter.ui.theme.RedKiwoko
-import com.mockknights.petshelter.ui.theme.moderatTextField
-import com.mockknights.petshelter.ui.theme.moderatUsername
+import com.mockknights.petshelter.ui.theme.*
 
 @Preview
 @Composable
@@ -38,5 +35,17 @@ fun TextPlaceholder(text: String = "Placeholder") {
         style = MaterialTheme.typography.moderatTextField,
         color = GrayKiwoko,
         textAlign = TextAlign.Left
+    )
+}
+
+/**
+ * This is the label shown above the text field in the detail and sign up screens.
+ */
+@Preview
+@Composable
+fun UserDataFieldLabel(fieldLabel: String = "Dirección") {
+    Text(
+        text = fieldLabel,
+        style = MaterialTheme.typography.moderatDataFieldLabel
     )
 }

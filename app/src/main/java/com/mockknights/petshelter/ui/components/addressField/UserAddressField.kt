@@ -22,7 +22,6 @@ import com.google.android.libraries.places.api.Places
 import com.mockknights.petshelter.BuildConfig
 import com.mockknights.petshelter.data.remote.response.Address
 import com.mockknights.petshelter.ui.components.addressField.UserAddressFieldViewModel
-import com.mockknights.petshelter.ui.detail.UserDataFieldLabel
 import com.mockknights.petshelter.ui.detail.toDp
 import com.mockknights.petshelter.ui.theme.GrayKiwoko
 import com.mockknights.petshelter.ui.theme.moderatTextField

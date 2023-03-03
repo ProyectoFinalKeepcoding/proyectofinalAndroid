@@ -35,13 +35,21 @@ import com.mockknights.petshelter.ui.components.UserDataField
 import com.mockknights.petshelter.ui.components.detailImage.DetailImage
 import com.mockknights.petshelter.ui.theme.*
 
+/**
+ * Extension function to convert Int to Dp to help transforming Figma metrics to Compose.
+ */
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt())
-fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density.toInt())
 
-
+/**
+ * This is the screen that shows the details of a pet shelter.
+ * @param id the id of the shelter to show
+ * @param detailViewModel the view model that will be used to manage the data. Injected by Hilt.
+ */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel()) {
+fun DetailScreen(
+    id: String,
+    detailViewModel: DetailViewModel = hiltViewModel()) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -62,6 +70,7 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
             modifier = Modifier
                 .fillMaxWidth()
                 .pointerInput(Unit) {
+                    // When tapped outside the keyboard, hide it
                     detectTapGestures(onTap = {
                         keyboardController?.hide()
                     })
@@ -69,7 +78,8 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.toDp().dp)
         ) {
-            if (detailState is DetailState.Success) { // If the data is not loaded yet, don't show anything
+            // If the data is not successfully loaded yet, don't show anything
+            if (detailState is DetailState.Success) {
                 val shelter = (detailState as DetailState.Success).petShelter
                 UserNameRow(
                     userName = shelter.name,
@@ -119,6 +129,11 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
     }
 }
 
+/**
+ * This is a custom row that shows the name of the shelter.
+ * @param userName the name of the shelter that is shown in the text field.
+ * @param onNameEdited a callback that is called when the user presses the done button on the keyboard.
+ */
 @Preview
 @Composable
 fun UserNameRow(
@@ -148,9 +163,23 @@ fun UserNameRow(
     }
 }
 
+/**
+ * This is a custom text field that allows the user to edit the username.
+ * The text field has a trailing icon that allows user to enable the text field for editing. When
+ * clicking the second time, the text field is disabled and the onDone callback is called with the
+ * typed name.
+ *
+ * @param userName the name of the user, it is shown as the text of the text field.
+ * @param onDone a callback that is called when the user presses the done button on the keyboard. It
+ * receives as a parameter the typed name.
+ */
 @Preview
 @Composable
-fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "username", onDone: (String) -> Unit = {}) {
+fun UserNameTextField(
+    modifier: Modifier = Modifier,
+    userName: String = "username",
+    onDone: (String) -> Unit = {}
+) {
 
     val enabled = remember { mutableStateOf(false) }
     val textFieldValue = remember { mutableStateOf(
@@ -212,7 +241,12 @@ fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "usernam
     )
 }
 
-
+/**
+ * This is the row that contains the image of the shelter.
+ * @param photoUrl the url of the image
+ * @param shelterId the id of the shelter
+ * @param onImageClicked the function that is called when the image is clicked
+ */
 @Preview
 @Composable
 fun ImageRow(
@@ -250,14 +284,7 @@ fun ImageRow(
     }
 }
 
-@Preview
-@Composable
-fun UserDataFieldLabel(fieldLabel: String = "Dirección") {
-    Text(
-        text = fieldLabel,
-        style = MaterialTheme.typography.moderatDataFieldLabel
-    )
-}
+
 
 
 
