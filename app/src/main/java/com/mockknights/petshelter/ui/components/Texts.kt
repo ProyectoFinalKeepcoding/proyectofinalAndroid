@@ -1,6 +1,5 @@
 package com.mockknights.petshelter.ui.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -12,9 +11,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.mockknights.petshelter.ui.theme.*
 
+/**
+ * This is the title that indicates main information in the app.
+ * @param title The text that will be shown in the title.
+ * @param color The color of the text. By default is black.
+ */
 @Preview
 @Composable
-fun BoldTitle(modifier: Modifier = Modifier, title: String = "title", color: Color = Color.Black) {
+fun BoldTitle(
+    modifier: Modifier = Modifier,
+    title: String = "title",
+    color: Color = Color.Black
+) {
     Text(
         modifier = modifier,
         text = title,
@@ -25,9 +33,15 @@ fun BoldTitle(modifier: Modifier = Modifier, title: String = "title", color: Col
     )
 }
 
+/**
+ * This is the placeholder shown in the text fields when needed.
+ * @param text The text that will be shown in the placeholder.
+ */
 @Preview
 @Composable
-fun TextPlaceholder(text: String = "Placeholder") {
+fun TextPlaceholder(
+    text: String = "Placeholder"
+) {
     Text(
         text = text,
         modifier = Modifier
@@ -40,10 +54,13 @@ fun TextPlaceholder(text: String = "Placeholder") {
 
 /**
  * This is the label shown above the text field in the detail and sign up screens.
+ * @param fieldLabel The text that will be shown in the label.
  */
 @Preview
 @Composable
-fun UserDataFieldLabel(fieldLabel: String = "Dirección") {
+fun UserDataFieldLabel(
+    fieldLabel: String = "Dirección"
+) {
     Text(
         text = fieldLabel,
         style = MaterialTheme.typography.moderatDataFieldLabel

@@ -10,6 +10,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.mockknights.petshelter.R
 
+/**
+ * This is the logo that is shown in the welcome screen.
+ */
 @Composable
 fun LogoBox(modifier: Modifier) {
     Box(

@@ -22,14 +22,18 @@ val Typography = Typography(
     )
 )
 
-// Create new family for font moderat
+/**
+ * Custom font family for the app.
+ */
 val ModeratFamily = FontFamily(
     Font(R.font.moderat_bold, FontWeight.Bold),
     Font(R.font.moderat_medium, FontWeight.Medium),
     Font(R.font.moderat_light, FontWeight.Light)
 )
 
-// Create extension styles that can be used as Material styles
+/**
+ * Style for the title of the modal and the welcome button.
+ */
 val Typography.moderatMediumTitle: TextStyle
     @Composable
     get() {
@@ -41,7 +45,9 @@ val Typography.moderatMediumTitle: TextStyle
         )
     }
 
-// Create extension styles that can be used as Material styles
+/**
+ * Style for the text in the kiwoko button.
+ */
 val Typography.moderatButtonBold: TextStyle
     @Composable
     get() {
@@ -52,17 +58,9 @@ val Typography.moderatButtonBold: TextStyle
         )
     }
 
-val Typography.moderatLightTitle: TextStyle
-    @Composable
-    get() {
-        return  TextStyle(
-            fontFamily = ModeratFamily,
-            fontWeight = FontWeight.Light,
-            fontSize = 24.sp,
-            letterSpacing = 0.14.em
-        )
-    }
-
+/**
+ * Style for the text in the labels shown above the text fields in the detail and register screens.
+ */
 val Typography.moderatDataFieldLabel: TextStyle
     @Composable
     get() {
@@ -74,6 +72,9 @@ val Typography.moderatDataFieldLabel: TextStyle
         )
     }
 
+/**
+ * Style for the text of the labels shown under the radio buttons in the register and detail screens.
+ */
 val Typography.moderatRadioButtonLabel: TextStyle
     @Composable
     get() {
@@ -85,6 +86,9 @@ val Typography.moderatRadioButtonLabel: TextStyle
         )
     }
 
+/**
+ * Style used for the name of the shelter in the detail screen.
+ */
 val Typography.moderatUsername: TextStyle
     @Composable
     get() {
@@ -96,6 +100,9 @@ val Typography.moderatUsername: TextStyle
         )
     }
 
+/**
+ * Style used for the text fields.
+ */
 val Typography.moderatTextField: TextStyle
     @Composable
     get() {
