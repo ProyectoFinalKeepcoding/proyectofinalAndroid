@@ -30,6 +30,17 @@ object FakePetShelterData {
         )
     }
 
+    fun getEmptiedPetShelter(): PetShelter {
+        return PetShelter(
+            id = "",
+            name = "",
+            password = "",
+            phoneNumber = "",
+            address = Address(0.0, 0.0),
+            photoURL = "",
+            shelterType = ShelterType.SHELTER_POINT
+        )
+    }
     fun getPetShelter(): PetShelter {
         return PetShelter(
             id = "id",
