@@ -31,6 +31,11 @@ import com.mockknights.petshelter.domain.ShelterType
 import com.mockknights.petshelter.ui.components.*
 import com.mockknights.petshelter.ui.detail.toDp
 
+/**
+ * Screen to register a new user.
+ * @param viewModel ViewModel for the Register screen. It is injected by Hilt.
+ * @param navigateToLogin Callback to navigate to the login screen.
+ */
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Preview(showSystemUi = true)
 @Composable
@@ -64,7 +69,10 @@ fun RegisterScreen (
     }
 }
 
-
+/**
+ * Form to register a new user.
+ * @param onRegister Callback to register a new user.
+ */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RegisterForm(onRegister: (RegisterRequest) -> Unit = {}) {
