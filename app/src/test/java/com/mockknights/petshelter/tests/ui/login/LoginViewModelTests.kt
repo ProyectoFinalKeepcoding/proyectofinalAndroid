@@ -46,7 +46,7 @@ class LoginViewModelTests {
 
     @After
     fun tearDown() {
-
+        Dispatchers.resetMain()
     }
 
     @Test

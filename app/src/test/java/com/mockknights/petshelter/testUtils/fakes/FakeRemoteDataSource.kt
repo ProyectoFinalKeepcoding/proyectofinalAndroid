@@ -26,7 +26,8 @@ class FakeRemoteDataSource: RemoteDataSource {
     }
 
     override suspend fun register(registerRequest: RegisterRequest) {
-        TODO("Not yet implemented")
+        if(registerRequest.name == FakePetShelterData.getEmptiedPetShelter().name)
+            throw Exception("Invalid data")
     }
 
     override suspend fun getShelter(id: String): Flow<PetShelterRemote> {
