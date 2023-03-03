@@ -59,7 +59,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     // Local context to get resources
     val mapScreenContext = LocalContext.current
     // PetShelter list
-    val petShelters = viewModel.petShelters.collectAsState().value
+    val petShelters = ((viewModel.mapShelterListState.collectAsState().value) as? MapShelterListState.Success)?.petShelters
     // Get camera position
     val cameraPositionState = viewModel.cameraPositionState.collectAsState().value
     // This launcher is used to request permissions
@@ -106,7 +106,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                         .fillMaxSize()
                         .weight(1.3f))
 
-                if (petShelters.isNotEmpty()) {
+                if (petShelters != null) {
 
                     MyGoogleMaps(petShelters,
                         locationGranted = viewModel.locationPermissionGranted.value,
