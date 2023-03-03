@@ -83,7 +83,7 @@ class LoginViewModelTests {
         // THEN, the state will be set as failure, and the message is the one of the exception
         val loginState = sut.stateLogin.value
         Truth.assertThat(sut.stateLogin.value).isInstanceOf(LoginState.Failure::class.java)
-        Truth.assertThat((loginState as LoginState.Failure).error).isEqualTo("Empty list doesn't contain element at index 0.")
+        Truth.assertThat((loginState as LoginState.Failure).error).isEqualTo("No token found")
     }
 
     @Test
@@ -99,7 +99,7 @@ class LoginViewModelTests {
         // the state will be set as failure, and the message is the one of the exception
         val loginState = sut.stateLogin.value
         Truth.assertThat(sut.stateLogin.value).isInstanceOf(LoginState.Failure::class.java)
-        Truth.assertThat((loginState as LoginState.Failure).error).isEqualTo("Empty list doesn't contain element at index 0.")
+        Truth.assertThat((loginState as LoginState.Failure).error).isEqualTo("No token found")
 
         // WHEN called reset state
         sut.resetState()

@@ -29,9 +29,13 @@ import com.mockknights.petshelter.ui.detail.toDp
 import com.mockknights.petshelter.ui.theme.RedKiwoko
 import com.mockknights.petshelter.ui.theme.moderatTextField
 
-fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt())
-fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density.toInt())
-
+/**
+ * This class represents the login screen. It is composed by the logo, the login form and the register
+ * @param [viewModel] ViewModel of the login screen, injected by Hilt
+ * @param [navigateToDetail] Function called to navigate to the detail screen
+ * @param [navigateToWelcome] Function called to navigate to the welcome screen
+ * @param [navigateToRegister] Function called to navigate to the register screen
+ */
 @OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Preview(showSystemUi = true)
@@ -100,6 +104,13 @@ fun LoginScreen (
 
 }
 
+/**
+ * Login form formed by the user data fields and the enter button
+ * @param [modifier] Modifier of the form applied to the column
+ * @param [success] State of the login data
+ * @param [onTokenRequested] Function that is called when the enter button is pressed
+ * @param [navigateToDetail] Function that is called when the login data is successfully loaded
+ */
 @Preview
 @Composable
 fun LoginForm(
@@ -151,6 +162,12 @@ fun LoginForm(
     }
 }
 
+/**
+ * Enter button of the login screen
+ * @param [success] LoginState that contains the state of the login
+ * @param [onTokenRequested] Function that is called when the user clicks on the button
+ * @param [navigateToDetail] Function that is called when the user is logged in
+ */
 @Preview
 @Composable
 fun EnterButton(success: LoginState = LoginState.Loading,
@@ -185,6 +202,10 @@ fun EnterButton(success: LoginState = LoginState.Loading,
         )
     }
 }
+
+/**
+ * Forgot password column that contains the "¿Has olvidado tu contraseña?" actionable text
+ */
 @Preview
 @Composable
 fun ForgotPassword() {
@@ -204,9 +225,19 @@ fun ForgotPassword() {
     }
 }
 
+/**
+ * Register column that contains the "No tengo cuenta" info text and the "Registrarme" actionable
+ * text
+ * @param modifier Modifier
+ * @param navigateToRegister Function that navigates to the register screen when "Registrarme" is
+ * clicked
+ */
 @Preview
 @Composable
-fun Register(modifier: Modifier = Modifier, navigateToRegister: () -> (Unit) = {}) {
+fun Register(
+    modifier: Modifier = Modifier,
+    navigateToRegister: () -> (Unit) = {}
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
