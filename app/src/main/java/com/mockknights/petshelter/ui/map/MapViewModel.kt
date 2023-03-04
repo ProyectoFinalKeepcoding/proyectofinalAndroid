@@ -77,6 +77,7 @@ class MapViewModel @Inject constructor(private val repository: Repository, priva
         viewModelScope.launch(coroutineDispatcher) {
             try {
                 val petShelters = repository.getAllPetShelter().flowOn(coroutineDispatcher)
+                if(petShelters.first().isEmpty()) throw Exception("Empty pet shelter list")
                 setValueOnMainThreadShelter(MapShelterListState.Success(petShelters.first()))
             } catch (e: Exception) {
                 setValueOnMainThreadShelter(MapShelterListState.Error(e.message.toString()))
