@@ -76,10 +76,10 @@ class MapViewModel @Inject constructor(private val repository: Repository, priva
     private fun getPetShelters() {
         viewModelScope.launch(coroutineDispatcher) {
             try {
-                val petShelters = repository.getAllPetShelter()
+                val petShelters = repository.getAllPetShelter().flowOn(coroutineDispatcher)
                 setValueOnMainThreadShelter(MapShelterListState.Success(petShelters.first()))
             } catch (e: Exception) {
-                Log.d("MapViewModel", e.message.toString())
+                setValueOnMainThreadShelter(MapShelterListState.Error(e.message.toString()))
             }
         }
     }

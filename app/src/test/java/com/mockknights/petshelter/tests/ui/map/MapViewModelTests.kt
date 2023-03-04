@@ -7,9 +7,11 @@ import com.mockknights.petshelter.di.RemoteModule
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.domain.Repository
 import com.mockknights.petshelter.testUtils.fakes.FakeRemoteDataSource
+import com.mockknights.petshelter.ui.map.MapShelterListState
 import com.mockknights.petshelter.ui.map.MapViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Before
@@ -38,7 +40,7 @@ class MapViewModelTests {
             mapper = RemoteModule.provideMapper(),
         )
         // Create the SUT
-//        sut = MapViewModel(repository, CoroutinesModule.provideIOCoroutineDispatcher())
+        sut = MapViewModel(repository, testDispatcher)
     }
 
     @After
@@ -58,7 +60,7 @@ class MapViewModelTests {
         advanceUntilIdle()
 
         // THEN a list of petShelter is set in the state
-        Truth.assertThat(sut.petShelters.value).isNotEmpty()
-        Truth.assertThat((sut.petShelters.value).first()).isInstanceOf(PetShelter::class.java)
+        Truth.assertThat((sut.mapShelterListState.value as MapShelterListState.Success).petShelters).isNotEmpty()
+        Truth.assertThat((sut.mapShelterListState.value as MapShelterListState.Success).petShelters.first()).isInstanceOf(PetShelter::class.java)
     }
 }
