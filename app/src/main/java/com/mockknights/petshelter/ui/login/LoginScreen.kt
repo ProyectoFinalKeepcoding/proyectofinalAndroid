@@ -2,6 +2,7 @@ package com.mockknights.petshelter.ui.login
 
 import android.annotation.SuppressLint
 import android.content.res.Resources
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -53,6 +54,10 @@ fun LoginScreen (
     LaunchedEffect(key1 = success) {
         if (success is LoginState.Success) {
             navigateToDetail((success as LoginState.Success).id)
+            viewModel.resetState()
+        }
+        if (success is LoginState.Failure) {
+            //TODO: Toast.makeText(this, "ERROR DE USUARIO Y/O CONTRASEÑA", Toast.LENGTH_LONG)
             viewModel.resetState()
         }
     }

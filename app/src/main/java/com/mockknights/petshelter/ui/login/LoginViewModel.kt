@@ -13,6 +13,7 @@ import okhttp3.Credentials
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
+
 /**
  * ViewModel for the Login screen.
  * The ViewModel works with the Repository to manage the data.
@@ -25,7 +26,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val repository: Repository,
     val sharedPreferences: SharedPreferences,
-    private val coroutineDispatcher: CoroutineDispatcher
+    private val coroutineDispatcher: CoroutineDispatcher,
 ): ViewModel()
 {
 
@@ -83,7 +84,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 repository.getToken().flowOn(coroutineDispatcher).collect() { tokenAndId ->
-                     setValueOnMainThread(LoginState.Success(token = tokenAndId[0], id = tokenAndId[1]))
+                    setValueOnMainThread(LoginState.Success(token = tokenAndId[0], id = tokenAndId[1]))
                 }
             } catch (e: Exception) {
                 setValueOnMainThread(LoginState.Failure(error = "No token found"))
