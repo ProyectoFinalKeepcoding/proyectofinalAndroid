@@ -1,9 +1,6 @@
 package com.mockknights.petshelter.tests.ui.map
 
 import android.content.Context
-import androidx.compose.material.ExperimentalMaterialApi
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.MapsInitializer
 import com.mockknights.petshelter.R
 import com.google.common.truth.Truth
 import com.mockknights.petshelter.data.RepositoryImpl
