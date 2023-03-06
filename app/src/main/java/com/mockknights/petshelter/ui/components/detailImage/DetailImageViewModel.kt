@@ -22,6 +22,12 @@ import java.io.File
 import java.io.InputStream
 import javax.inject.Inject
 
+/**
+ * ViewModel for DetailImage screen.
+ * @param repository Repository used to manage data.
+ * @param sharedPreferences Shared preferences used to manage the token.
+ * @param coroutineDispatcher Dispatcher used to manage the coroutine.
+ */
 @HiltViewModel
 class DetailImageViewModel@Inject constructor(
     private val repository: Repository,
@@ -57,6 +63,11 @@ class DetailImageViewModel@Inject constructor(
         }
     }
 
+    /**
+     * Get the multipart file from the file.
+     * @param file File to be converted.
+     * @param shelterId Shelter id.
+     */
     private fun getMultiPartFile(file: File, shelterId: String): MultipartBody.Part {
         val requestBody = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
         return MultipartBody.Part.createFormData(

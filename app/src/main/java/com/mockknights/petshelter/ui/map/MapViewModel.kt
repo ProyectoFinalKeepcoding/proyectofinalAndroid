@@ -39,6 +39,8 @@ import kotlin.math.sqrt
 
 /**
  * ViewModel for the Map screen.
+ * @param repository The repository that is used to manage the data.
+ * @param coroutineDispatcher The IO dispatcher that is used to run the coroutines.
  */
 @OptIn(ExperimentalMaterialApi::class)
 @HiltViewModel
