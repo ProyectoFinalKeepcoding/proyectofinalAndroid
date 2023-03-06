@@ -2,9 +2,12 @@ package com.mockknights.petshelter.tests.ui.map
 
 import android.content.Context
 import androidx.compose.material.ExperimentalMaterialApi
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.MapsInitializer
 import com.mockknights.petshelter.R
 import com.google.common.truth.Truth
 import com.mockknights.petshelter.data.RepositoryImpl
+import com.mockknights.petshelter.data.remote.mappers.PetShelterMapper
 import com.mockknights.petshelter.di.RemoteModule
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.domain.Repository
@@ -158,5 +161,22 @@ class MapViewModelTests {
 
         // THEN, the modal is expanded
         Truth.assertThat(sut.locationPermissionGranted.value).isTrue()
+    }
+
+    @Test
+    fun `WHEN getClosestShelter THEN closest shelter is returned`() = testScope.runTest {
+        // GIVEN the setup conditions
+        // Emulate the main dispatcher with the test dispatcher
+        val dispatcher = UnconfinedTestDispatcher(testScheduler)
+        Dispatchers.setMain(dispatcher)
+        advanceUntilIdle() // Wait until the sut is initialized and the data is fetched
+
+        // WHEN getClosestShelter is called with granted permission
+        sut.locationPermissionGranted.value = true
+        val closestShelter = sut.getClosestShelter()
+
+        // THEN, the closest shelter is returned (Joakin)
+        Truth.assertThat(closestShelter)
+            .isEqualTo(PetShelterMapper().mapOnePetShelterRemoteToPresentation(FakeMapData.getPetShelterList()[3]))
     }
 }

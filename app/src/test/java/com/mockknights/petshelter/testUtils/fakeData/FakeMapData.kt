@@ -1,5 +1,7 @@
 package com.mockknights.petshelter.testUtils.fakeData
 
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.mockknights.petshelter.data.remote.response.Address
 import com.mockknights.petshelter.data.remote.response.PetShelterRemote
 import com.mockknights.petshelter.domain.ShelterType
@@ -18,5 +20,9 @@ object FakeMapData {
         val kiwokoStore3 = PetShelterRemote(id = "8", name = "KiwokoStore3", phoneNumber = "918167787", address = Address(latitude = 40.3446868, longitude = -3.8486131), shelterType = ShelterType.KIWOKO_STORE, password = "123456", photoURL = "")
 
         return listOf(shelterVeterinary2, shelterParticular1, shelterParticular2, shelterParticular3, shelterVeterinary, localGovernment, kiwokoStore1, kiwokoStore2, kiwokoStore3)
+    }
+
+    fun getLocation(): LatLng {
+        return LatLng(30.0, 30.0)
     }
 }

@@ -58,7 +58,7 @@ class MapViewModel @Inject constructor(private val repository: Repository, priva
     val locationPermissionGranted: MutableState<Boolean> get() = _locationPermissionGranted
 
     private val _currentUserLocation = mutableStateOf(LatLng(40.4167047, -3.7035825)) // Madrid by default
-    private val currentUserLocation: MutableState<LatLng> get() = _currentUserLocation
+    val currentUserLocation: MutableState<LatLng> get() = _currentUserLocation
 
     private val _cameraPositionState = MutableStateFlow(CameraPositionState(CameraPosition.fromLatLngZoom(currentUserLocation.value, 6f)))
     val cameraPositionState: MutableStateFlow<CameraPositionState> get() = _cameraPositionState
@@ -169,7 +169,7 @@ class MapViewModel @Inject constructor(private val repository: Repository, priva
         }
     }
 
-    private fun getClosestShelter(): PetShelter? {
+    fun getClosestShelter(): PetShelter? {
         // If there is no shelter, return an empty shelter
         if ((_mapShelterListState.value as? MapShelterListState.Success)?.petShelters.isNullOrEmpty()) return null
         val petShelters = (_mapShelterListState.value as MapShelterListState.Success).petShelters // Checked cast
