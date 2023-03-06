@@ -26,6 +26,10 @@ import com.mockknights.petshelter.ui.detail.toDp
 import com.mockknights.petshelter.ui.theme.GrayKiwoko
 import com.mockknights.petshelter.ui.theme.moderatTextField
 
+/**
+ * This composable shows the address of the user. It allows the user to select an address from an
+ * autocompletion list.
+ */
 @Composable
 fun UserAddressField(
     viewModel: UserAddressFieldViewModel = hiltViewModel(),

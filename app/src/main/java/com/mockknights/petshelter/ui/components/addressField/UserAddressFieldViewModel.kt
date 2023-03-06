@@ -21,25 +21,64 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * The view model for an user address field.
+ */
 @HiltViewModel
 class UserAddressFieldViewModel@Inject constructor(): ViewModel(){
 
+    /**
+     * The places client to manage the places API. It has to be initialized before using it.
+     */
     lateinit var placesClient: PlacesClient
+
+    /**
+     * The list of places that match the user query.
+     */
     val locationAutofill = mutableStateListOf<AutocompleteResult>()
+
+    /**
+     * The job that is used to perform the search.
+     */
     private var job: Job? = null
+
+    /**
+     * The geocoder to perform inverse geocoding.
+     */
     lateinit var geoCoder: Geocoder
 
+    /**
+     * The current address of the user. When working with this value in this view model, use this value.
+     * The default value is LatLng(0.0, 0.0)
+     */
     private val _currentLatLong = MutableStateFlow(LatLng(0.0, 0.0))
+
+    /**
+     * The current address of the user visible outside this view model. The default value is LatLng(0.0, 0.0)
+     */
     val currentLatLong: MutableStateFlow<LatLng> get() = _currentLatLong
 
+    /**
+     * The current address of the user as a string. When working with this value in this view model, use this value.
+     * The default value is ""
+     */
     private val _addressAsString = MutableStateFlow("")
-    val addressAsString: MutableStateFlow<String>
-    get() = _addressAsString
+    /**
+     * The current address of the user as a string visible outside this view model. The default value is ""
+     */
+    val addressAsString: MutableStateFlow<String> get() = _addressAsString
 
-
+    /**
+     * Updates the current address of the user as a string.
+     */
     fun updateAddressAsString(address: String) {
         _addressAsString.value = address
     }
+
+    /**
+     * Searches for places that match the user query and updates the [locationAutofill] list.
+     * @param query The user query.
+     */
     fun searchPlaces(query: String) {
         job?.cancel()
         locationAutofill.clear()
@@ -73,6 +112,10 @@ class UserAddressFieldViewModel@Inject constructor(): ViewModel(){
         }
     }
 
+    /**
+     * Gets the coordinates of the place selected by the user.
+     * @param result The result of the place selected by the user.
+     */
     fun getCoordinates(result: AutocompleteResult) {
         val placeFields = listOf(Place.Field.LAT_LNG)
         val request = FetchPlaceRequest.newInstance(result.placeId, placeFields)
@@ -90,7 +133,9 @@ class UserAddressFieldViewModel@Inject constructor(): ViewModel(){
             }
     }
 
-
+    /**
+     * Gets the address of the user from the coordinates.
+     */
     fun onRequestAddressAsString(currentAddress: Address, localContext: Context): String {
         // If already have the address, return it
         if(addressAsString.value.isNotEmpty()) return addressAsString.value
@@ -123,6 +168,9 @@ class UserAddressFieldViewModel@Inject constructor(): ViewModel(){
     }
 }
 
+/**
+ * The result of an autocomplete search.
+ */
 data class AutocompleteResult(
     val address: String,
     val placeId: String
