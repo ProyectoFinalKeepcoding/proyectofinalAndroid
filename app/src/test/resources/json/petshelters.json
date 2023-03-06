@@ -1,0 +1,135 @@
+[
+  {
+    "address": {
+      "longitude": -4.0303290000000001,
+      "latitude": 39.865761999999997
+    },
+    "id": "2D2118F9-2C9D-4351-B4A4-B4972F9C9730",
+    "shelterType": "particular",
+    "name": "Fran",
+    "phoneNumber": "44433421"
+  },
+  {
+    "address": {
+      "longitude": -3.9965039999999998,
+      "latitude": 40.405774999999998
+    },
+    "id": "705D41ED-C7E1-4D77-BA4A-29085C6F6035",
+    "shelterType": "particular",
+    "name": "Isma",
+    "phoneNumber": "44433421"
+  },
+  {
+    "address": {
+      "longitude": -3.6371530000000001,
+      "latitude": 40.422989000000001
+    },
+    "id": "3E19146B-8C89-4736-81B2-006A1BC11897",
+    "shelterType": "particular",
+    "name": "Joakin",
+    "phoneNumber": "44433421"
+  },
+  {
+    "address": {
+      "longitude": -2.8726099999999999,
+      "latitude": 43.262217
+    },
+    "id": "B68EBA9E-D976-4362-8FF6-8F7BF3AFD97F",
+    "shelterType": "veterinary",
+    "name": "Aitor",
+    "phoneNumber": "44433421"
+  },
+  {
+    "address": {
+      "longitude": -3.2050040000000002,
+      "latitude": 43.229453999999997
+    },
+    "id": "030573C5-632D-4F8C-AF57-80C69EB515EE",
+    "shelterType": "localGovernment",
+    "name": "Robert",
+    "phoneNumber": "44433421"
+  },
+  {
+    "address": {
+      "longitude": -3.9992454999999998,
+      "latitude": 40.441035300000003
+    },
+    "id": "DDBB3BE3-60F8-4512-AC2C-1FA9E3C4B901",
+    "shelterType": "kiwokoStore",
+    "name": "KiwokoStore1",
+    "phoneNumber": "23423242112454232"
+  },
+  {
+    "address": {
+      "longitude": -3.8682917800496277,
+      "latitude": 40.452839150000003
+    },
+    "id": "EF040E98-9DBE-4DE5-A071-5812FAB1F144",
+    "shelterType": "kiwokoStore",
+    "name": "KiwokoStore2",
+    "phoneNumber": "918167789"
+  },
+  {
+    "address": {
+      "longitude": -3.8486131000000001,
+      "latitude": 40.344686799999998
+    },
+    "id": "6ED87229-4F0E-4C4D-BC39-523A4255420B",
+    "shelterType": "kiwokoStore",
+    "name": "KiwokoStore3",
+    "phoneNumber": "918167787"
+  },
+  {
+    "address": {
+      "longitude": -4.0275268000000004,
+      "latitude": 40.347542199999999
+    },
+    "id": "108A42C8-037A-4873-8907-401C6E93643A",
+    "shelterType": "veterinary",
+    "name": "VeterinarySevillaLaNuevaWithLongName",
+    "phoneNumber": "666909898"
+  },
+  {
+    "address": {
+      "longitude": -122.4194155,
+      "latitude": 37.774929499999999
+    },
+    "id": "9C8893F1-9A88-49BE-BE83-0C9BE87C73C5",
+    "photoURL": "9C8893F1-9A88-49BE-BE83-0C9BE87C73C5.png",
+    "shelterType": "veterinary",
+    "name": "yu",
+    "phoneNumber": "6663636363"
+  },
+  {
+    "address": {
+      "longitude": -3.8278443000000002,
+      "latitude": 40.346845399999999
+    },
+    "id": "92D83C1B-7A95-4F0A-BB1F-65BE9D505BCC",
+    "photoURL": "92D83C1B-7A95-4F0A-BB1F-65BE9D505BCC.png",
+    "shelterType": "shelterPoint",
+    "name": "JOAKIN1",
+    "phoneNumber": "636996633"
+  },
+  {
+    "address": {
+      "longitude": -3.7323933999999999,
+      "latitude": 40.308250399999999
+    },
+    "id": "708DD5FE-977F-4D63-B0E3-6E81A11CB9FE",
+    "photoURL": "708DD5FE-977F-4D63-B0E3-6E81A11CB9FE.png",
+    "shelterType": "shelterPoint",
+    "name": "ISMAEL",
+    "phoneNumber": "666633365"
+  },
+  {
+    "address": {
+      "longitude": 17.038537600000002,
+      "latitude": 51.107885199999998
+    },
+    "id": "8EC10A5D-1418-4A7C-B53C-C61B79EE1427",
+    "shelterType": "particular",
+    "name": "abc",
+    "phoneNumber": "3"
+  }
+]
