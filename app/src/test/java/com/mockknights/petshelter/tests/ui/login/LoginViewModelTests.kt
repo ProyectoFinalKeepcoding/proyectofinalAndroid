@@ -41,7 +41,7 @@ class LoginViewModelTests {
             mapper = RemoteModule.provideMapper(),
         )
         // Create the SUT
-        sut = LoginViewModel(repository, RemoteModule.provideSharedPreferences(RuntimeEnvironment.getApplication().baseContext), CoroutinesModule.provideIOCoroutineDispatcher())
+        sut = LoginViewModel(repository, RemoteModule.provideSharedPreferences(RuntimeEnvironment.getApplication().baseContext), testDispatcher)
     }
 
     @After

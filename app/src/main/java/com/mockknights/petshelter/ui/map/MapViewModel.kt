@@ -21,10 +21,13 @@ import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.domain.Repository
 import com.mockknights.petshelter.domain.ShelterType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.lang.StrictMath.pow
 import java.lang.StrictMath.toRadians
@@ -36,10 +39,10 @@ import kotlin.math.sqrt
 
 @OptIn(ExperimentalMaterialApi::class)
 @HiltViewModel
-class MapViewModel @Inject constructor(private val repository: Repository): ViewModel() {
+class MapViewModel @Inject constructor(private val repository: Repository, private val coroutineDispatcher: CoroutineDispatcher): ViewModel() {
 
-    private val _petShelters = MutableStateFlow(emptyList<PetShelter>())
-    val petShelters: MutableStateFlow<List<PetShelter>> get() = _petShelters
+    private val _mapShelterListState = MutableStateFlow<MapShelterListState>(MapShelterListState.Loading)
+    val mapShelterListState: MutableStateFlow<MapShelterListState> get() = _mapShelterListState
 
     private val _modalShelterList = MutableStateFlow(emptyList<PetShelter>())
     val modalShelterList: MutableStateFlow<List<PetShelter>> get() = _modalShelterList
@@ -55,14 +58,14 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
     val locationPermissionGranted: MutableState<Boolean> get() = _locationPermissionGranted
 
     private val _currentUserLocation = mutableStateOf(LatLng(40.4167047, -3.7035825)) // Madrid by default
-    private val currentUserLocation: MutableState<LatLng> get() = _currentUserLocation
+    val currentUserLocation: MutableState<LatLng> get() = _currentUserLocation
 
     private val _cameraPositionState = MutableStateFlow(CameraPositionState(CameraPosition.fromLatLngZoom(currentUserLocation.value, 6f)))
     val cameraPositionState: MutableStateFlow<CameraPositionState> get() = _cameraPositionState
 
-    private fun setValueOnMainThreadShelter(value: List<PetShelter>) {
+    private fun setValueOnMainThreadShelter(value: MapShelterListState) {
         viewModelScope.launch(Dispatchers.Main) {
-            _petShelters.value = value
+            _mapShelterListState.value = value
         }
     }
 
@@ -71,19 +74,20 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
     }
 
     private fun getPetShelters() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineDispatcher) {
             try {
-                repository.getAllPetShelter().flowOn(Dispatchers.IO).collect {
-                    setValueOnMainThreadShelter(it)
-                }
+                val petShelters = repository.getAllPetShelter().flowOn(coroutineDispatcher)
+                if(petShelters.first().isEmpty()) throw Exception("Empty pet shelter list")
+                setValueOnMainThreadShelter(MapShelterListState.Success(petShelters.first()))
             } catch (e: Exception) {
-                Log.d("MapViewModel", e.message.toString())
+                setValueOnMainThreadShelter(MapShelterListState.Error(e.message.toString()))
             }
         }
     }
 
     fun setModalShelter(shelterName: String) {
-        val modalPetShelter = petShelters.value.filter { it.name == shelterName }
+        val petShelters = (_mapShelterListState.value as? MapShelterListState.Success)?.petShelters ?: listOf()
+        val modalPetShelter = petShelters.filter { it.name == shelterName }
         viewModelScope.launch(Dispatchers.Main) {
             _modalShelterList.value = modalPetShelter
         }
@@ -152,7 +156,7 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
 
     fun onClosestShelterClicked(coroutineScope: CoroutineScope) {
         // If there is no shelter, do nothing
-        if (petShelters.value.isEmpty()) return
+        if ((_mapShelterListState.value as? MapShelterListState.Success)?.petShelters.isNullOrEmpty()) return
         // Get closest shelter and move camera to it
         val closestShelter = getClosestShelter()
         closestShelter?.let { unwrappedClosestShelter ->
@@ -165,15 +169,16 @@ class MapViewModel @Inject constructor(private val repository: Repository): View
         }
     }
 
-    private fun getClosestShelter(): PetShelter? {
+    fun getClosestShelter(): PetShelter? {
         // If there is no shelter, return an empty shelter
-        if (petShelters.value.isEmpty()) return null
+        if ((_mapShelterListState.value as? MapShelterListState.Success)?.petShelters.isNullOrEmpty()) return null
+        val petShelters = (_mapShelterListState.value as MapShelterListState.Success).petShelters // Checked cast
         // When permission is granted, the user location is the origin
         val origin: LatLng? = if (locationPermissionGranted.value) currentUserLocation.value else null
         // If there is an origin, get the closest shelter
         var closestShelter: PetShelter? = null
         origin?.let {unwrappedOrigin ->
-            closestShelter = petShelters.value
+            closestShelter = petShelters
                 .filter { petShelter ->
                     petShelter.address.latitude - unwrappedOrigin.latitude <= 1 &&
                             petShelter.address.longitude - unwrappedOrigin.longitude <= 1
