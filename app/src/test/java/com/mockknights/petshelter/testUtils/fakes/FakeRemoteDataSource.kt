@@ -16,6 +16,8 @@ class FakeRemoteDataSource: RemoteDataSource {
     var updatedShelter = FakePetShelterData.getEmptiedRemotePetShelter()
     var returnValidToken = true
     var returnValidPetShelterList = true
+    var id = ""
+    var photo: MultipartBody.Part? = null
 
     override suspend fun getAllPetShelter(): Flow<List<PetShelterRemote>> {
         return if (returnValidPetShelterList)
@@ -41,7 +43,8 @@ class FakeRemoteDataSource: RemoteDataSource {
     }
 
     override suspend fun uploadPhoto(id: String, body: MultipartBody.Part) {
-        TODO("Not yet implemented")
+        this.id = id
+        photo = body
     }
 
     override suspend fun updateShelter(id: String, shelter: PetShelterRemote) {

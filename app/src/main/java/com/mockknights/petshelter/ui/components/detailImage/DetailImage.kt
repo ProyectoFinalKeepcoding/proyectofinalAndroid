@@ -15,6 +15,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.mockknights.petshelter.R
 
+/**
+ * This composable shows the detail image of a pet shelter. It allows the user to select an image
+ * from the gallery and upload it to the server.
+ * @param modifier The modifier to be applied to this composable.
+ * @param shelterId The id of the pet shelter.
+ * @param detailImageViewModel The view model of the detail image.
+ * @param photoUrl The url of the photo of the pet shelter.
+ * @param onImageSelected The callback to be invoked when an image is selected.
+ */
 @Preview
 @Composable
 fun DetailImage(
