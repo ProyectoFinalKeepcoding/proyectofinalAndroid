@@ -5,6 +5,7 @@ import com.mockknights.petshelter.data.remote.response.PetShelterRemote
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 
+
 interface RemoteDataSource {
     suspend fun getAllPetShelter(): Flow<List<PetShelterRemote>>
     suspend fun getToken(): Flow<List<String>>

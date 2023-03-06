@@ -1,7 +1,8 @@
-package com.isabri.dragonballandroidavanzado.base
+package com.mockknights.petshelter.tests.base
 
-import com.isabri.dragonballandroidavanzado.data.remote.DragonBallAPI
-import com.isabri.dragonballandroidavanzado.utils.DragonBallApiDispatcher
+import com.mockknights.petshelter.data.remote.PetShelterAPI
+import com.mockknights.petshelter.testUtils.fakes.FakeAPI
+import com.mockknights.petshelter.testUtils.mocks.PetShelterAPIMockDispatcher
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
@@ -18,7 +19,7 @@ open class BaseNetworkTest {
         .add(KotlinJsonAdapterFactory())
         .build()
 
-    lateinit var api: DragonBallAPI
+    lateinit var api: PetShelterAPI
     private lateinit var mockWebServer: MockWebServer
     private lateinit var okHttpClient: OkHttpClient
     private lateinit var loggingInterceptor: HttpLoggingInterceptor
@@ -26,7 +27,7 @@ open class BaseNetworkTest {
     @Before
     fun setup(){
         mockWebServer = MockWebServer()
-        mockWebServer.dispatcher = DragonBallApiDispatcher()
+        mockWebServer.dispatcher = PetShelterAPIMockDispatcher()
         mockWebServer.start()
         loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
@@ -38,7 +39,7 @@ open class BaseNetworkTest {
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
             .build()
-            .create(DragonBallAPI::class.java)
+            .create(PetShelterAPI::class.java)
     }
 
     @After
