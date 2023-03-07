@@ -1,6 +1,8 @@
 package com.mockknights.petshelter.ui.login
 
+import android.content.Context
 import android.content.SharedPreferences
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mockknights.petshelter.domain.Repository
@@ -91,4 +93,10 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+    // Function to generate a Toast
+    fun mToast(context: Context, message: String){
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    }
+
 }

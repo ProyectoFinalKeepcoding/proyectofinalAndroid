@@ -15,6 +15,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -29,6 +30,7 @@ import com.mockknights.petshelter.ui.components.UserDataFieldTextField
 import com.mockknights.petshelter.ui.detail.toDp
 import com.mockknights.petshelter.ui.theme.RedKiwoko
 import com.mockknights.petshelter.ui.theme.moderatTextField
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 /**
  * This class represents the login screen. It is composed by the logo, the login form and the register
@@ -45,8 +47,10 @@ fun LoginScreen (
     viewModel: LoginViewModel = hiltViewModel(),
     navigateToDetail: (String) -> Unit = {},
     navigateToWelcome: () -> (Unit)= {},
-    navigateToRegister: () -> (Unit) = {}) {
+    navigateToRegister: () -> (Unit) = {},
+) {
 
+    val mContext = LocalContext.current
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -57,7 +61,7 @@ fun LoginScreen (
             viewModel.resetState()
         }
         if (success is LoginState.Failure) {
-            //TODO: Toast.makeText(this, "ERROR DE USUARIO Y/O CONTRASEÑA", Toast.LENGTH_LONG)
+            viewModel.mToast(mContext, (success as LoginState.Failure).error.toString())
             viewModel.resetState()
         }
     }
@@ -73,7 +77,8 @@ fun LoginScreen (
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(25.toDp().dp).pointerInput(Unit) {
+                .padding(25.toDp().dp)
+                .pointerInput(Unit) {
                     detectTapGestures(onTap = {
                         keyboardController?.hide()
                     })
