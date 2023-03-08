@@ -29,6 +29,7 @@ class DetailViewModelTests {
     private val testScheduler = TestCoroutineScheduler()
     private val testDispatcher = StandardTestDispatcher(testScheduler)
     private val testScope = TestScope(testDispatcher)
+    private lateinit var context: Context
     private lateinit var fakeRemoteDataSource: FakeRemoteDataSource
     private lateinit var repository: Repository
     private lateinit var sut: DetailViewModel
@@ -37,7 +38,7 @@ class DetailViewModelTests {
     fun setUp() {
         // Create repository and fake data source
         fakeRemoteDataSource = FakeRemoteDataSource()
-        val context = RuntimeEnvironment.getApplication().baseContext
+        context = RuntimeEnvironment.getApplication().baseContext
         repository = RepositoryImpl(
             remoteDataSource = fakeRemoteDataSource,
             sharedPreferences = context.getSharedPreferences("NAME", Context.MODE_PRIVATE),
