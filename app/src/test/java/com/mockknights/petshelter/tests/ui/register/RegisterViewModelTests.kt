@@ -1,5 +1,6 @@
 package com.mockknights.petshelter.tests.ui.register
 
+import android.content.Context
 import com.google.common.truth.Truth
 import com.mockknights.petshelter.data.RepositoryImpl
 import com.mockknights.petshelter.di.RemoteModule
@@ -33,9 +34,10 @@ class RegisterViewModelTests {
     fun setUp() {
         // Create repository and fake data source
         fakeRemoteDataSource = FakeRemoteDataSource()
+        val context = RuntimeEnvironment.getApplication().baseContext
         repository = RepositoryImpl(
             remoteDataSource = fakeRemoteDataSource,
-            sharedPreferences = RemoteModule.provideSharedPreferences(RuntimeEnvironment.getApplication().baseContext),
+            sharedPreferences = context.getSharedPreferences("NAME", Context.MODE_PRIVATE),
             mapper = RemoteModule.provideMapper(),
         )
         // Create the SUT
@@ -74,6 +76,6 @@ class RegisterViewModelTests {
         // THEN stateRegister updates to Success
         Truth.assertThat(sut.registerState.value).isInstanceOf(RegisterState.Failure::class.java)
         Truth.assertThat((sut.registerState.value as RegisterState.Failure).error)
-            .isEqualTo("Invalid data") // Thrown error from FakeRemoteDataSource
+            .isEqualTo("ERROR EN EL REGISTRO") // Thrown error from FakeRemoteDataSource
     }
 }

@@ -40,7 +40,7 @@ class DetailImageViewModelTests {
     fun setUp() {
         // Init context
         context = RuntimeEnvironment.getApplication().baseContext
-        sharedPreferences = RemoteModule.provideSharedPreferences(context)
+        sharedPreferences = context.getSharedPreferences("NAME", Context.MODE_PRIVATE)
         // Create repository and fake data source
         fakeRemoteDataSource = FakeRemoteDataSource()
         repository = RepositoryImpl(

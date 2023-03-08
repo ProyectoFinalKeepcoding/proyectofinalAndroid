@@ -40,10 +40,6 @@ object RemoteModule {
             .build()
     }
 
-/*    @Provides
-    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-       return context.getSharedPreferences("NAME", Context.MODE_PRIVATE)
-    }*/
 
     @Provides
     fun provideEncryptedSharedPreferences(@ApplicationContext context: Context, masterKey: MasterKey): SharedPreferences {

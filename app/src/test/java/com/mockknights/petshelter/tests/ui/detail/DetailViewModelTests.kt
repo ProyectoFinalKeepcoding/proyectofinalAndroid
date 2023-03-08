@@ -1,5 +1,6 @@
 package com.mockknights.petshelter.tests.ui.detail
 
+import android.content.Context
 import com.google.common.truth.Truth
 import com.mockknights.petshelter.data.RepositoryImpl
 import com.mockknights.petshelter.data.remote.response.Address
@@ -39,9 +40,10 @@ class DetailViewModelTests {
     fun setUp() {
         // Create repository and fake data source
         fakeRemoteDataSource = FakeRemoteDataSource()
+        val context = RuntimeEnvironment.getApplication().baseContext
         repository = RepositoryImpl(
             remoteDataSource = fakeRemoteDataSource,
-            sharedPreferences = RemoteModule.provideSharedPreferences(RuntimeEnvironment.getApplication().baseContext),
+            sharedPreferences = context.getSharedPreferences("NAME", Context.MODE_PRIVATE),
             mapper = RemoteModule.provideMapper(),
         )
         // Create the SUT

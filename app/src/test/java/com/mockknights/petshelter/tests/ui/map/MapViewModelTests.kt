@@ -41,7 +41,7 @@ class MapViewModelTests {
         fakeRemoteDataSource = FakeRemoteDataSource()
         repository = RepositoryImpl(
             remoteDataSource = fakeRemoteDataSource,
-            sharedPreferences = RemoteModule.provideSharedPreferences(context),
+            sharedPreferences = context.getSharedPreferences("NAME", Context.MODE_PRIVATE),
             mapper = RemoteModule.provideMapper(),
         )
         // Init sut
