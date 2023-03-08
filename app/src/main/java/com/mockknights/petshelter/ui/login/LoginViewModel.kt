@@ -89,7 +89,7 @@ class LoginViewModel @Inject constructor(
                     setValueOnMainThread(LoginState.Success(token = tokenAndId[0], id = tokenAndId[1]))
                 }
             } catch (e: Exception) {
-                setValueOnMainThread(LoginState.Failure(error = "No token found"))
+                setValueOnMainThread(LoginState.Failure(error = "USUARIO Y/O CONTRASEÑA INCORRECTOS"))
             }
         }
     }
