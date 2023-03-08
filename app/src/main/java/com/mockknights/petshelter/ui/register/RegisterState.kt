@@ -1,13 +1,11 @@
 package com.mockknights.petshelter.ui.register
 
-/**
- * This class represents the state of the register data.
- */
 sealed class RegisterState {
     /**
      * This class represents the state of the register data when it is successfully loaded.
+     * @param success The success message.
      */
-    object Success: RegisterState()
+    data class Success(val success: String): RegisterState()
     /**
      * This class represents the state of the register data when it is not successfully loaded. The
      * [error] property contains the error message.

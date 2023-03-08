@@ -130,6 +130,9 @@ dependencies {
     // LOTTIE
     implementation "com.airbnb.android:lottie-compose:6.0.0"
 
+    //ENCRYPTED SHARED PREFERENCES
+    implementation "androidx.security:security-crypto:1.1.0-alpha05"
+
     //TESTING
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.9.2'

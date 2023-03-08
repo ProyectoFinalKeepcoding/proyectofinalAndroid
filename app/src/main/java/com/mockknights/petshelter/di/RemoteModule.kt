@@ -2,8 +2,11 @@ package com.mockknights.petshelter.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.util.Log
-import com.android.volley.toolbox.HttpResponse
+import androidx.annotation.RequiresApi
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.mockknights.petshelter.data.remote.PetShelterAPI
 import com.mockknights.petshelter.data.remote.mappers.PetShelterMapper
 import com.squareup.moshi.Moshi
@@ -16,11 +19,10 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.net.HttpURLConnection
 import javax.inject.Singleton
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -30,9 +32,30 @@ object RemoteModule {
     fun provideMapper(): PetShelterMapper {
         return PetShelterMapper()
     }
+
     @Provides
+    fun provideMasterKey(@ApplicationContext context: Context): MasterKey {
+        return MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+    }
+
+/*    @Provides
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-        return context.getSharedPreferences("NAME", Context.MODE_PRIVATE)
+       return context.getSharedPreferences("NAME", Context.MODE_PRIVATE)
+    }*/
+
+    @Provides
+    fun provideEncryptedSharedPreferences(@ApplicationContext context: Context, masterKey: MasterKey): SharedPreferences {
+
+        val encryptedSharedPreferences: SharedPreferences =  EncryptedSharedPreferences.create(
+            context,
+            "secured_file",
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+        return encryptedSharedPreferences
     }
 
     @Provides

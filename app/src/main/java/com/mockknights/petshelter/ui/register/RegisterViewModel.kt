@@ -1,5 +1,8 @@
 package com.mockknights.petshelter.ui.register
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mockknights.petshelter.data.remote.request.RegisterRequest
@@ -39,6 +42,13 @@ class RegisterViewModel @Inject constructor(private val repository: Repository):
     }
 
     /**
+     * Resets the state of the register screen to [RegisterState.Loading].
+     */
+    fun resetState() {
+        setValueOnMainThread(RegisterState.Loading)
+    }
+
+    /**
      * Registers the register request. If the register is successful, the state is set to [RegisterState.Success].
      * If the register is not successful, the state is set to [RegisterState.Failure].
      */
@@ -46,10 +56,17 @@ class RegisterViewModel @Inject constructor(private val repository: Repository):
         viewModelScope.launch {
             try {
                 repository.register(registerRequest)
-                setValueOnMainThread(RegisterState.Success)
+                setValueOnMainThread(RegisterState.Success("REGISTRADO CORRECTAMENTE"))
+
+
             } catch (e: Exception) {
-                setValueOnMainThread(RegisterState.Failure(error = e.message.toString()))
+                setValueOnMainThread(RegisterState.Failure(error = "ERROR EN EL REGISTRO"))
             }
         }
+    }
+
+    // Function to generate a Toast
+    fun mToast(context: Context, error: String){
+        Toast.makeText(context, error, Toast.LENGTH_LONG).show()
     }
 }

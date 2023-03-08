@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -30,6 +31,7 @@ import com.mockknights.petshelter.data.remote.response.Address
 import com.mockknights.petshelter.domain.ShelterType
 import com.mockknights.petshelter.ui.components.*
 import com.mockknights.petshelter.ui.detail.toDp
+import com.mockknights.petshelter.ui.login.LoginState
 
 /**
  * Screen to register a new user.
@@ -43,6 +45,19 @@ fun RegisterScreen (
     viewModel: RegisterViewModel = hiltViewModel(),
     navigateToLogin: () -> Unit = {}
 ) {
+
+    val mContext = LocalContext.current
+    val success by viewModel.registerState.collectAsState()
+    LaunchedEffect(key1 = success) {
+        if (success is RegisterState.Success) {
+            viewModel.mToast(mContext, (success as RegisterState.Success).success)
+            navigateToLogin()
+        }
+        if (success is RegisterState.Failure) {
+            (success as RegisterState.Failure).error?.let { viewModel.mToast(mContext, it) }
+            viewModel.resetState()
+        }
+    }
 
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
@@ -62,7 +77,6 @@ fun RegisterScreen (
             RegisterForm(
                 onRegister = { registerRequest ->
                     viewModel.register(registerRequest)
-                    navigateToLogin()
                 }
             )
         }

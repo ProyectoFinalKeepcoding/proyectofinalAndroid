@@ -1,6 +1,8 @@
 package com.mockknights.petshelter.ui.login
 
+import android.content.Context
 import android.content.SharedPreferences
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mockknights.petshelter.domain.Repository
@@ -12,6 +14,7 @@ import kotlinx.coroutines.launch
 import okhttp3.Credentials
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
+
 
 /**
  * ViewModel for the Login screen.
@@ -25,7 +28,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val repository: Repository,
     val sharedPreferences: SharedPreferences,
-    private val coroutineDispatcher: CoroutineDispatcher
+    private val coroutineDispatcher: CoroutineDispatcher,
 ): ViewModel()
 {
 
@@ -83,11 +86,17 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 repository.getToken().flowOn(coroutineDispatcher).collect() { tokenAndId ->
-                     setValueOnMainThread(LoginState.Success(token = tokenAndId[0], id = tokenAndId[1]))
+                    setValueOnMainThread(LoginState.Success(token = tokenAndId[0], id = tokenAndId[1]))
                 }
             } catch (e: Exception) {
-                setValueOnMainThread(LoginState.Failure(error = "No token found"))
+                setValueOnMainThread(LoginState.Failure(error = "USUARIO Y/O CONTRASEÑA INCORRECTOS"))
             }
         }
     }
+
+    // Function to generate a Toast
+    fun mToast(context: Context, message: String){
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    }
+
 }
