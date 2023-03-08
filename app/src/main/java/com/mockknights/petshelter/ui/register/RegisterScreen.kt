@@ -63,7 +63,7 @@ fun RegisterScreen (
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar() {
             Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Volver atras",
-                modifier = Modifier.clickable { })
+                modifier = Modifier.clickable { navigateToLogin() })
             Text(text = "Login")
         }
     }) {
