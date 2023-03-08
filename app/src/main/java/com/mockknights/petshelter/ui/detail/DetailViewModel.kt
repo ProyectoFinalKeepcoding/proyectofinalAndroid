@@ -1,8 +1,11 @@
 package com.mockknights.petshelter.ui.detail
 
+import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mockknights.petshelter.data.remote.response.Address
+import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.domain.Repository
 import com.mockknights.petshelter.domain.ShelterType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -133,14 +136,33 @@ class DetailViewModel@Inject constructor(private val repository: Repository, pri
      * Update the shelter in the server with the value of [_detailState] using the [coroutineDispatcher].
      * It only updates the value if the [_detailState] is [DetailState.Success].
      */
-    fun onSaveClicked() {
+    fun onSaveClicked(context: Context) {
         val petShelter = (_detailState.value as? DetailState.Success)?.petShelter
         petShelter?.let {
-            val id = it.id
-            viewModelScope.launch(coroutineDispatcher) {
-                repository.updateShelter(id, it)
+            if(checkEmptyProperties(it, context)) {
+                val id = it.id
+                viewModelScope.launch(coroutineDispatcher) {
+                    repository.updateShelter(id, it)
+                    mToast(context, "DATOS ACTUALIZADOS")
+                }
             }
         }
+    }
+
+    /**
+     * Check if the [petShelter] has empty properties and show a toast message if it has.
+     * @return True if the [petShelter] has no empty properties, false otherwise.
+     */
+    private fun checkEmptyProperties(petShelter : PetShelter, context: Context): Boolean {
+        if(petShelter.name.isEmpty()){
+            mToast(context, "NOMBRE VACÍO")
+            return false
+        }
+        if(petShelter.phoneNumber.isEmpty()){
+            mToast(context, "TELÉFONO VACÍO")
+            return false
+        }
+        return true
     }
 
     /**
@@ -149,6 +171,18 @@ class DetailViewModel@Inject constructor(private val repository: Repository, pri
     private fun setValueOnIOThread(value: DetailState) {
         viewModelScope.launch(coroutineDispatcher) {
             _detailState.value = value
+        }
+    }
+
+    /**
+     * Show a toast message on the UI thread.
+     * @param context The context of the application.
+     * @param message The message to show.
+     */
+    fun mToast(context: Context, message: String){
+        viewModelScope.launch {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 }

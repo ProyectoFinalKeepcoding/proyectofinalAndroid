@@ -76,7 +76,7 @@ fun RegisterScreen (
         ){
             RegisterForm(
                 onRegister = { registerRequest ->
-                    viewModel.register(registerRequest)
+                    viewModel.register(registerRequest, mContext)
                 }
             )
         }
@@ -164,10 +164,6 @@ fun RegisterForm(onRegister: (RegisterRequest) -> Unit = {}) {
 
         ButtonRow(
             onClick = {
-                if(user.isEmpty() ||
-                    password.isEmpty() ||
-                    (address.latitude == 0.0 && address.longitude == 0.0) ||
-                    phone.isEmpty()) return@ButtonRow
                 onRegister(RegisterRequest(user, password, address, phone, shelterType))
                       },
         )

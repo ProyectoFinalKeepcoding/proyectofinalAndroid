@@ -17,6 +17,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -51,6 +52,7 @@ fun DetailScreen(
     id: String,
     detailViewModel: DetailViewModel = hiltViewModel()) {
 
+    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val detailState by detailViewModel.detailState.collectAsState()
@@ -106,6 +108,7 @@ fun DetailScreen(
                 UserDataField(
                     fieldLabel = "Teléfono",
                     userData = shelter.phoneNumber,
+                    placeholderText = "Teléfono",
                     keyboardType = KeyboardType.Phone,
                     onUpdateValue = { phone ->
                         detailViewModel.onUpdatedPhone(phone)
@@ -122,7 +125,7 @@ fun DetailScreen(
                 )
                 ButtonRow(
                     onClick = {
-                        detailViewModel.onSaveClicked()
+                        detailViewModel.onSaveClicked(context)
                     })
             }
         }

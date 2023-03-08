@@ -51,9 +51,7 @@ fun LoginScreen (
 ) {
 
     val mContext = LocalContext.current
-
     val keyboardController = LocalSoftwareKeyboardController.current
-
     val success by viewModel.stateLogin.collectAsState()
     LaunchedEffect(key1 = success) {
         if (success is LoginState.Success) {

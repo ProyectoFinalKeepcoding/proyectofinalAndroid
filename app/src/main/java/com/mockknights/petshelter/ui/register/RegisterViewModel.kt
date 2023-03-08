@@ -52,21 +52,47 @@ class RegisterViewModel @Inject constructor(private val repository: Repository):
      * Registers the register request. If the register is successful, the state is set to [RegisterState.Success].
      * If the register is not successful, the state is set to [RegisterState.Failure].
      */
-    fun register(registerRequest: RegisterRequest) {
+    fun register(registerRequest: RegisterRequest, context: Context) {
         viewModelScope.launch {
             try {
-                repository.register(registerRequest)
-                setValueOnMainThread(RegisterState.Success("REGISTRADO CORRECTAMENTE"))
-
-
+                if(checkEmptyProperties(registerRequest, context)) {
+                    repository.register(registerRequest)
+                    setValueOnMainThread(RegisterState.Success("REGISTRADO CORRECTAMENTE"))
+                }
             } catch (e: Exception) {
-                setValueOnMainThread(RegisterState.Failure(error = "ERROR EN EL REGISTRO"))
+                setValueOnMainThread(RegisterState.Failure(error = "NOMBRE DE USUARIO YA EXISTENTE"))
             }
         }
     }
 
-    // Function to generate a Toast
+    private fun checkEmptyProperties(registerRequest: RegisterRequest, context: Context): Boolean {
+        if(registerRequest.name.isEmpty()){
+            mToast(context, "NOMBRE DE USUARIO VACÍO")
+            return false
+        }
+        if (registerRequest.password.isEmpty()){
+            mToast(context, "CONTRASEÑA VACÍA")
+            return false
+        }
+        if (registerRequest.address.latitude == 0.0 && registerRequest.address.longitude == 0.0){
+            mToast(context, "DIRECCIÓN NO VÁLIDA")
+            return false
+        }
+        if(registerRequest.phoneNumber.isEmpty()){
+            mToast(context, "TELÉFONO VACÍO")
+            return false
+        }
+        return true
+    }
+
+    /**
+     * Makes a toast on UI thread.
+     * @param context The context of the activity.
+     * @param error The error message to show.
+     */
     fun mToast(context: Context, error: String){
-        Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+        viewModelScope.launch {
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+        }
     }
 }
