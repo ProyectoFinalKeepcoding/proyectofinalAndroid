@@ -4,10 +4,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
+import android.Manifest
+import android.app.Activity
+import android.content.ContextWrapper
+import android.widget.Toast
 import androidx.compose.material.*
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
@@ -27,7 +31,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.lang.StrictMath.pow
 import java.lang.StrictMath.toRadians
@@ -210,10 +213,43 @@ class MapViewModel @Inject constructor(private val repository: Repository, priva
      */
     fun onPermissionRequestCompleted(isGranted: Boolean, context: Context) {
         // Change the status of the permission
-        _locationPermissionGranted.value = isGranted
+        managePermissions(isGranted, context)
         // If the permission is granted, get the user location
         if (isGranted) { setCurrentUserLocation(context) }
     }
+
+    /**
+     * Sets the state of the location permission and shows a toast if the permission is not granted
+     * for a second time.
+     * @param isGranted the value of the permission.
+     * @param context the context of the application.
+     */
+    private fun managePermissions(isGranted: Boolean,  context: Context) {
+
+        _locationPermissionGranted.value = isGranted
+        val currentActivity = getCurrentActivity(context)
+        currentActivity?.let { unwrappedActivity ->
+            if(!shouldShowRequestPermissionRationale(unwrappedActivity, Manifest.permission.ACCESS_FINE_LOCATION) &&
+                    !isGranted) {
+                    mToast(context, "ACTIVE LA LOCALIZACIÓN EN AJUSTES")
+            }
+        }
+    }
+
+    /**
+     * Gets the current activity from the context.
+     * @param context the context of the application.
+     */
+    private fun getCurrentActivity(context: Context): Activity? {
+        var currentActivity: Activity? = null
+        if (context is Activity) {
+            currentActivity = context
+        } else if (context is ContextWrapper) {
+            currentActivity = getCurrentActivity(context.baseContext)
+        }
+        return currentActivity
+    }
+
 
     /**
      * Sets the value of the [currentUserLocation] to the current user location and sets the value of
@@ -260,7 +296,13 @@ class MapViewModel @Inject constructor(private val repository: Repository, priva
      * Moves the camera to the closest shelter.
      * @param coroutineScope the coroutine scope of the application.
      */
-    fun onClosestShelterClicked(coroutineScope: CoroutineScope) {
+    fun onClosestShelterClicked(coroutineScope: CoroutineScope, requestPermission: () -> Unit) {
+        // If permission is not granted, request permission
+        if(!_locationPermissionGranted.value) {
+            requestPermission()
+
+            return
+        }
         // If there is no shelter, do nothing
         if ((_mapShelterListState.value as? MapShelterListState.Success)?.petShelters.isNullOrEmpty()) return
         // Get closest shelter and move camera to it
@@ -353,6 +395,17 @@ class MapViewModel @Inject constructor(private val repository: Repository, priva
         mapIntent.setPackage("com.google.android.apps.maps")
         mapIntent.resolveActivity(localContext.packageManager)?.let {
             localContext.startActivity(mapIntent)
+        }
+    }
+
+    /**
+     * Makes a toast on UI thread.
+     * @param context The context of the activity.
+     * @param error The error message to show.
+     */
+    fun mToast(context: Context, error: String){
+        viewModelScope.launch {
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
         }
     }
 }
