@@ -94,9 +94,16 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    // Function to generate a Toast
+    /**
+     * Show a toast message on a UI thread.
+     * @param context The context of the activity
+     * @param message The message to show
+     */
     fun mToast(context: Context, message: String){
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        viewModelScope.launch {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT)
+                .show()
+        }
     }
 
 }

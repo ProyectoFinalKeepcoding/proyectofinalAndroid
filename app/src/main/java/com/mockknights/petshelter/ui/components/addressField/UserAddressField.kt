@@ -92,7 +92,9 @@ fun UserAddressField(
                         .clickable {
                             viewModel.updateAddressAsString(it.address)
                             viewModel.locationAutofill.clear()
-                            viewModel.getCoordinates(it)
+                            viewModel.getCoordinates(it) { currentLocation ->
+                                onUpdateData(currentLocation.latitude.toString(),currentLocation.longitude.toString())
+                            }
                         }
                 ) {
                     Text(it.address)

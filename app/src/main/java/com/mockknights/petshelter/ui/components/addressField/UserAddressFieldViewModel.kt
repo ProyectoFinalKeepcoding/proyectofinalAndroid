@@ -116,7 +116,7 @@ class UserAddressFieldViewModel@Inject constructor(): ViewModel(){
      * Gets the coordinates of the place selected by the user.
      * @param result The result of the place selected by the user.
      */
-    fun getCoordinates(result: AutocompleteResult) {
+    fun getCoordinates(result: AutocompleteResult, onSuccess: (LatLng) -> Unit) {
         val placeFields = listOf(Place.Field.LAT_LNG)
         val request = FetchPlaceRequest.newInstance(result.placeId, placeFields)
         placesClient.fetchPlace(request)
@@ -125,6 +125,7 @@ class UserAddressFieldViewModel@Inject constructor(): ViewModel(){
                     viewModelScope.launch(Dispatchers.IO) {
                         currentLatLong.emit(it.place.latLng!!)
                         _addressAsString.emit(result.address)
+                        onSuccess(it.place.latLng!!)
                     }
                 }
             }

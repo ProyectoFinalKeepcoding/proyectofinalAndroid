@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -139,7 +140,8 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     .height((LocalConfiguration.current.screenHeightDp / 7.19).dp)
                     .padding(16.dp),
                 onClick = {
-                    viewModel.onClosestShelterClicked(coroutineScope)
+                    viewModel.onClosestShelterClicked(coroutineScope,
+                        { launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION) })
                 }
             )
         }

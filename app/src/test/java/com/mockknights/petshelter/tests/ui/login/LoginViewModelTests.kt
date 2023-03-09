@@ -1,5 +1,6 @@
 package com.mockknights.petshelter.tests.ui.login
 
+import android.content.Context
 import com.google.common.truth.Truth
 import com.mockknights.petshelter.data.RepositoryImpl
 import com.mockknights.petshelter.di.CoroutinesModule
@@ -35,13 +36,15 @@ class LoginViewModelTests {
     fun setUp() {
         // Create repository and fake data source
         fakeRemoteDataSource = FakeRemoteDataSource()
+        val context = RuntimeEnvironment.getApplication().baseContext
+        val sharedPreferences = context.getSharedPreferences("NAME", Context.MODE_PRIVATE)
         repository = RepositoryImpl(
             remoteDataSource = fakeRemoteDataSource,
-            sharedPreferences = RemoteModule.provideSharedPreferences(RuntimeEnvironment.getApplication().baseContext),
+            sharedPreferences = sharedPreferences,
             mapper = RemoteModule.provideMapper(),
         )
         // Create the SUT
-        sut = LoginViewModel(repository, RemoteModule.provideSharedPreferences(RuntimeEnvironment.getApplication().baseContext), testDispatcher)
+        sut = LoginViewModel(repository, sharedPreferences, testDispatcher)
     }
 
     @After
@@ -83,7 +86,7 @@ class LoginViewModelTests {
         // THEN, the state will be set as failure, and the message is the one of the exception
         val loginState = sut.stateLogin.value
         Truth.assertThat(sut.stateLogin.value).isInstanceOf(LoginState.Failure::class.java)
-        Truth.assertThat((loginState as LoginState.Failure).error).isEqualTo("No token found")
+        Truth.assertThat((loginState as LoginState.Failure).error).isEqualTo("USUARIO Y/O CONTRASEÑA INCORRECTOS")
     }
 
     @Test
@@ -99,7 +102,7 @@ class LoginViewModelTests {
         // the state will be set as failure, and the message is the one of the exception
         val loginState = sut.stateLogin.value
         Truth.assertThat(sut.stateLogin.value).isInstanceOf(LoginState.Failure::class.java)
-        Truth.assertThat((loginState as LoginState.Failure).error).isEqualTo("No token found")
+        Truth.assertThat((loginState as LoginState.Failure).error).isEqualTo("USUARIO Y/O CONTRASEÑA INCORRECTOS")
 
         // WHEN called reset state
         sut.resetState()

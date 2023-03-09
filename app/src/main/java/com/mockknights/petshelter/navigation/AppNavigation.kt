@@ -47,7 +47,9 @@ fun AppNavigation () {
             })
         ) { backStackEntry ->
             backStackEntry.arguments?.getString(Screens.Detail.ARG_ID)?.let { id ->
-                DetailScreen(id)
+                DetailScreen(id = id, navigateToLogin = {
+                    navController.navigate(Screens.Login.route)
+                })
             }
         }
 

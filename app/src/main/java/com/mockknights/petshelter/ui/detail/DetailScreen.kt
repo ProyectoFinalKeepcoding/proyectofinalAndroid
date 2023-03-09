@@ -1,12 +1,15 @@
 package com.mockknights.petshelter.ui.detail
 
 import android.content.res.Resources
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -17,6 +20,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -49,8 +53,10 @@ fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt
 @Composable
 fun DetailScreen(
     id: String,
+    navigateToLogin: () -> Unit = {},
     detailViewModel: DetailViewModel = hiltViewModel()) {
 
+    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val detailState by detailViewModel.detailState.collectAsState()
@@ -59,74 +65,84 @@ fun DetailScreen(
         detailViewModel.getShelterDetail(id)
     }
 
-    Column (
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 25.toDp().dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-            ){
+    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+        TopAppBar() {
+            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Login",
+                modifier = Modifier.clickable { navigateToLogin() })
+            Text(text = "Login")
+        }
+    }) { padding ->
         Column (
             modifier = Modifier
-                .fillMaxWidth()
-                .pointerInput(Unit) {
-                    // When tapped outside the keyboard, hide it
-                    detectTapGestures(onTap = {
-                        keyboardController?.hide()
-                    })
-                },
+                .fillMaxSize()
+                .padding(horizontal = 25.toDp().dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.toDp().dp)
-        ) {
-            // If the data is not successfully loaded yet, don't show anything
-            if (detailState is DetailState.Success) {
-                val shelter = (detailState as DetailState.Success).petShelter
-                UserNameRow(
-                    userName = shelter.name,
-                    onNameEdited = { newName ->
-                        detailViewModel.onEditName(newName)
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
-                    }
-                )
-                ImageRow(
-                    photoUrl = shelter.photoURL,
-                    shelterId = shelter.id,
-                    onImageClicked = {
-                        detailViewModel.onImageClicked()
-                    }
-                )
-                UserAddressField(
-                    currentAddress = shelter.address,
-                    onUpdateData = { latitude, longitude ->
-                        detailViewModel.onUpdatedAddress(latitude, longitude)
-                        focusManager.moveFocus(FocusDirection.Down)
-                    }
-                )
-                UserDataField(
-                    fieldLabel = "Teléfono",
-                    userData = shelter.phoneNumber,
-                    keyboardType = KeyboardType.Phone,
-                    onUpdateValue = { phone ->
-                        detailViewModel.onUpdatedPhone(phone)
+            verticalArrangement = Arrangement.Center
+        ){
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .pointerInput(Unit) {
+                        // When tapped outside the keyboard, hide it
+                        detectTapGestures(onTap = {
+                            keyboardController?.hide()
+                        })
                     },
-                    onDone = {
-                        focusManager.clearFocus()
-                    }
-                )
-                RadioButtonsRow(
-                    currentSelection = shelter.shelterType,
-                    onItemClick = { shelterType ->
-                        detailViewModel.onUpdatedShelterType(shelterType)
-                    }
-                )
-                ButtonRow(
-                    onClick = {
-                        detailViewModel.onSaveClicked()
-                    })
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.toDp().dp)
+            ) {
+                // If the data is not successfully loaded yet, don't show anything
+                if (detailState is DetailState.Success) {
+                    val shelter = (detailState as DetailState.Success).petShelter
+                    UserNameRow(
+                        userName = shelter.name,
+                        onNameEdited = { newName ->
+                            detailViewModel.onEditName(newName)
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                        }
+                    )
+                    ImageRow(
+                        photoUrl = shelter.photoURL,
+                        shelterId = shelter.id,
+                        onImageClicked = {
+                            detailViewModel.onImageClicked()
+                        }
+                    )
+                    UserAddressField(
+                        currentAddress = shelter.address,
+                        onUpdateData = { latitude, longitude ->
+                            detailViewModel.onUpdatedAddress(latitude, longitude)
+                            focusManager.moveFocus(FocusDirection.Down)
+                        }
+                    )
+                    UserDataField(
+                        fieldLabel = "Teléfono",
+                        userData = shelter.phoneNumber,
+                        placeholderText = "Teléfono",
+                        keyboardType = KeyboardType.Phone,
+                        onUpdateValue = { phone ->
+                            detailViewModel.onUpdatedPhone(phone)
+                        },
+                        onDone = {
+                            focusManager.clearFocus()
+                        }
+                    )
+                    RadioButtonsRow(
+                        currentSelection = shelter.shelterType,
+                        onItemClick = { shelterType ->
+                            detailViewModel.onUpdatedShelterType(shelterType)
+                        }
+                    )
+                    ButtonRow(
+                        onClick = {
+                            detailViewModel.onSaveClicked(context)
+                        })
+                }
             }
         }
     }
+
 }
 
 /**

@@ -1,5 +1,6 @@
 package com.mockknights.petshelter.tests.ui.detail
 
+import android.content.Context
 import com.google.common.truth.Truth
 import com.mockknights.petshelter.data.RepositoryImpl
 import com.mockknights.petshelter.data.remote.response.Address
@@ -14,10 +15,7 @@ import com.mockknights.petshelter.testUtils.fakes.FakeRemoteDataSource
 import com.mockknights.petshelter.ui.detail.DetailState
 import com.mockknights.petshelter.ui.detail.DetailViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.*
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,6 +29,7 @@ class DetailViewModelTests {
     private val testScheduler = TestCoroutineScheduler()
     private val testDispatcher = StandardTestDispatcher(testScheduler)
     private val testScope = TestScope(testDispatcher)
+    private lateinit var context: Context
     private lateinit var fakeRemoteDataSource: FakeRemoteDataSource
     private lateinit var repository: Repository
     private lateinit var sut: DetailViewModel
@@ -39,9 +38,10 @@ class DetailViewModelTests {
     fun setUp() {
         // Create repository and fake data source
         fakeRemoteDataSource = FakeRemoteDataSource()
+        context = RuntimeEnvironment.getApplication().baseContext
         repository = RepositoryImpl(
             remoteDataSource = fakeRemoteDataSource,
-            sharedPreferences = RemoteModule.provideSharedPreferences(RuntimeEnvironment.getApplication().baseContext),
+            sharedPreferences = context.getSharedPreferences("NAME", Context.MODE_PRIVATE),
             mapper = RemoteModule.provideMapper(),
         )
         // Create the SUT
@@ -183,7 +183,7 @@ class DetailViewModelTests {
         advanceUntilIdle()
 
         // WHEN
-        sut.onSaveClicked()
+        sut.onSaveClicked(context)
         advanceUntilIdle()
 
         // THEN, the value is updated in the fake remote data source
