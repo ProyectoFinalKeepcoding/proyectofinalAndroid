@@ -3,6 +3,7 @@ package com.mockknights.petshelter.navigation
 import com.mockknights.petshelter.navigation.Screens.Detail.ARG_ID
 
 sealed class Screens(val route: String) {
+    object Splash: Screens(SPLASH_ROUTE)
     object Welcome: Screens(WELCOME_ROUTE)
     object Login: Screens(LOGIN_ROUTE)
     object Map: Screens(MAP_ROUTE)
@@ -17,6 +18,7 @@ sealed class Screens(val route: String) {
 
 
     companion object {
+        private const val SPLASH_ROUTE = "splash"
         private const val WELCOME_ROUTE = "welcome"
         private const val LOGIN_ROUTE = "welcome/login"
         private const val MAP_ROUTE = "welcome/map"
