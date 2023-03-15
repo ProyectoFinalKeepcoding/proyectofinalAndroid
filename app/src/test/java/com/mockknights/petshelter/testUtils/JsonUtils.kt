@@ -1,4 +1,4 @@
-package com.isabri.dragonballandroidavanzado.utils
+package com.mockknights.petshelter.testUtils
 
 import com.google.common.io.Resources
 import java.io.File

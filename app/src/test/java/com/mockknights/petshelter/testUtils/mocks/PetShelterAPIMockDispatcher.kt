@@ -1,6 +1,6 @@
 package com.mockknights.petshelter.testUtils.mocks
 
-import com.isabri.dragonballandroidavanzado.utils.getJson
+import com.mockknights.petshelter.testUtils.getJson
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
