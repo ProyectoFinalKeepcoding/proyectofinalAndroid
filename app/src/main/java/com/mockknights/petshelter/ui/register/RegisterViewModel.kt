@@ -65,6 +65,12 @@ class RegisterViewModel @Inject constructor(private val repository: Repository):
         }
     }
 
+    /**
+     * Checks if the properties of the register request are empty.
+     * @param registerRequest The register request to check.
+     * @param context The context of the activity.
+     * @return True if the properties are not empty, false otherwise.
+     */
     private fun checkEmptyProperties(registerRequest: RegisterRequest, context: Context): Boolean {
         if(registerRequest.name.isEmpty()){
             mToast(context, "NOMBRE DE USUARIO VACÍO")
