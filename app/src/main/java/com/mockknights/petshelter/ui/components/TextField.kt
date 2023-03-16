@@ -9,18 +9,27 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.mockknights.petshelter.ui.detail.UserDataFieldLabel
 import com.mockknights.petshelter.ui.detail.toDp
 import com.mockknights.petshelter.ui.theme.GrayKiwoko
 import com.mockknights.petshelter.ui.theme.moderatTextField
 
+/**
+ * User data field. It contains a label and a text field.
+ * @param fieldLabel Label for the text field.
+ * @param userData User data to be displayed in the text field.
+ * @param placeholderText Placeholder text for the text field.
+ * @param keyboardType Keyboard type for the text field.
+ * @param doneAction Done action for the text field.
+ * @param isPassword Indicates if the text field is a password field.
+ * @param onUpdateValue Callback for when the text field is updated.
+ * @param onDone Callback for when the text field is done.
+ */
 @Preview
 @Composable
 fun UserDataField(
@@ -49,6 +58,16 @@ fun UserDataField(
     }
 }
 
+/**
+ * Text field for user data.
+ * @param userData The data to be displayed in the field.
+ * @param keyboardType The type of keyboard to be used.
+ * @param doneAction The action to be performed when the done button is pressed.
+ * @param placeholderText The text to be displayed when the field is empty.
+ * @param isPassword Whether the field is a password field.
+ * @param onUpdateValue The function to be called when the field is updated.
+ * @param onDone The function to be called when the done button is pressed.
+ */
 @Preview
 @Composable
 fun UserDataFieldTextField(

@@ -22,11 +22,14 @@ import com.google.android.libraries.places.api.Places
 import com.mockknights.petshelter.BuildConfig
 import com.mockknights.petshelter.data.remote.response.Address
 import com.mockknights.petshelter.ui.components.addressField.UserAddressFieldViewModel
-import com.mockknights.petshelter.ui.detail.UserDataFieldLabel
 import com.mockknights.petshelter.ui.detail.toDp
 import com.mockknights.petshelter.ui.theme.GrayKiwoko
 import com.mockknights.petshelter.ui.theme.moderatTextField
 
+/**
+ * This composable shows the address of the user. It allows the user to select an address from an
+ * autocompletion list.
+ */
 @Composable
 fun UserAddressField(
     viewModel: UserAddressFieldViewModel = hiltViewModel(),
@@ -89,7 +92,9 @@ fun UserAddressField(
                         .clickable {
                             viewModel.updateAddressAsString(it.address)
                             viewModel.locationAutofill.clear()
-                            viewModel.getCoordinates(it)
+                            viewModel.getCoordinates(it) { currentLocation ->
+                                onUpdateData(currentLocation.latitude.toString(),currentLocation.longitude.toString())
+                            }
                         }
                 ) {
                     Text(it.address)

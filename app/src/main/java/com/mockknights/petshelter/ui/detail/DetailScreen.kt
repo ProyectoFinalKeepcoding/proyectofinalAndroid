@@ -1,12 +1,15 @@
 package com.mockknights.petshelter.ui.detail
 
 import android.content.res.Resources
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -17,6 +20,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -35,14 +39,24 @@ import com.mockknights.petshelter.ui.components.UserDataField
 import com.mockknights.petshelter.ui.components.detailImage.DetailImage
 import com.mockknights.petshelter.ui.theme.*
 
+/**
+ * Extension function to convert Int to Dp to help transforming Figma metrics to Compose.
+ */
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt())
-fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density.toInt())
 
-
+/**
+ * This is the screen that shows the details of a pet shelter.
+ * @param id the id of the shelter to show
+ * @param detailViewModel the view model that will be used to manage the data. Injected by Hilt.
+ */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel()) {
+fun DetailScreen(
+    id: String,
+    navigateToLogin: () -> Unit = {},
+    detailViewModel: DetailViewModel = hiltViewModel()) {
 
+    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val detailState by detailViewModel.detailState.collectAsState()
@@ -51,74 +65,91 @@ fun DetailScreen(id: String, detailViewModel: DetailViewModel = hiltViewModel())
         detailViewModel.getShelterDetail(id)
     }
 
-    Column (
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 25.toDp().dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-            ){
+    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+        TopAppBar() {
+            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Login",
+                modifier = Modifier.clickable { navigateToLogin() })
+            Text(text = "Login")
+        }
+    }) { padding ->
         Column (
             modifier = Modifier
-                .fillMaxWidth()
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = {
-                        keyboardController?.hide()
-                    })
-                },
+                .fillMaxSize()
+                .padding(horizontal = 25.toDp().dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.toDp().dp)
-        ) {
-            if (detailState is DetailState.Success) { // If the data is not loaded yet, don't show anything
-                val shelter = (detailState as DetailState.Success).petShelter
-                UserNameRow(
-                    userName = shelter.name,
-                    onNameEdited = { newName ->
-                        detailViewModel.onEditName(newName)
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
-                    }
-                )
-                ImageRow(
-                    photoUrl = shelter.photoURL,
-                    shelterId = shelter.id,
-                    onImageClicked = {
-                        detailViewModel.onImageClicked()
-                    }
-                )
-                UserAddressField(
-                    currentAddress = shelter.address,
-                    onUpdateData = { latitude, longitude ->
-                        detailViewModel.onUpdatedAddress(latitude, longitude)
-                        focusManager.moveFocus(FocusDirection.Down)
-                    }
-                )
-                UserDataField(
-                    fieldLabel = "Teléfono",
-                    userData = shelter.phoneNumber,
-                    keyboardType = KeyboardType.Phone,
-                    onUpdateValue = { phone ->
-                        detailViewModel.onUpdatedPhone(phone)
+            verticalArrangement = Arrangement.Center
+        ){
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .pointerInput(Unit) {
+                        // When tapped outside the keyboard, hide it
+                        detectTapGestures(onTap = {
+                            keyboardController?.hide()
+                        })
                     },
-                    onDone = {
-                        focusManager.clearFocus()
-                    }
-                )
-                RadioButtonsRow(
-                    currentSelection = shelter.shelterType,
-                    onItemClick = { shelterType ->
-                        detailViewModel.onUpdatedShelterType(shelterType)
-                    }
-                )
-                ButtonRow(
-                    onClick = {
-                        detailViewModel.onSaveClicked()
-                    })
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.toDp().dp)
+            ) {
+                // If the data is not successfully loaded yet, don't show anything
+                if (detailState is DetailState.Success) {
+                    val shelter = (detailState as DetailState.Success).petShelter
+                    UserNameRow(
+                        userName = shelter.name,
+                        onNameEdited = { newName ->
+                            detailViewModel.onEditName(newName)
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                        }
+                    )
+                    ImageRow(
+                        photoUrl = shelter.photoURL,
+                        shelterId = shelter.id,
+                        onImageClicked = {
+                            detailViewModel.onImageClicked()
+                        }
+                    )
+                    UserAddressField(
+                        currentAddress = shelter.address,
+                        onUpdateData = { latitude, longitude ->
+                            detailViewModel.onUpdatedAddress(latitude, longitude)
+                            focusManager.moveFocus(FocusDirection.Down)
+                        }
+                    )
+                    UserDataField(
+                        fieldLabel = "Teléfono",
+                        userData = shelter.phoneNumber,
+                        placeholderText = "Teléfono",
+                        keyboardType = KeyboardType.Phone,
+                        onUpdateValue = { phone ->
+                            detailViewModel.onUpdatedPhone(phone)
+                        },
+                        onDone = {
+                            focusManager.clearFocus()
+                        }
+                    )
+                    RadioButtonsRow(
+                        currentSelection = shelter.shelterType,
+                        onItemClick = { shelterType ->
+                            detailViewModel.onUpdatedShelterType(shelterType)
+                        }
+                    )
+                    ButtonRow(
+                        onClick = {
+                            detailViewModel.onSaveClicked(context)
+                        })
+                }
             }
         }
     }
+
 }
 
+/**
+ * This is a custom row that shows the name of the shelter.
+ * @param userName the name of the shelter that is shown in the text field.
+ * @param onNameEdited a callback that is called when the user presses the done button on the keyboard.
+ */
 @Preview
 @Composable
 fun UserNameRow(
@@ -148,9 +179,23 @@ fun UserNameRow(
     }
 }
 
+/**
+ * This is a custom text field that allows the user to edit the username.
+ * The text field has a trailing icon that allows user to enable the text field for editing. When
+ * clicking the second time, the text field is disabled and the onDone callback is called with the
+ * typed name.
+ *
+ * @param userName the name of the user, it is shown as the text of the text field.
+ * @param onDone a callback that is called when the user presses the done button on the keyboard. It
+ * receives as a parameter the typed name.
+ */
 @Preview
 @Composable
-fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "username", onDone: (String) -> Unit = {}) {
+fun UserNameTextField(
+    modifier: Modifier = Modifier,
+    userName: String = "username",
+    onDone: (String) -> Unit = {}
+) {
 
     val enabled = remember { mutableStateOf(false) }
     val textFieldValue = remember { mutableStateOf(
@@ -212,7 +257,12 @@ fun UserNameTextField(modifier: Modifier = Modifier, userName: String = "usernam
     )
 }
 
-
+/**
+ * This is the row that contains the image of the shelter.
+ * @param photoUrl the url of the image
+ * @param shelterId the id of the shelter
+ * @param onImageClicked the function that is called when the image is clicked
+ */
 @Preview
 @Composable
 fun ImageRow(
@@ -250,14 +300,7 @@ fun ImageRow(
     }
 }
 
-@Preview
-@Composable
-fun UserDataFieldLabel(fieldLabel: String = "Dirección") {
-    Text(
-        text = fieldLabel,
-        style = MaterialTheme.typography.moderatDataFieldLabel
-    )
-}
+
 
 
 

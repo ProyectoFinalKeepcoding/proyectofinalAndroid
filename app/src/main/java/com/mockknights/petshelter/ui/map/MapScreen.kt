@@ -4,24 +4,22 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
-import android.widget.Space
+import android.util.DisplayMetrics
+import android.view.WindowManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -45,6 +44,7 @@ import com.mockknights.petshelter.R
 import com.mockknights.petshelter.domain.PetShelter
 import com.mockknights.petshelter.ui.components.KiwokoIconButton
 import com.mockknights.petshelter.ui.components.LogoBox
+import com.mockknights.petshelter.ui.detail.toDp
 import com.mockknights.petshelter.ui.theme.moderatMediumTitle
 import kotlinx.coroutines.*
 
@@ -60,9 +60,9 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     // Local context to get resources
     val mapScreenContext = LocalContext.current
     // PetShelter list
-    val petShelters = viewModel.petShelter.collectAsState().value
+    val petShelters = ((viewModel.mapShelterListState.collectAsState().value) as? MapShelterListState.Success)?.petShelters
     // Get camera position
-    val cameraPositionState = remember { viewModel.cameraPositionState }
+    val cameraPositionState = viewModel.cameraPositionState.collectAsState().value
     // This launcher is used to request permissions
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -84,7 +84,13 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 ModalBox(
                     title = shelter.name,
                     phoneNumber = shelter.phoneNumber,
-                    photoUrl = shelter.photoURL)
+                    photoUrl = shelter.photoURL,
+                    onCall = {
+                        viewModel.onCall(shelter.phoneNumber, mapScreenContext)
+                    },
+                    onGo = {
+                        viewModel.onGo(shelter.address, mapScreenContext)
+                    })
             } else {
                 ModalBox(null, null, null)
             }
@@ -101,11 +107,11 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                         .fillMaxSize()
                         .weight(1.3f))
 
-                if (petShelters.isNotEmpty()) {
+                if (petShelters != null) {
 
                     MyGoogleMaps(petShelters,
                         locationGranted = viewModel.locationPermissionGranted.value,
-                        cameraPositionState = cameraPositionState.value,
+                        cameraPositionState = cameraPositionState,
                         modifier = Modifier
                             .fillMaxSize()
                             .weight(7.7f),
@@ -126,14 +132,16 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 }
             }
             KiwokoIconButton(
-                name = "Me!",
-                icon = R.drawable.logomarker,
+                name = "Refugio más cercano",
+                icon = 0,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .width(LocalConfiguration.current.screenWidthDp.dp / 2)
+                    .fillMaxWidth()
+                    .height((LocalConfiguration.current.screenHeightDp / 7.19).dp)
                     .padding(16.dp),
                 onClick = {
-                    if(viewModel.locationPermissionGranted.value) viewModel.moveCameraToUserLocation(coroutineScope)
+                    viewModel.onClosestShelterClicked(coroutineScope,
+                        { launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION) })
                 }
             )
         }
@@ -154,11 +162,16 @@ fun MyGoogleMaps(petShelter: List<PetShelter>,
     val properties = MapProperties( // Important: not remembered, as it has to be recomposed entirely for purposes of repainting user location
         mapType = MapType.NORMAL,
         isMyLocationEnabled = locationGranted,
-        //latLngBoundsForCameraTarget = LatLngBounds(marker2, marker3)
     )
 
     // Settings of the map
-    val uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = true, tiltGesturesEnabled = true))}
+    val uiSettings by remember {
+        mutableStateOf(
+            MapUiSettings(
+                zoomControlsEnabled = false,
+                tiltGesturesEnabled = true,
+                myLocationButtonEnabled = false,
+            ))}
 
     GoogleMap(modifier = modifier,
         cameraPositionState = cameraPositionState,
@@ -186,7 +199,13 @@ fun MyGoogleMaps(petShelter: List<PetShelter>,
 // least 8 dp of padding.
 @Preview
 @Composable
-fun ModalBox(title: String? = "Title", phoneNumber: String? = "918158899", photoUrl: String? = "") {
+fun ModalBox(
+    title: String? = "Title",
+    phoneNumber: String? = "918158899",
+    photoUrl: String? = "",
+    onCall: () -> Unit = {},
+    onGo: () -> Unit = {}
+) {
     val configuration = LocalConfiguration.current
     val modalHeight = configuration.screenHeightDp.dp / 3
     Box(
@@ -210,7 +229,9 @@ fun ModalBox(title: String? = "Title", phoneNumber: String? = "918158899", photo
                 photoUrl = photoUrl ?:"",
                 modifier = Modifier
                     .fillMaxSize()
-                    .weight(7.4f)
+                    .weight(7.4f),
+                onCall = onCall,
+                onGo = onGo,
             )
         }
     }
@@ -242,7 +263,12 @@ fun TitleBox(title: String, modifier: Modifier) {
 }
 
 @Composable
-fun ImageAndButtonsRow(photoUrl: String, modifier: Modifier) {
+fun ImageAndButtonsRow(
+    photoUrl: String,
+    modifier: Modifier,
+    onCall: () -> Unit = {},
+    onGo: () -> Unit = {})
+{
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.Start,
@@ -258,7 +284,9 @@ fun ImageAndButtonsRow(photoUrl: String, modifier: Modifier) {
             modifier = Modifier
                 .fillMaxSize()
                 .weight(4.7f)
-                .padding(horizontal = 8.dp, vertical = 8.dp)
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            onCall = onCall,
+            onGo = onGo
         )
     }
 }
@@ -283,7 +311,11 @@ fun ImageColumn(photoUrl: String, modifier: Modifier) {
 }
 
 @Composable
-fun ButtonsColumn(modifier: Modifier) {
+fun ButtonsColumn(
+    modifier: Modifier,
+    onCall: () -> Unit = {},
+    onGo: () -> Unit = {}
+) {
     Column(
         modifier = modifier.padding(vertical = 16.dp),
         verticalArrangement = Arrangement.Center,
@@ -296,10 +328,10 @@ fun ButtonsColumn(modifier: Modifier) {
                 .fillMaxSize()
                 .weight(1f)
         ) {
-            // TODO: Call!!
+            onCall()
         }
-        Spacer(modifier = Modifier.
-            fillMaxSize()
+        Spacer(modifier = Modifier
+            .fillMaxSize()
             .weight(0.5f))
 
         KiwokoIconButton(
@@ -309,7 +341,7 @@ fun ButtonsColumn(modifier: Modifier) {
                 .fillMaxSize()
                 .weight(1f)
         ) {
-            // TODO: Go!!
+            onGo()
         }
     }
 }

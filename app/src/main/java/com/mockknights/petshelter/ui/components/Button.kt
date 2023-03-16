@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -27,12 +26,25 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mockknights.petshelter.domain.ShelterType
-import com.mockknights.petshelter.ui.detail.UserDataFieldLabel
 import com.mockknights.petshelter.ui.detail.toDp
 import com.mockknights.petshelter.ui.theme.*
 
+/**
+ * The button used in the welcome screen.
+ * @param name The text to be displayed in the button.
+ * @param modifier The modifier to be applied to the button.
+ * @param colorButton The color of the button.
+ * @param colorText The color of the text.
+ * @param onClick The callback to be invoked when the button is clicked.
+ */
 @Composable
-fun CreateWelcomeButton(name: String, modifier: Modifier, colorButton: Color, colorText: Color, onClick: () -> Unit) {
+fun CreateWelcomeButton(
+    name: String,
+    modifier: Modifier,
+    colorButton: Color,
+    colorText: Color,
+    onClick: () -> Unit
+) {
     Button(
         onClick = onClick,
         modifier = modifier
@@ -61,7 +73,9 @@ fun CreateWelcomeButton(name: String, modifier: Modifier, colorButton: Color, co
     }
 }
 
-
+/**
+ * Button row used in the register, detail and login screens.
+ */
 @Preview
 @Composable
 fun ButtonRow(onClick: () -> Unit = {}) {
@@ -90,8 +104,20 @@ fun ButtonRow(onClick: () -> Unit = {}) {
     }
 }
 
+/**
+ * A button with a text and a trailing icon.
+ * @param name The text to be displayed in the button.
+ * @param icon The icon to be displayed in the button.
+ * @param modifier The modifier to be applied to the button.
+ * @param onClick The callback to be invoked when the button is clicked.
+ */
 @Composable
-fun KiwokoIconButton(name: String, icon: Int, modifier: Modifier, onClick: () -> Unit) {
+fun KiwokoIconButton(
+    name: String,
+    icon: Int,
+    modifier: Modifier,
+    onClick: () -> Unit = {}
+) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(backgroundColor = RedKiwoko),
@@ -135,8 +161,16 @@ fun KiwokoIconButton(name: String, icon: Int, modifier: Modifier, onClick: () ->
     }
 }
 
+/**
+ * A radio button group in a row to be displayed along with a label.
+ * @param currentSelection The current selected shelter type.
+ * @param onItemClick The callback to be invoked when a radio button is clicked.
+ */
 @Composable
-fun RadioButtonsRow(currentSelection: ShelterType = ShelterType.PARTICULAR, onItemClick: (ShelterType) -> Unit = {}) {
+fun RadioButtonsRow(
+    currentSelection: ShelterType = ShelterType.PARTICULAR,
+    onItemClick: (ShelterType) -> Unit = {}
+) {
 
     val currentlySelectedShelterType = remember { mutableStateOf(currentSelection) }
 
@@ -154,8 +188,20 @@ fun RadioButtonsRow(currentSelection: ShelterType = ShelterType.PARTICULAR, onIt
     }
 }
 
+/**
+ * A radio button.
+ * @param selected Whether the radio button is selected.
+ * @param labelText The text to be displayed below the radio button.
+ * @param modifier The modifier to be applied to the radio button.
+ * @param onClick The callback to be invoked when the radio button is clicked.
+ */
 @Composable
-fun KiwokoRadioButton(selected: Boolean = false, labelText: String = "Particular", modifier: Modifier, onClick: () -> Unit = {}) {
+fun KiwokoRadioButton(
+    selected: Boolean = false,
+    labelText: String = "Particular",
+    modifier: Modifier,
+    onClick: () -> Unit = {}
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.toDp().dp),
@@ -180,9 +226,17 @@ fun KiwokoRadioButton(selected: Boolean = false, labelText: String = "Particular
     }
 }
 
+/**
+ * A group of radio buttons.
+ * @param selected The currently selected radio button.
+ * @param onItemClick The callback to be invoked when a radio button is clicked.
+ */
 @Preview
 @Composable
-fun RadioButtonsGroup(selected: ShelterType = ShelterType.PARTICULAR, onItemClick: (ShelterType) -> Unit = {}) {
+fun RadioButtonsGroup(
+    selected: ShelterType = ShelterType.PARTICULAR,
+    onItemClick: (ShelterType) -> Unit = {}
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -202,6 +256,15 @@ fun RadioButtonsGroup(selected: ShelterType = ShelterType.PARTICULAR, onItemClic
     }
 }
 
+/**
+ * Draws a shadow around the content.
+ * @param color The color of the shadow.
+ * @param borderRadius The radius of the shadow.
+ * @param blurRadius The blur radius of the shadow.
+ * @param offsetY The offset of the shadow in the y direction.
+ * @param offsetX The offset of the shadow in the x direction.
+ * @param spread The spread of the shadow.
+ */
 fun Modifier.shadow(
     color: Color = Color.Black,
     borderRadius: Dp = 0.dp,

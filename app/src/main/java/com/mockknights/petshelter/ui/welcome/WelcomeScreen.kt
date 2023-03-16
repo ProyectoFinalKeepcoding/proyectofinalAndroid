@@ -13,27 +13,37 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.*
 import com.mockknights.petshelter.ui.components.CreateWelcomeButton
 import com.mockknights.petshelter.ui.theme.RedKiwoko
 import com.mockknights.petshelter.R
 
-
+/**
+ * Extension function to convert Int to Dp to help transforming Figma metrics to Compose.
+ */
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density.toInt())
-fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density.toInt())
 
+/**
+ * This is the screen that shows the welcome screen.
+ * @param navigateToMap the function that will be called when the user clicks on the "Puedo acoger a una mascota" button.
+ * @param navigateToLogin the function that will be called when the user clicks on the "He encontrado una mascota" button.
+ */
 @Preview(showSystemUi = true)
 @Composable
-fun WelcomeScreen(welcomeViewModel: WelcomeViewModel = hiltViewModel(), navigateToMap: () -> (Unit) = {}, navigateToLogin: () -> (Unit) = {}) {
-
+fun WelcomeScreen(
+    navigateToMap: () -> (Unit) = {},
+    navigateToLogin: () -> (Unit) = {}
+) {
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(RedKiwoko), Alignment.Center
         ) {
+            // The image with dog footprints is loaded as a background
             BackgroundImage()
+
+            // This column contains the two buttons and a lottie file that is not showing in the preview
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -107,7 +117,9 @@ fun WelcomeScreen(welcomeViewModel: WelcomeViewModel = hiltViewModel(), navigate
 
 }
 
-
+/**
+ * The image with dog footprints.
+ */
 @Composable
 fun BackgroundImage() {
     Image(
@@ -117,17 +129,23 @@ fun BackgroundImage() {
         modifier = Modifier.fillMaxSize())
 }
 
-@Preview // No preview for lottie files yet
+/**
+ * Lottie file dog walking. This is not showing in the preview.
+ */
+@Preview
 @Composable
 fun WalkingDog(modifier: Modifier = Modifier) {
+
     val compositeResult: LottieCompositionResult = rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(R.raw.dog)
     )
+
     val progress by animateLottieCompositionAsState(
         compositeResult.value,
         isPlaying = true,
         iterations = LottieConstants.IterateForever
     )
+
     LottieAnimation(
         composition = compositeResult.value,
         progress = { progress },
